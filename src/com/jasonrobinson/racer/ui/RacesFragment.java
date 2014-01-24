@@ -92,7 +92,8 @@ public class RacesFragment extends BaseListFragment {
 		super.onListItemClick(l, v, position, id);
 		Race race = (Race) l.getItemAtPosition(position);
 
-		mCallback.showUrl(race.getUrl());
+		// mCallback.showUrl(race.getUrl());
+		mCallback.showLadder(race.getId());
 	}
 
 	private void fetchRaces() {
@@ -114,6 +115,8 @@ public class RacesFragment extends BaseListFragment {
 	public interface RacesCallback {
 
 		public void showUrl(String url);
+
+		public void showLadder(String id);
 	}
 
 	private class RacesTask extends AsyncTask<Void, Void, List<Race>> {
@@ -128,7 +131,7 @@ public class RacesFragment extends BaseListFragment {
 		@Override
 		protected List<Race> doInBackground(Void... params) {
 
-			return new RaceClient().build();
+			return new RaceClient().fetchRaces();
 		}
 
 		@Override

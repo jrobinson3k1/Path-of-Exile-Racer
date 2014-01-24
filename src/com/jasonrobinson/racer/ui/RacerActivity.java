@@ -27,4 +27,12 @@ public class RacerActivity extends RoboActionBarActivity implements RacesCallbac
 		intent.putExtra(WebActivity.EXTRA_URL, url);
 		startActivity(intent);
 	}
+
+	@Override
+	public void showLadder(String id) {
+
+		Intent intent = new Intent(this, LadderActivity.class);
+		intent.putExtra(LadderActivity.EXTRA_ID, id);
+		startActivity(intent);
+	}
 }

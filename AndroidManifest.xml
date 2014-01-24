@@ -28,6 +28,9 @@
         <activity
             android:name=".ui.WebActivity"
             android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".ui.LadderActivity"
+            android:configChanges="orientation|screenSize" />
     </application>
 
 </manifest>
