@@ -5,7 +5,11 @@
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="unknown">Unknown</string>
+    <string name="starting_in">Starting in</string>
     <string name="in_progress">In Progress</string>
+    <string name="finished">Finished</string>
     <string name="refresh">Refresh</string>
+    <string name="open">OPEN</string>
+    <string name="closed">CLOSED</string>
 
 </resources>

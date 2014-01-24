@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
@@ -70,46 +71,26 @@ public class RaceAdapter extends BaseAdapter {
 		holder.titleTextView.setText(race.getId());
 
 		Date startDate;
+		Date endDate;
+		Date registerDate;
 		try {
 			startDate = race.getStartAt();
+			endDate = race.getEndAt();
+			registerDate = race.getRegisterAt();
 		}
 		catch (ParseException e) {
 			e.printStackTrace();
 			startDate = null;
+			endDate = null;
+			registerDate = null;
 		}
 
-		CharSequence startAtTime;
-		CharSequence startAtDate;
-		if (startDate != null) {
-			long millisNow = System.currentTimeMillis();
-			long millisUntil = startDate.getTime() - millisNow;
-			if (millisUntil <= 3600000) { // 60 minutes
-				if (millisUntil <= 0) {
-					startAtTime = context.getString(R.string.in_progress);
-				}
-				else {
-					holder.timer = new RaceCountDownTimer(holder.startTimeTextView, millisUntil);
-					holder.timer.start();
+		long millisNow = System.currentTimeMillis();
+		long millisTotal = (startDate.getTime() - millisNow) + endDate.getTime();
 
-					startAtTime = null;
-				}
-			}
-			else {
-				startAtTime = formatTime(startDate);
-			}
+		holder.timer = new RaceCountDownTimer(context, holder, registerDate, startDate, endDate, millisTotal);
+		holder.timer.start();
 
-			startAtDate = formatDate(context, startDate);
-		}
-		else {
-			startAtTime = context.getString(R.string.unknown);
-			startAtDate = startAtTime;
-		}
-
-		if (startAtTime != null) {
-			holder.startTimeTextView.setText(startAtTime);
-		}
-
-		holder.startDateTextView.setText(startAtDate);
 		holder.descriptionTextView.setText(formatRules(race.getRules()));
 
 		return view;
@@ -164,6 +145,7 @@ public class RaceAdapter extends BaseAdapter {
 		public TextView titleTextView;
 		public TextView startDateTextView;
 		public TextView startTimeTextView;
+		public TextView registerTextView;
 		public TextView descriptionTextView;
 
 		public RaceCountDownTimer timer;
@@ -173,31 +155,81 @@ public class RaceAdapter extends BaseAdapter {
 			titleTextView = (TextView) v.findViewById(R.id.title);
 			startDateTextView = (TextView) v.findViewById(R.id.startDate);
 			startTimeTextView = (TextView) v.findViewById(R.id.startTime);
+			registerTextView = (TextView) v.findViewById(R.id.register);
 			descriptionTextView = (TextView) v.findViewById(R.id.description);
 		}
 	}
 
 	private class RaceCountDownTimer extends CountDownTimer {
 
-		private TextView mTextView;
+		private Context mContext;
+		private ViewHolder mViewHolder;
+		private Date mRegisterDate;
+		private Date mStartDate;
+		private Date mEndDate;
 
-		public RaceCountDownTimer(TextView textView, long millisInFuture) {
+		public RaceCountDownTimer(Context context, ViewHolder viewHolder, Date registerDate, Date startDate, Date endDate, long millisInFuture) {
 
 			super(millisInFuture, 1000);
-			mTextView = textView;
+			mContext = context;
+			mViewHolder = viewHolder;
+			mRegisterDate = registerDate;
+			mStartDate = startDate;
+			mEndDate = endDate;
 		}
 
 		@Override
 		public void onFinish() {
 
-			mTextView.setText(R.string.in_progress);
+			mViewHolder.startTimeTextView.setText(R.string.finished);
+			mViewHolder.startDateTextView.setText(null);
 		}
 
 		@Override
 		public void onTick(long millisUntilFinished) {
 
-			String formattedTime = DateUtils.formatElapsedTime(millisUntilFinished / 1000);
-			mTextView.setText(formattedTime);
+			updateTimeViews(mContext, mViewHolder, mRegisterDate, mStartDate, mEndDate);
+		}
+	}
+
+	private void updateTimeViews(Context context, ViewHolder holder, Date registerDate, Date startDate, Date endDate) {
+
+		CharSequence startAtTime;
+		CharSequence startAtDate;
+
+		long millisNow = System.currentTimeMillis();
+		long millisUntil = startDate.getTime() - millisNow;
+		long millisRemaining = endDate.getTime() - millisNow;
+
+		if (millisUntil <= 3600000) { // <60 minutes until start
+			long millis;
+			if (millisUntil <= 0) { // race in progress
+				long raceDuration = endDate.getTime() - startDate.getTime();
+				millis = raceDuration - millisRemaining;
+				startAtDate = context.getString(R.string.in_progress);
+			}
+			else {
+				millis = millisUntil;
+				startAtDate = context.getString(R.string.starting_in);
+			}
+
+			startAtTime = DateUtils.formatElapsedTime(millis / 1000);
+		}
+		else { // >60 minutes until start
+			startAtTime = formatTime(startDate);
+			startAtDate = formatDate(context, startDate);
+		}
+
+		holder.startTimeTextView.setText(startAtTime);
+		holder.startDateTextView.setText(startAtDate);
+
+		if (new Date(millisNow).after(registerDate)) {
+			holder.registerTextView.setTextColor(Color.GREEN);
+			holder.registerTextView.setText(R.string.open);
+		}
+		else {
+			holder.registerTextView.setTextColor(Color.RED);
+			holder.registerTextView.setText(R.string.closed);
 		}
 	}
 }
