@@ -5,9 +5,14 @@ import java.util.List;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.adapter.RaceAdapter;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.network.RaceClient;
@@ -15,11 +20,21 @@ import com.jasonrobinson.racer.ui.base.BaseListFragment;
 
 public class RacesFragment extends BaseListFragment {
 
+	private RacesTask mRacesTask;
+	private boolean mRefreshing;
+
 	private RacesCallback mCallback;
 
 	public static RacesFragment newInstance() {
 
 		return new RacesFragment();
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
 	}
 
 	@Override
@@ -33,23 +48,42 @@ public class RacesFragment extends BaseListFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 
 		super.onActivityCreated(savedInstanceState);
-		new RaceTask().execute();
+		fetchRaces();
 	}
 
-	private class RaceTask extends AsyncTask<Void, Void, List<Race>> {
+	@Override
+	public void onDestroyView() {
 
-		@Override
-		protected List<Race> doInBackground(Void... params) {
+		super.onDestroyView();
+		if (mRacesTask != null) {
+			mRacesTask.cancel(true);
+		}
+	}
 
-			return new RaceClient().build();
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+		super.onCreateOptionsMenu(menu, inflater);
+		inflater.inflate(R.menu.refresh_menu, menu);
+
+		if (!mRefreshing) {
+			MenuItem refreshItem = menu.findItem(R.id.menu_refresh);
+			MenuItemCompat.setActionView(refreshItem, null);
+		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		switch (item.getItemId()) {
+			case R.id.menu_refresh:
+				fetchRaces();
+				break;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 
-		@Override
-		protected void onPostExecute(List<Race> result) {
-
-			super.onPostExecute(result);
-			setListAdapter(new RaceAdapter(result));
-		}
+		return true;
 	}
 
 	@Override
@@ -61,8 +95,48 @@ public class RacesFragment extends BaseListFragment {
 		mCallback.showUrl(race.getUrl());
 	}
 
+	private void fetchRaces() {
+
+		if (mRacesTask != null) {
+			mRacesTask.cancel(true);
+		}
+
+		mRacesTask = new RacesTask();
+		mRacesTask.execute();
+	}
+
+	private void setRefreshing(boolean refreshing) {
+
+		mRefreshing = refreshing;
+		getActivity().supportInvalidateOptionsMenu();
+	}
+
 	public interface RacesCallback {
 
 		public void showUrl(String url);
+	}
+
+	private class RacesTask extends AsyncTask<Void, Void, List<Race>> {
+
+		@Override
+		protected void onPreExecute() {
+
+			super.onPreExecute();
+			setRefreshing(true);
+		}
+
+		@Override
+		protected List<Race> doInBackground(Void... params) {
+
+			return new RaceClient().build();
+		}
+
+		@Override
+		protected void onPostExecute(List<Race> result) {
+
+			super.onPostExecute(result);
+			setRefreshing(false);
+			setListAdapter(new RaceAdapter(result));
+		}
 	}
 }

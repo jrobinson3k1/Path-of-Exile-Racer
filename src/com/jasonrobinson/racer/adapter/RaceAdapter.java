@@ -23,7 +23,7 @@ import com.jasonrobinson.racer.model.Race.Rule;
 
 public class RaceAdapter extends BaseAdapter {
 
-	private static final SimpleDateFormat DATE_FORMAT_TIME = new SimpleDateFormat("K':'mm a", Locale.getDefault());
+	private static final SimpleDateFormat DATE_FORMAT_TIME = new SimpleDateFormat("h':'mm a", Locale.getDefault());
 
 	private List<Race> mRaces;
 
