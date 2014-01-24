@@ -85,4 +85,22 @@ public class Race {
 
 		return rules;
 	}
+
+	public boolean isInProgress() throws ParseException {
+
+		Date now = new Date(System.currentTimeMillis());
+		return now.after(getStartAt()) && now.before(getEndAt());
+	}
+
+	public boolean isFinished() throws ParseException {
+
+		Date now = new Date(System.currentTimeMillis());
+		return now.after(getEndAt());
+	}
+
+	public boolean isRegistrationOpen() throws ParseException {
+
+		Date now = new Date(System.currentTimeMillis());
+		return now.after(getRegisterAt()) && now.before(getEndAt());
+	}
 }
