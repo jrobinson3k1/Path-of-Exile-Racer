@@ -11,7 +11,7 @@ import android.support.v4.view.ViewPager;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.ui.UpcomingRacesFragment.RacesCallback;
+import com.jasonrobinson.racer.ui.RacesFragment.RacesCallback;
 
 public class RacerActivity extends RoboActionBarActivity implements RacesCallback {
 
@@ -38,7 +38,7 @@ public class RacerActivity extends RoboActionBarActivity implements RacesCallbac
 		startActivity(intent);
 	}
 
-	public static class RaceTabAdapter extends FragmentPagerAdapter {
+	public class RaceTabAdapter extends FragmentPagerAdapter {
 
 		public RaceTabAdapter(FragmentManager fm) {
 
@@ -48,7 +48,7 @@ public class RacerActivity extends RoboActionBarActivity implements RacesCallbac
 		@Override
 		public Fragment getItem(int position) {
 
-			return UpcomingRacesFragment.newInstance();
+			return RacesFragment.newInstance();
 		}
 
 		@Override
@@ -60,7 +60,7 @@ public class RacerActivity extends RoboActionBarActivity implements RacesCallbac
 		@Override
 		public CharSequence getPageTitle(int position) {
 
-			return "Races";
+			return "Upcoming";
 		}
 	}
 }

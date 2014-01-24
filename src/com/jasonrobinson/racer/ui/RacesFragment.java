@@ -13,13 +13,13 @@ import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.network.RaceClient;
 import com.jasonrobinson.racer.ui.base.BaseListFragment;
 
-public class UpcomingRacesFragment extends BaseListFragment {
+public class RacesFragment extends BaseListFragment {
 
 	private RacesCallback mCallback;
 
-	public static UpcomingRacesFragment newInstance() {
+	public static RacesFragment newInstance() {
 
-		return new UpcomingRacesFragment();
+		return new RacesFragment();
 	}
 
 	@Override

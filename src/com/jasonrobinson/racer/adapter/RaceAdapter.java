@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Locale;
 
 import android.content.Context;
+import android.os.CountDownTimer;
 import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,23 +63,53 @@ public class RaceAdapter extends BaseAdapter {
 		Race race = getItem(position);
 		ViewHolder holder = (ViewHolder) view.getTag();
 
+		if (holder.timer != null) {
+			holder.timer.cancel();
+		}
+
 		holder.titleTextView.setText(race.getId());
 
-		CharSequence startAtDate;
-		CharSequence startAtTime;
+		Date startDate;
 		try {
-			Date startDate = race.getStartAt();
-			startAtDate = formatDate(context, startDate);
-			startAtTime = formatTime(startDate);
+			startDate = race.getStartAt();
 		}
 		catch (ParseException e) {
 			e.printStackTrace();
-			startAtDate = context.getString(R.string.unknown);
-			startAtTime = startAtDate;
+			startDate = null;
+		}
+
+		CharSequence startAtTime;
+		CharSequence startAtDate;
+		if (startDate != null) {
+			long millisNow = System.currentTimeMillis();
+			long millisUntil = startDate.getTime() - millisNow;
+			if (millisUntil <= 3600000) { // 60 minutes
+				if (millisUntil <= 0) {
+					startAtTime = context.getString(R.string.in_progress);
+				}
+				else {
+					holder.timer = new RaceCountDownTimer(holder.startTimeTextView, millisUntil);
+					holder.timer.start();
+
+					startAtTime = null;
+				}
+			}
+			else {
+				startAtTime = formatTime(startDate);
+			}
+
+			startAtDate = formatDate(context, startDate);
+		}
+		else {
+			startAtTime = context.getString(R.string.unknown);
+			startAtDate = startAtTime;
+		}
+
+		if (startAtTime != null) {
+			holder.startTimeTextView.setText(startAtTime);
 		}
 
 		holder.startDateTextView.setText(startAtDate);
-		holder.startTimeTextView.setText(startAtTime);
 		holder.descriptionTextView.setText(formatRules(race.getRules()));
 
 		return view;
@@ -134,12 +166,38 @@ public class RaceAdapter extends BaseAdapter {
 		public TextView startTimeTextView;
 		public TextView descriptionTextView;
 
+		public RaceCountDownTimer timer;
+
 		public ViewHolder(View v) {
 
 			titleTextView = (TextView) v.findViewById(R.id.title);
 			startDateTextView = (TextView) v.findViewById(R.id.startDate);
 			startTimeTextView = (TextView) v.findViewById(R.id.startTime);
 			descriptionTextView = (TextView) v.findViewById(R.id.description);
+		}
+	}
+
+	private class RaceCountDownTimer extends CountDownTimer {
+
+		private TextView mTextView;
+
+		public RaceCountDownTimer(TextView textView, long millisInFuture) {
+
+			super(millisInFuture, 1000);
+			mTextView = textView;
+		}
+
+		@Override
+		public void onFinish() {
+
+			mTextView.setText(R.string.in_progress);
+		}
+
+		@Override
+		public void onTick(long millisUntilFinished) {
+
+			String formattedTime = DateUtils.formatElapsedTime(millisUntilFinished / 1000);
+			mTextView.setText(formattedTime);
 		}
 	}
 }
