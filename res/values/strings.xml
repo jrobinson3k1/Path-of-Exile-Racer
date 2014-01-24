@@ -2,5 +2,8 @@
 <resources>
 
     <string name="app_name">Path of Exile Racer</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="unknown">Unknown</string>
 
 </resources>

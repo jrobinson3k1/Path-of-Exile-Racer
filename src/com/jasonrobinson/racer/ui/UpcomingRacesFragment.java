@@ -2,19 +2,31 @@ package com.jasonrobinson.racer.ui;
 
 import java.util.List;
 
-import roboguice.fragment.RoboListFragment;
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ListView;
 
 import com.jasonrobinson.racer.adapter.RaceAdapter;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.network.RaceClient;
+import com.jasonrobinson.racer.ui.base.BaseListFragment;
 
-public class UpcomingRacesFragment extends RoboListFragment {
+public class UpcomingRacesFragment extends BaseListFragment {
+
+	private RacesCallback mCallback;
 
 	public static UpcomingRacesFragment newInstance() {
 
 		return new UpcomingRacesFragment();
+	}
+
+	@Override
+	public void onAttach(Activity activity) {
+
+		super.onAttach(activity);
+		mCallback = castActivity(RacesCallback.class);
 	}
 
 	@Override
@@ -38,5 +50,19 @@ public class UpcomingRacesFragment extends RoboListFragment {
 			super.onPostExecute(result);
 			setListAdapter(new RaceAdapter(result));
 		}
+	}
+
+	@Override
+	public void onListItemClick(ListView l, View v, int position, long id) {
+
+		super.onListItemClick(l, v, position, id);
+		Race race = (Race) l.getItemAtPosition(position);
+
+		mCallback.showUrl(race.getUrl());
+	}
+
+	public interface RacesCallback {
+
+		public void showUrl(String url);
 	}
 }

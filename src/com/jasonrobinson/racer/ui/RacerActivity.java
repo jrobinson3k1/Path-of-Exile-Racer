@@ -1,7 +1,8 @@
 package com.jasonrobinson.racer.ui;
 
-import roboguice.activity.RoboFragmentActivity;
+import roboguice.activity.RoboActionBarActivity;
 import roboguice.inject.InjectView;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -10,8 +11,9 @@ import android.support.v4.view.ViewPager;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.ui.UpcomingRacesFragment.RacesCallback;
 
-public class RacerActivity extends RoboFragmentActivity {
+public class RacerActivity extends RoboActionBarActivity implements RacesCallback {
 
 	@InjectView(R.id.pager)
 	private ViewPager mPager;
@@ -26,6 +28,14 @@ public class RacerActivity extends RoboFragmentActivity {
 
 		mPager.setAdapter(new RaceTabAdapter(getSupportFragmentManager()));
 		mTabs.setViewPager(mPager);
+	}
+
+	@Override
+	public void showUrl(String url) {
+
+		Intent intent = new Intent(this, WebActivity.class);
+		intent.putExtra(WebActivity.EXTRA_URL, url);
+		startActivity(intent);
 	}
 
 	public static class RaceTabAdapter extends FragmentPagerAdapter {

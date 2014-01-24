@@ -66,9 +66,9 @@ public class Race {
 		return event;
 	}
 
-	public String getRegisterAt() {
+	public Date getRegisterAt() throws ParseException {
 
-		return registerAt;
+		return DATE_FORMAT.parse(registerAt);
 	}
 
 	public Date getStartAt() throws ParseException {
@@ -76,9 +76,9 @@ public class Race {
 		return DATE_FORMAT.parse(startAt);
 	}
 
-	public String getEndAt() {
+	public Date getEndAt() throws ParseException {
 
-		return endAt;
+		return DATE_FORMAT.parse(endAt);
 	}
 
 	public Rule[] getRules() {
