@@ -9,6 +9,7 @@
     <string name="in_progress">In Progress</string>
     <string name="finished">Finished</string>
     <string name="refresh">Refresh</string>
+    <string name="keep_screen_on">Keep Screen On</string>
     <string name="open">OPEN</string>
     <string name="closed">CLOSED</string>
 

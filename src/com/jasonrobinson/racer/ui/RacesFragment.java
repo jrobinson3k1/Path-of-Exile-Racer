@@ -1,5 +1,6 @@
 package com.jasonrobinson.racer.ui;
 
+import java.text.ParseException;
 import java.util.List;
 
 import android.app.Activity;
@@ -92,8 +93,21 @@ public class RacesFragment extends BaseListFragment {
 		super.onListItemClick(l, v, position, id);
 		Race race = (Race) l.getItemAtPosition(position);
 
-		// mCallback.showUrl(race.getUrl());
-		mCallback.showLadder(race.getId());
+		boolean inProgress;
+		try {
+			inProgress = race.isInProgress();
+		}
+		catch (ParseException e) {
+			e.printStackTrace();
+			inProgress = false;
+		}
+
+		if (inProgress) {
+			mCallback.showLadder(race.getId());
+		}
+		else {
+			mCallback.showUrl(race.getUrl());
+		}
 	}
 
 	private void fetchRaces() {
