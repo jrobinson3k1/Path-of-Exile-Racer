@@ -84,7 +84,7 @@ public class RaceAdapter extends BaseAdapter {
 
 		if (startDate != null && endDate != null) {
 			long millisNow = System.currentTimeMillis();
-			long millisTotal = (startDate.getTime() - millisNow) + endDate.getTime();
+			long millisTotal = (startDate.getTime() - millisNow) + (endDate.getTime() - startDate.getTime());
 
 			holder.timer = new RaceCountDownTimer(context, holder, race, millisTotal);
 			holder.timer.start();
