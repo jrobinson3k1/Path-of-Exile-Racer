@@ -1,16 +1,16 @@
 package com.jasonrobinson.racer.ui;
 
-import roboguice.activity.RoboActionBarActivity;
 import roboguice.inject.InjectFragment;
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.ui.RacesFragment.RacesCallback;
+import com.jasonrobinson.racer.ui.base.BaseActivity;
 
-public class RacerActivity extends RoboActionBarActivity implements RacesCallback {
+public class RacerActivity extends BaseActivity implements RacesCallback {
 
-	@InjectFragment(R.id.races_fragment)
+	@InjectFragment(tag = "races_fragment")
 	RacesFragment mFragment;
 
 	@Override
@@ -18,6 +18,7 @@ public class RacerActivity extends RoboActionBarActivity implements RacesCallbac
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.racer_activity);
+		setTitle(R.string.races);
 	}
 
 	@Override

@@ -86,8 +86,13 @@ public class RaceAdapter extends BaseAdapter {
 			long millisNow = System.currentTimeMillis();
 			long millisTotal = (startDate.getTime() - millisNow) + (endDate.getTime() - startDate.getTime());
 
-			holder.timer = new RaceCountDownTimer(context, holder, race, millisTotal);
-			holder.timer.start();
+			if (millisTotal > 0) {
+				holder.timer = new RaceCountDownTimer(context, holder, race, millisTotal);
+				holder.timer.start();
+			}
+			else {
+				onRaceFinished(holder);
+			}
 		}
 
 		holder.descriptionTextView.setText(formatRules(race.getRules()));
@@ -180,6 +185,12 @@ public class RaceAdapter extends BaseAdapter {
 		return DATE_FORMAT_TIME.format(date);
 	}
 
+	private void onRaceFinished(ViewHolder holder) {
+
+		holder.timeTextView.setText(R.string.finished);
+		holder.dateTextView.setText(null);
+	}
+
 	private void onError(ViewHolder viewHolder) {
 
 		viewHolder.timeTextView.setText(R.string.unknown);
@@ -204,8 +215,7 @@ public class RaceAdapter extends BaseAdapter {
 		@Override
 		public void onFinish() {
 
-			mViewHolder.timeTextView.setText(R.string.finished);
-			mViewHolder.dateTextView.setText(null);
+			onRaceFinished(mViewHolder);
 		}
 
 		@Override

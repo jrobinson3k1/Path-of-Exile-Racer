@@ -1,6 +1,5 @@
 package com.jasonrobinson.racer.ui;
 
-import roboguice.activity.RoboActionBarActivity;
 import roboguice.inject.InjectFragment;
 import roboguice.inject.InjectView;
 import android.os.Bundle;
@@ -13,14 +12,15 @@ import android.widget.ProgressBar;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.ui.WebFragment.WebCallback;
+import com.jasonrobinson.racer.ui.base.BaseActivity;
 
-public class WebActivity extends RoboActionBarActivity implements WebCallback {
+public class WebActivity extends BaseActivity implements WebCallback {
 
 	public static final String EXTRA_URL = "url";
 
-	@InjectFragment(R.id.web_fragment)
+	@InjectFragment(tag = "web_fragment")
 	WebFragment mWebFragment;
-	@InjectView(R.id.progress)
+	@InjectView(tag = "progress")
 	ProgressBar mProgressBar;
 
 	@Override

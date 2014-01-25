@@ -2,4 +2,5 @@
     android:id="@+id/ladder_fragment"
     android:name="com.jasonrobinson.racer.ui.LadderFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent"
+    android:tag="ladder_fragment" />

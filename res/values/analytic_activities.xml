@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyDashes">
+    
+    <string name="com.jasonrobinson.racer.ui.RacerActivity">Races</string>
+    <string name="com.jasonrobinson.racer.ui.LadderActivity">Ladder</string>
+    <string name="com.jasonrobinson.racer.ui.WebActivity">Forum Post</string>
+</resources>

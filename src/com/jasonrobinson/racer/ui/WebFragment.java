@@ -15,7 +15,7 @@ import com.jasonrobinson.racer.ui.base.BaseFragment;
 
 public class WebFragment extends BaseFragment {
 
-	@InjectView(R.id.webview)
+	@InjectView(tag = "webview")
 	WebView mWebView;
 
 	private WebCallback mCallback;

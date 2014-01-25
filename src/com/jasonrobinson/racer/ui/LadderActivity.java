@@ -1,6 +1,5 @@
 package com.jasonrobinson.racer.ui;
 
-import roboguice.activity.RoboActionBarActivity;
 import roboguice.inject.InjectFragment;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,13 +7,14 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 
 import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.ui.base.BaseActivity;
 
-public class LadderActivity extends RoboActionBarActivity {
+public class LadderActivity extends BaseActivity {
 
 	public static final String EXTRA_ID = "id";
 	public static final String EXTRA_TITLE = "title";
 
-	@InjectFragment(R.id.ladder_fragment)
+	@InjectFragment(tag = "ladder_fragment")
 	LadderFragment mFragment;
 
 	@Override
@@ -44,16 +44,16 @@ public class LadderActivity extends RoboActionBarActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				finish();
-				break;
-			case R.id.menu_keep_screen_on:
-				item.setChecked(!item.isChecked());
-				keepScreenOn(item.isChecked());
-				break;
-			default:
-				return super.onOptionsItemSelected(item);
+		int id = item.getItemId();
+		if (id == android.R.id.home) {
+			finish();
+		}
+		else if (id == R.id.menu_keep_screen_on) {
+			item.setChecked(!item.isChecked());
+			keepScreenOn(item.isChecked());
+		}
+		else {
+			return super.onOptionsItemSelected(item);
 		}
 
 		return true;

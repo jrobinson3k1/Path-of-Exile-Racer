@@ -7,7 +7,8 @@
         android:id="@+id/web_fragment"
         android:name="com.jasonrobinson.racer.ui.WebFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:tag="web_fragment" />
 
     <ProgressBar
         android:id="@+id/progress"
@@ -15,6 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="-7dp"
-        android:max="100" />
+        android:max="100"
+        android:tag="progress" />
 
 </FrameLayout>

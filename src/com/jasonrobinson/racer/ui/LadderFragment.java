@@ -116,12 +116,12 @@ public class LadderFragment extends BaseListFragment {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
-		switch (item.getItemId()) {
-			case R.id.menu_refresh:
-				fetchLadder(mId);
-				break;
-			default:
-				return super.onOptionsItemSelected(item);
+		int id = item.getItemId();
+		if (id == R.id.menu_refresh) {
+			fetchLadder(mId);
+		}
+		else {
+			super.onOptionsItemSelected(item);
 		}
 
 		return true;
