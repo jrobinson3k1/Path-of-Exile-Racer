@@ -1,47 +1,54 @@
 package com.jasonrobinson.racer.ui.base;
 
-import javax.inject.Inject;
-
 import roboguice.activity.RoboActionBarActivity;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.SpannableString;
-
-import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.analytics.AnalyticsManager;
-import com.jasonrobinson.racer.util.CustomTypefaceSpan;
-import com.jasonrobinson.racer.util.RawTypeface;
+import android.view.Menu;
+import android.view.MenuItem;
 
 public class BaseActivity extends RoboActionBarActivity {
 
-	@Inject
-	private AnalyticsManager mAnalyticsManager;
+	private BaseActivityImpl mImpl;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		setTitle(getTitle()); // ensuring formatting is applied
+		mImpl = new BaseActivityImpl(this, true);
+		mImpl.onCreate(savedInstanceState);
 	}
 
 	@Override
 	protected void onStart() {
 
 		super.onStart();
-		mAnalyticsManager.onStart(this);
+		mImpl.onStart();
 	}
 
 	@Override
 	protected void onStop() {
 
 		super.onStop();
-		mAnalyticsManager.onStop(this);
+		mImpl.onStop();
 	}
 
-	public AnalyticsManager getAnalyticsManager() {
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
 
-		return mAnalyticsManager;
+		if (mImpl.onCreateOptionsMenu(menu)) {
+			return true;
+		}
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		if (mImpl.onOptionsItemSelected(item)) {
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
@@ -53,19 +60,6 @@ public class BaseActivity extends RoboActionBarActivity {
 	@Override
 	public void setTitle(CharSequence title) {
 
-		super.setTitle(formatTitleText(title));
-	}
-
-	private CharSequence formatTitleText(CharSequence title) {
-
-		Typeface typeface = RawTypeface.obtain(this, R.raw.fontin_regular);
-		if (typeface != null) {
-			SpannableString s = new SpannableString(title);
-			s.setSpan(new CustomTypefaceSpan(typeface), 0, s.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-			title = s;
-		}
-
-		return title;
+		super.setTitle(mImpl.formatTitleText(title));
 	}
 }

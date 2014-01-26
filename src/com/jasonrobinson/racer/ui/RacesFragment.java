@@ -96,15 +96,18 @@ public class RacesFragment extends BaseListFragment {
 		Race race = (Race) l.getItemAtPosition(position);
 
 		boolean inProgress;
+		boolean finished;
 		try {
 			inProgress = race.isInProgress();
+			finished = race.isFinished();
 		}
 		catch (ParseException e) {
 			e.printStackTrace();
 			inProgress = false;
+			finished = false;
 		}
 
-		if (inProgress) {
+		if (inProgress || finished) {
 			mCallback.showLadder(race.getId());
 		}
 		else {
@@ -161,7 +164,7 @@ public class RacesFragment extends BaseListFragment {
 			super.onPostExecute(result);
 			setRefreshing(false);
 			if (result != null) {
-				setListAdapter(new RaceAdapter(result));
+				setListAdapter(new RaceAdapter(getActivity(), result));
 			}
 			else {
 				Toast.makeText(getActivity(), R.string.error_unavailable, Toast.LENGTH_SHORT).show();

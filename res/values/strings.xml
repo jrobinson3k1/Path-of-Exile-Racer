@@ -14,5 +14,10 @@
     <string name="closed">CLOSED</string>
     <string name="races">Races</string>
     <string name="error_unavailable">Unable to connect to the Path of Exile server.</string>
+    
+    <!-- Preferences -->
+    <string name="settings">Settings</string>
+    <string name="prefs_24hour_key">24hour</string>
+    <string name="prefs_24hour_title">24-Hour Clock</string>
 
 </resources>

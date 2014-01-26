@@ -4,4 +4,5 @@
     <string name="com.jasonrobinson.racer.ui.RacerActivity">Races</string>
     <string name="com.jasonrobinson.racer.ui.LadderActivity">Ladder</string>
     <string name="com.jasonrobinson.racer.ui.WebActivity">Forum Post</string>
+    <string name="com.jasonrobinson.racer.ui.SettingsActivity">Settings</string>
 </resources>

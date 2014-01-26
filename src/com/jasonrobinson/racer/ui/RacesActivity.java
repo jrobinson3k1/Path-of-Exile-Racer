@@ -8,7 +8,7 @@ import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.ui.RacesFragment.RacesCallback;
 import com.jasonrobinson.racer.ui.base.BaseActivity;
 
-public class RacerActivity extends BaseActivity implements RacesCallback {
+public class RacesActivity extends BaseActivity implements RacesCallback {
 
 	@InjectFragment(tag = "races_fragment")
 	RacesFragment mFragment;

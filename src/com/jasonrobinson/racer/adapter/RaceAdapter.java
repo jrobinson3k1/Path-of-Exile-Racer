@@ -7,6 +7,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
+import roboguice.RoboGuice;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.CountDownTimer;
@@ -21,16 +24,23 @@ import android.widget.TextView;
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.model.Race.Rule;
+import com.jasonrobinson.racer.util.SettingsManager;
 
 public class RaceAdapter extends BaseAdapter {
 
-	private static final SimpleDateFormat DATE_FORMAT_TIME = new SimpleDateFormat("h':'mm a", Locale.getDefault());
+	private static final SimpleDateFormat DATE_FORMAT_TIME_12 = new SimpleDateFormat("h':'mm a", Locale.getDefault());
+	private static final SimpleDateFormat DATE_FORMAT_TIME_24 = new SimpleDateFormat("k':'mm", Locale.getDefault());
+
+	@Inject
+	SettingsManager mSettings;
 
 	private List<Race> mRaces;
 
-	public RaceAdapter(List<Race> races) {
+	public RaceAdapter(Context context, List<Race> races) {
 
 		mRaces = races;
+
+		RoboGuice.injectMembers(context, this);
 	}
 
 	@Override
@@ -182,7 +192,11 @@ public class RaceAdapter extends BaseAdapter {
 
 	private CharSequence formatTime(Date date) {
 
-		return DATE_FORMAT_TIME.format(date);
+		if (mSettings.is24HourClock()) {
+			return DATE_FORMAT_TIME_24.format(date);
+		}
+
+		return DATE_FORMAT_TIME_12.format(date);
 	}
 
 	private void onRaceFinished(ViewHolder holder) {

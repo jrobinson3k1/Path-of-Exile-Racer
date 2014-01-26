@@ -37,6 +37,7 @@ public class LadderActivity extends BaseActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
+		super.onCreateOptionsMenu(menu);
 		getMenuInflater().inflate(R.menu.ladder_menu, menu);
 		return true;
 	}

@@ -1,0 +1,8 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/prefs_24hour_key"
+        android:title="@string/prefs_24hour_title" />
+
+</PreferenceScreen>
