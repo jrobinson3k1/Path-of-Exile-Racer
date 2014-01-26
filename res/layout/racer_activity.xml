@@ -1,6 +1,6 @@
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/races_fragment"
-    android:name="com.jasonrobinson.racer.ui.RacesFragment"
+    android:name="com.jasonrobinson.racer.ui.race.RacesFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:tag="races_fragment" />

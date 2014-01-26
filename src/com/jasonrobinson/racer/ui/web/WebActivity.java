@@ -1,4 +1,4 @@
-package com.jasonrobinson.racer.ui;
+package com.jasonrobinson.racer.ui.web;
 
 import roboguice.inject.InjectFragment;
 import roboguice.inject.InjectView;
@@ -11,8 +11,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 
 import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.ui.WebFragment.WebCallback;
 import com.jasonrobinson.racer.ui.base.BaseActivity;
+import com.jasonrobinson.racer.ui.web.WebFragment.WebCallback;
 
 public class WebActivity extends BaseActivity implements WebCallback {
 

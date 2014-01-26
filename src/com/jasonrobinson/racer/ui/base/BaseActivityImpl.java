@@ -14,14 +14,18 @@ import android.view.MenuItem;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.analytics.AnalyticsManager;
-import com.jasonrobinson.racer.ui.SettingsActivity;
+import com.jasonrobinson.racer.ui.settings.SettingsActivity;
 import com.jasonrobinson.racer.util.CustomTypefaceSpan;
 import com.jasonrobinson.racer.util.RawTypeface;
+import com.jasonrobinson.racer.util.SettingsManager;
 
 public class BaseActivityImpl {
 
 	@Inject
 	private AnalyticsManager mAnalyticsManager;
+	@Inject
+	private SettingsManager mSettingsManager;
+
 	private Activity mActivity;
 
 	private boolean mShowSettingsMenu;
@@ -75,6 +79,11 @@ public class BaseActivityImpl {
 	public AnalyticsManager getAnalyticsManager() {
 
 		return mAnalyticsManager;
+	}
+
+	public SettingsManager getSettingsManager() {
+
+		return mSettingsManager;
 	}
 
 	public CharSequence formatTitleText(CharSequence title) {

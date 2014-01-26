@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.jasonrobinson.racer.analytics.AnalyticsManager;
+import com.jasonrobinson.racer.util.SettingsManager;
+
 public class BaseActivity extends RoboActionBarActivity {
 
 	private BaseActivityImpl mImpl;
@@ -49,6 +52,16 @@ public class BaseActivity extends RoboActionBarActivity {
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	public SettingsManager getSettingsManager() {
+
+		return mImpl.getSettingsManager();
+	}
+
+	public AnalyticsManager getAnalyticsManager() {
+
+		return mImpl.getAnalyticsManager();
 	}
 
 	@Override

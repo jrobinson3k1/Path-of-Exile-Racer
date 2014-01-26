@@ -5,7 +5,7 @@
 
     <fragment
         android:id="@+id/web_fragment"
-        android:name="com.jasonrobinson.racer.ui.WebFragment"
+        android:name="com.jasonrobinson.racer.ui.web.WebFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:tag="web_fragment" />

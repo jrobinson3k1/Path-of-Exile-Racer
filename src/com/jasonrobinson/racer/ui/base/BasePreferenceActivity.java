@@ -3,6 +3,9 @@ package com.jasonrobinson.racer.ui.base;
 import roboguice.activity.RoboPreferenceActivity;
 import android.os.Bundle;
 
+import com.jasonrobinson.racer.analytics.AnalyticsManager;
+import com.jasonrobinson.racer.util.SettingsManager;
+
 public class BasePreferenceActivity extends RoboPreferenceActivity {
 
 	BaseActivityImpl mImpl;
@@ -27,6 +30,16 @@ public class BasePreferenceActivity extends RoboPreferenceActivity {
 
 		super.onStop();
 		mImpl.onStop();
+	}
+
+	public SettingsManager getSettingsManager() {
+
+		return mImpl.getSettingsManager();
+	}
+
+	public AnalyticsManager getAnalyticsManager() {
+
+		return mImpl.getAnalyticsManager();
 	}
 
 	@Override

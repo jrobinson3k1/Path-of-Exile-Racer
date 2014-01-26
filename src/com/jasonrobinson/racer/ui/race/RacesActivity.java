@@ -1,12 +1,14 @@
-package com.jasonrobinson.racer.ui;
+package com.jasonrobinson.racer.ui.race;
 
 import roboguice.inject.InjectFragment;
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.ui.RacesFragment.RacesCallback;
 import com.jasonrobinson.racer.ui.base.BaseActivity;
+import com.jasonrobinson.racer.ui.ladder.LadderActivity;
+import com.jasonrobinson.racer.ui.race.RacesFragment.RacesCallback;
+import com.jasonrobinson.racer.ui.web.WebActivity;
 
 public class RacesActivity extends BaseActivity implements RacesCallback {
 

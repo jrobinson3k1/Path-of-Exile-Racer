@@ -1,4 +1,4 @@
-package com.jasonrobinson.racer.ui;
+package com.jasonrobinson.racer.ui.settings;
 
 import android.annotation.TargetApi;
 import android.os.Build;

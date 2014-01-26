@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyDashes">
     
-    <string name="com.jasonrobinson.racer.ui.RacerActivity">Races</string>
-    <string name="com.jasonrobinson.racer.ui.LadderActivity">Ladder</string>
-    <string name="com.jasonrobinson.racer.ui.WebActivity">Forum Post</string>
-    <string name="com.jasonrobinson.racer.ui.SettingsActivity">Settings</string>
+    <string name="com.jasonrobinson.racer.ui.race.RacesActivity">Races</string>
+    <string name="com.jasonrobinson.racer.ui.ladder.LadderActivity">Ladder</string>
+    <string name="com.jasonrobinson.racer.ui.web.WebActivity">Forum Post</string>
+    <string name="com.jasonrobinson.racer.ui.Settings.SettingsActivity">Settings</string>
 </resources>

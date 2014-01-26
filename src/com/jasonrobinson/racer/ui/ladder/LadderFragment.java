@@ -1,4 +1,4 @@
-package com.jasonrobinson.racer.ui;
+package com.jasonrobinson.racer.ui.ladder;
 
 import java.net.SocketTimeoutException;
 import java.util.Timer;

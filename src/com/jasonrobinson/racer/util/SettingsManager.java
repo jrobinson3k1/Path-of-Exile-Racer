@@ -13,16 +13,41 @@ import com.jasonrobinson.racer.R;
 public class SettingsManager {
 
 	@Inject
-	Context mContext;
+	private Context mContext;
+
+	public void setKeepScreenOn(boolean enable) {
+
+		putBoolean(R.string.prefs_keepscreenon_key, enable);
+	}
+
+	public boolean isKeepScreenOn() {
+
+		return getBoolean(R.string.prefs_keepscreenon_key, false);
+	}
+
+	public void set24HourClock(boolean enable) {
+
+		putBoolean(R.string.prefs_24hour_key, enable);
+	}
 
 	public boolean is24HourClock() {
 
-		return getPrefs().getBoolean(getKey(R.string.prefs_24hour_key), false);
+		return getBoolean(R.string.prefs_24hour_key, false);
 	}
 
 	private String getKey(int resId) {
 
 		return mContext.getString(resId);
+	}
+
+	private void putBoolean(int keyResId, boolean value) {
+
+		getPrefs().edit().putBoolean(getKey(keyResId), value).commit();
+	}
+
+	private boolean getBoolean(int keyResId, boolean defValue) {
+
+		return getPrefs().getBoolean(getKey(keyResId), defValue);
 	}
 
 	private SharedPreferences getPrefs() {

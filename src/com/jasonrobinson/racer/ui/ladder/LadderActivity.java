@@ -1,4 +1,4 @@
-package com.jasonrobinson.racer.ui;
+package com.jasonrobinson.racer.ui.ladder;
 
 import roboguice.inject.InjectFragment;
 import android.os.Bundle;
@@ -39,6 +39,11 @@ public class LadderActivity extends BaseActivity {
 
 		super.onCreateOptionsMenu(menu);
 		getMenuInflater().inflate(R.menu.ladder_menu, menu);
+
+		boolean checked = getSettingsManager().isKeepScreenOn();
+		menu.findItem(R.id.menu_keep_screen_on).setChecked(checked);
+		keepScreenOn(checked);
+
 		return true;
 	}
 
@@ -69,5 +74,7 @@ public class LadderActivity extends BaseActivity {
 		else {
 			getWindow().clearFlags(flag);
 		}
+
+		getSettingsManager().setKeepScreenOn(keepScreenOn);
 	}
 }

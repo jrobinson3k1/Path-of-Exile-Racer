@@ -17,7 +17,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".ui.RacesActivity"
+            android:name="com.jasonrobinson.racer.ui.race.RacesActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name" >
             <intent-filter>
@@ -27,13 +27,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.WebActivity"
+            android:name="com.jasonrobinson.racer.ui.web.WebActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".ui.LadderActivity"
+            android:name="com.jasonrobinson.racer.ui.ladder.LadderActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".ui.SettingsActivity"
+            android:name="com.jasonrobinson.racer.ui.settings.SettingsActivity"
             android:configChanges="orientation|screenSize" />
     </application>
 

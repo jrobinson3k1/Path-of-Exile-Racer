@@ -203,6 +203,7 @@ public class RaceAdapter extends BaseAdapter {
 
 		holder.timeTextView.setText(R.string.finished);
 		holder.dateTextView.setText(null);
+		holder.registerTextView.setText(null);
 	}
 
 	private void onError(ViewHolder viewHolder) {

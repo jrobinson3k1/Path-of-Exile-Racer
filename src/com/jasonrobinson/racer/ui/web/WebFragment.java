@@ -1,4 +1,4 @@
-package com.jasonrobinson.racer.ui;
+package com.jasonrobinson.racer.ui.web;
 
 import roboguice.inject.InjectView;
 import android.app.Activity;

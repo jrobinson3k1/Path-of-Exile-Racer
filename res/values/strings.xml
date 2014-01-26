@@ -19,5 +19,6 @@
     <string name="settings">Settings</string>
     <string name="prefs_24hour_key">24hour</string>
     <string name="prefs_24hour_title">24-Hour Clock</string>
+    <string name="prefs_keepscreenon_key">keepscreenon</string>
 
 </resources>
