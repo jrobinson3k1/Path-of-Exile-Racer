@@ -1,5 +1,6 @@
 package com.jasonrobinson.racer.ui;
 
+import java.net.SocketTimeoutException;
 import java.text.ParseException;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.adapter.RaceAdapter;
@@ -145,7 +147,12 @@ public class RacesFragment extends BaseListFragment {
 		@Override
 		protected List<Race> doInBackground(Void... params) {
 
-			return new RaceClient().fetchRaces();
+			try {
+				return new RaceClient().fetchRaces();
+			}
+			catch (SocketTimeoutException e) {
+				return null;
+			}
 		}
 
 		@Override
@@ -153,7 +160,12 @@ public class RacesFragment extends BaseListFragment {
 
 			super.onPostExecute(result);
 			setRefreshing(false);
-			setListAdapter(new RaceAdapter(result));
+			if (result != null) {
+				setListAdapter(new RaceAdapter(result));
+			}
+			else {
+				Toast.makeText(getActivity(), R.string.error_unavailable, Toast.LENGTH_SHORT).show();
+			}
 		}
 	}
 }

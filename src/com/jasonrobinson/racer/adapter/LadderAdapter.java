@@ -1,6 +1,7 @@
 package com.jasonrobinson.racer.adapter;
 
-import java.util.Locale;
+import java.math.BigDecimal;
+import java.math.MathContext;
 
 import android.content.Context;
 import android.graphics.Paint;
@@ -91,14 +92,15 @@ public class LadderAdapter extends BaseAdapter {
 
 	private CharSequence formatExperience(long experience) {
 
+		MathContext mc = new MathContext(4);
 		if (experience >= 1000000000) { // billion
-			return String.format(Locale.getDefault(), "%.2fB", (double) experience / 1000000000);
+			return new BigDecimal((double) experience / 1000000000).round(mc).toString() + "B";
 		}
 		else if (experience >= 1000000) { // million
-			return String.format(Locale.getDefault(), "%.2fM", (double) experience / 1000000);
+			return new BigDecimal((double) experience / 1000000).round(mc).toString() + "M";
 		}
 		else if (experience >= 1000) { // thousand
-			return String.format(Locale.getDefault(), "%.2fK", (double) experience / 1000);
+			return new BigDecimal((double) experience / 1000).round(mc).toString() + "K";
 		}
 
 		return Long.toString(experience);

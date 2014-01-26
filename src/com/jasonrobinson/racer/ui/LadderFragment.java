@@ -1,5 +1,6 @@
 package com.jasonrobinson.racer.ui;
 
+import java.net.SocketTimeoutException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -13,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.adapter.LadderAdapter;
@@ -168,7 +170,12 @@ public class LadderFragment extends BaseListFragment {
 		protected Ladder doInBackground(String... params) {
 
 			String id = params[0];
-			return new RaceClient().fetchLadder(id, 0, 100);
+			try {
+				return new RaceClient().fetchLadder(id, 0, 100);
+			}
+			catch (SocketTimeoutException e) {
+				return null;
+			}
 		}
 
 		@Override
@@ -177,13 +184,18 @@ public class LadderFragment extends BaseListFragment {
 			super.onPostExecute(result);
 			setRefreshing(false);
 
-			Entry[] entries = result.getEntries();
-			if (mAdapter == null) {
-				mAdapter = new LadderAdapter(entries);
-				setListAdapter(mAdapter);
+			if (result != null) {
+				Entry[] entries = result.getEntries();
+				if (mAdapter == null) {
+					mAdapter = new LadderAdapter(entries);
+					setListAdapter(mAdapter);
+				}
+				else {
+					mAdapter.setEntries(entries);
+				}
 			}
 			else {
-				mAdapter.setEntries(entries);
+				Toast.makeText(getActivity(), R.string.error_unavailable, Toast.LENGTH_SHORT).show();
 			}
 		}
 	}

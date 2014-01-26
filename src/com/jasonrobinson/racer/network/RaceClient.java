@@ -1,5 +1,6 @@
 package com.jasonrobinson.racer.network;
 
+import java.net.SocketTimeoutException;
 import java.util.List;
 
 import retrofit.RestAdapter;
@@ -14,13 +15,13 @@ public class RaceClient {
 
 	private static final String API_URL = "http://api.pathofexile.com";
 
-	public List<Race> fetchRaces() {
+	public List<Race> fetchRaces() throws SocketTimeoutException {
 
 		RaceService raceService = buildRaceService();
 		return raceService.races();
 	}
 
-	public Ladder fetchLadder(String id, int offset, int limit) {
+	public Ladder fetchLadder(String id, int offset, int limit) throws SocketTimeoutException {
 
 		RaceService raceService = buildRaceService();
 		return raceService.ladder(id, offset, limit);

@@ -13,5 +13,6 @@
     <string name="open">OPEN</string>
     <string name="closed">CLOSED</string>
     <string name="races">Races</string>
+    <string name="error_unavailable">Unable to connect to the Path of Exile server.</string>
 
 </resources>
