@@ -43,6 +43,8 @@ public class LadderFragment extends BaseListFragment {
 	private LadderAdapter mAdapter;
 	private LadderTask mTask;
 
+	private boolean mTracked;
+
 	public static final LadderFragment newInstance(String id) {
 
 		LadderFragment fragment = new LadderFragment();
@@ -59,8 +61,6 @@ public class LadderFragment extends BaseListFragment {
 
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
-
-		getAnalyticsManager().trackEvent("Ladder", "View", mId);
 	}
 
 	@Override
@@ -191,6 +191,11 @@ public class LadderFragment extends BaseListFragment {
 
 		mTask = new LadderTask(mWatchedCharacter);
 		mTask.execute(mId);
+
+		if (!mTracked) {
+			mTracked = true;
+			getAnalyticsManager().trackEvent("Ladder", "View", mId);
+		}
 	}
 
 	private void setRefreshing(boolean refreshing) {
