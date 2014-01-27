@@ -1,12 +1,12 @@
 package com.jasonrobinson.racer.ui.base;
 
-import roboguice.fragment.RoboFragment;
+import roboguice.fragment.RoboDialogFragment;
 import android.app.Activity;
 
 import com.jasonrobinson.racer.analytics.AnalyticsManager;
 import com.jasonrobinson.racer.util.SettingsManager;
 
-public abstract class BaseFragment extends RoboFragment {
+public class BaseDialogFragment extends RoboDialogFragment {
 
 	BaseFragmentImpl mImpl = new BaseFragmentImpl(this);
 

@@ -6,6 +6,7 @@
         android:id="@+id/menu_refresh"
         android:actionLayout="@layout/progress_bar"
         android:icon="@drawable/ic_action_refresh"
+        android:orderInCategory="100"
         android:showAsAction="always"
         android:title="@string/refresh"
         support:actionLayout="@layout/progress_bar"

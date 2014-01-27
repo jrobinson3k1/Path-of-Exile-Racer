@@ -56,12 +56,12 @@ public class BaseActivityImpl {
 	public boolean onCreateOptionsMenu(Menu menu) {
 
 		if (mShowSettingsMenu) {
-			mActivity.getMenuInflater().inflate(R.menu.settings_menu, menu);
-			return true;
+			// TODO Uncomment when there's settings
+			// mActivity.getMenuInflater().inflate(R.menu.settings_menu, menu);
+			// return true;
 		}
 
-		else
-			return false;
+		return false;
 	}
 
 	public boolean onOptionsItemSelected(MenuItem item) {

@@ -1,10 +1,13 @@
 package com.jasonrobinson.racer.ui.race;
 
+import java.text.ParseException;
+
 import roboguice.inject.InjectFragment;
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.ui.base.BaseActivity;
 import com.jasonrobinson.racer.ui.ladder.LadderActivity;
 import com.jasonrobinson.racer.ui.race.RacesFragment.RacesCallback;
@@ -32,10 +35,18 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 	}
 
 	@Override
-	public void showLadder(String id) {
+	public void showLadder(Race race) {
 
 		Intent intent = new Intent(this, LadderActivity.class);
-		intent.putExtra(LadderActivity.EXTRA_ID, id);
+		intent.putExtra(LadderActivity.EXTRA_ID, race.getId());
+		try {
+			intent.putExtra(LadderActivity.EXTRA_START_AT, race.getStartAt().getTime());
+			intent.putExtra(LadderActivity.EXTRA_END_AT, race.getEndAt().getTime());
+		}
+		catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
+
 		startActivity(intent);
 	}
 }

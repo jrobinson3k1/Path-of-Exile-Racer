@@ -1,11 +1,13 @@
 package com.jasonrobinson.racer.model;
 
+import java.util.List;
+
 import com.google.gson.annotations.SerializedName;
 
 public class Ladder {
 
 	private int total;
-	private Entry[] entries;
+	private List<Entry> entries;
 
 	public static class Entry {
 
@@ -117,7 +119,7 @@ public class Ladder {
 		return total;
 	}
 
-	public Entry[] getEntries() {
+	public List<Entry> getEntries() {
 
 		return entries;
 	}

@@ -25,16 +25,6 @@ public class SettingsManager {
 		return getBoolean(R.string.prefs_keepscreenon_key, false);
 	}
 
-	public void set24HourClock(boolean enable) {
-
-		putBoolean(R.string.prefs_24hour_key, enable);
-	}
-
-	public boolean is24HourClock() {
-
-		return getBoolean(R.string.prefs_24hour_key, false);
-	}
-
 	private String getKey(int resId) {
 
 		return mContext.getString(resId);

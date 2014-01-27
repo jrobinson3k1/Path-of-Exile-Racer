@@ -1,7 +1,7 @@
 package com.jasonrobinson.racer.adapter;
 
+import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -13,8 +13,6 @@ import roboguice.RoboGuice;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.CountDownTimer;
-import android.text.format.DateFormat;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,12 +22,13 @@ import android.widget.TextView;
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.model.Race.Rule;
+import com.jasonrobinson.racer.util.RacerTimeUtils;
 import com.jasonrobinson.racer.util.SettingsManager;
 
 public class RaceAdapter extends BaseAdapter {
 
-	private static final SimpleDateFormat DATE_FORMAT_TIME_12 = new SimpleDateFormat("h':'mm a", Locale.getDefault());
-	private static final SimpleDateFormat DATE_FORMAT_TIME_24 = new SimpleDateFormat("k':'mm", Locale.getDefault());
+	private DateFormat mDateFormat;
+	private DateFormat mTimeFormat;
 
 	@Inject
 	SettingsManager mSettings;
@@ -39,6 +38,8 @@ public class RaceAdapter extends BaseAdapter {
 	public RaceAdapter(Context context, List<Race> races) {
 
 		mRaces = races;
+		mDateFormat = android.text.format.DateFormat.getDateFormat(context);
+		mTimeFormat = android.text.format.DateFormat.getTimeFormat(context);
 
 		RoboGuice.injectMembers(context, this);
 	}
@@ -142,8 +143,7 @@ public class RaceAdapter extends BaseAdapter {
 		if (millisUntil <= 3600000) { // <60 minutes until start
 			long millis;
 			if (millisUntil <= 0) { // race in progress
-				long raceDuration = race.getEndAt().getTime() - race.getStartAt().getTime();
-				millis = raceDuration - millisRemaining;
+				millis = millisRemaining;
 				startAtDate = context.getString(R.string.in_progress);
 			}
 			else {
@@ -151,7 +151,7 @@ public class RaceAdapter extends BaseAdapter {
 				startAtDate = context.getString(R.string.starting_in);
 			}
 
-			startAtTime = DateUtils.formatElapsedTime(millis / 1000);
+			startAtTime = RacerTimeUtils.formatElapsedTime(millis / 1000);
 		}
 		else { // >60 minutes until start
 			startAtTime = formatTime(race.getStartAt());
@@ -187,16 +187,12 @@ public class RaceAdapter extends BaseAdapter {
 			return context.getString(R.string.tomorrow);
 		}
 
-		return DateFormat.getDateFormat(context).format(date);
+		return mDateFormat.format(date);
 	}
 
 	private CharSequence formatTime(Date date) {
 
-		if (mSettings.is24HourClock()) {
-			return DATE_FORMAT_TIME_24.format(date);
-		}
-
-		return DATE_FORMAT_TIME_12.format(date);
+		return mTimeFormat.format(date);
 	}
 
 	private void onRaceFinished(ViewHolder holder) {

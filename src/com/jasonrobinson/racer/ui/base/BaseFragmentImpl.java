@@ -1,9 +1,20 @@
 package com.jasonrobinson.racer.ui.base;
 
+import javax.inject.Inject;
+
+import roboguice.RoboGuice;
 import android.app.Activity;
 import android.support.v4.app.Fragment;
 
+import com.jasonrobinson.racer.analytics.AnalyticsManager;
+import com.jasonrobinson.racer.util.SettingsManager;
+
 public class BaseFragmentImpl {
+
+	@Inject
+	private AnalyticsManager mAnalyticsManager;
+	@Inject
+	private SettingsManager mSettingsManager;
 
 	private Fragment mFragment;
 
@@ -15,6 +26,11 @@ public class BaseFragmentImpl {
 	public Activity getActivity() {
 
 		return mFragment.getActivity();
+	}
+
+	public void onAttach(Activity activity) {
+
+		RoboGuice.injectMembers(activity, this);
 	}
 
 	public <T> T castActivity(Class<T> clz) {
@@ -30,5 +46,15 @@ public class BaseFragmentImpl {
 		catch (ClassCastException e) {
 			throw new ClassCastException(activity.getClass().getSimpleName() + " must implement " + clz.getSimpleName());
 		}
+	}
+
+	public AnalyticsManager getAnalyticsManager() {
+
+		return mAnalyticsManager;
+	}
+
+	public SettingsManager getSettingsManager() {
+
+		return mSettingsManager;
 	}
 }

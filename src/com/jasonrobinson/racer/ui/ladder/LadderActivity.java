@@ -1,5 +1,8 @@
 package com.jasonrobinson.racer.ui.ladder;
 
+import java.util.Date;
+
+import roboguice.inject.InjectExtra;
 import roboguice.inject.InjectFragment;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,10 +15,20 @@ import com.jasonrobinson.racer.ui.base.BaseActivity;
 public class LadderActivity extends BaseActivity {
 
 	public static final String EXTRA_ID = "id";
-	public static final String EXTRA_TITLE = "title";
+	public static final String EXTRA_START_AT = "startAt";
+	public static final String EXTRA_END_AT = "endAt";
 
+	@InjectFragment(tag = "raceTime_fragment")
+	RaceTimeFragment mRaceTimeFragment;
 	@InjectFragment(tag = "ladder_fragment")
-	LadderFragment mFragment;
+	LadderFragment mLadderFragment;
+
+	@InjectExtra(value = EXTRA_ID)
+	private String mId;
+	@InjectExtra(value = EXTRA_START_AT)
+	private long mStartAt;
+	@InjectExtra(value = EXTRA_END_AT)
+	private long mEndAt;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -25,13 +38,10 @@ public class LadderActivity extends BaseActivity {
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-		String id = getIntent().getStringExtra(EXTRA_ID);
-		if (id == null) {
-			throw new IllegalArgumentException("Id is missing");
-		}
+		setTitle(R.string.ladder);
 
-		setTitle(id);
-		mFragment.fetchLadder(id);
+		mRaceTimeFragment.setData(mId, new Date(mStartAt), new Date(mEndAt));
+		mLadderFragment.fetchLadder(mId);
 	}
 
 	@Override

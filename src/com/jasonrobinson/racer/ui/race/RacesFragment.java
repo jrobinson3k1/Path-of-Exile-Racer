@@ -95,20 +95,20 @@ public class RacesFragment extends BaseListFragment {
 		super.onListItemClick(l, v, position, id);
 		Race race = (Race) l.getItemAtPosition(position);
 
-		boolean inProgress;
+		boolean registrationOpen;
 		boolean finished;
 		try {
-			inProgress = race.isInProgress();
+			registrationOpen = race.isRegistrationOpen();
 			finished = race.isFinished();
 		}
 		catch (ParseException e) {
 			e.printStackTrace();
-			inProgress = false;
+			registrationOpen = false;
 			finished = false;
 		}
 
-		if (inProgress || finished) {
-			mCallback.showLadder(race.getId());
+		if (registrationOpen || finished) {
+			mCallback.showLadder(race);
 		}
 		else {
 			mCallback.showUrl(race.getUrl());
@@ -135,7 +135,7 @@ public class RacesFragment extends BaseListFragment {
 
 		public void showUrl(String url);
 
-		public void showLadder(String id);
+		public void showLadder(Race race);
 	}
 
 	private class RacesTask extends AsyncTask<Void, Void, List<Race>> {
