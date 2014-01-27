@@ -32,8 +32,10 @@ public class RaceTimeFragment extends BaseFragment {
 	private TextView mStartTimeTextView;
 	@InjectView(R.id.endTime)
 	private TextView mEndTimeTextView;
-	@InjectView(R.id.remaining)
-	private TextView mRemainingTextView;
+	@InjectView(R.id.countdownTime)
+	private TextView mCountdownTimeTextView;
+	@InjectView(R.id.countdownText)
+	private TextView mCountdownTextView;
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -69,7 +71,7 @@ public class RaceTimeFragment extends BaseFragment {
 		}
 
 		long remaining = endAt.getTime() - System.currentTimeMillis();
-		mRemainingTimer = new RemainingCountdownTimer(remaining);
+		mRemainingTimer = new RemainingCountdownTimer(startAt.getTime(), remaining);
 		mRemainingTimer.start();
 	}
 
@@ -98,22 +100,35 @@ public class RaceTimeFragment extends BaseFragment {
 
 	private class RemainingCountdownTimer extends CountDownTimer {
 
-		public RemainingCountdownTimer(long millisInFuture) {
+		private long mStartTime;
+
+		public RemainingCountdownTimer(long startTime, long millisInFuture) {
 
 			super(millisInFuture, 1000);
+			mStartTime = startTime;
 		}
 
 		@Override
 		public void onFinish() {
 
-			mRemainingTextView.setText(R.string.finished);
+			mCountdownTimeTextView.setText(R.string.finished);
 		}
 
 		@Override
 		public void onTick(long millisUntilFinished) {
 
-			long seconds = millisUntilFinished / 1000;
-			mRemainingTextView.setText(RacerTimeUtils.formatElapsedTime(seconds));
+			long timeToStart = mStartTime - System.currentTimeMillis();
+			long seconds;
+			if (timeToStart > 0) {
+				seconds = timeToStart / 1000;
+				mCountdownTextView.setText(R.string.starting_in);
+			}
+			else {
+				seconds = millisUntilFinished / 1000;
+				mCountdownTextView.setText(R.string.remaining);
+			}
+
+			mCountdownTimeTextView.setText(RacerTimeUtils.formatElapsedTime(seconds));
 		}
 	}
 }

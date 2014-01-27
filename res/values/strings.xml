@@ -24,7 +24,9 @@
     <string name="cancel">Cancel</string>
     <string name="remove">Remove</string>
     <string name="settings">Settings</string>
-    <string name="character_not_found">Unable to find a character named %1$s on the ladder.</string>
+    <string name="character_not_found">Unable to find a character named %1$s on the ladder. Searching again in 30 seconds.</string>
+    <string name="forum_post">Forum Post</string>
+    <string name="no_rankings">No rankings yet</string>
 
     <!-- Preference Keys -->
     <string name="prefs_keepscreenon_key">keepscreenon</string>

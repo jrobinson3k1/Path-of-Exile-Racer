@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.jasonrobinson.racer.R;
@@ -58,6 +59,15 @@ public class LadderFragment extends BaseListFragment {
 
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
+
+		getAnalyticsManager().trackEvent("Ladder", "View", mId);
+	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+
+		super.onViewCreated(view, savedInstanceState);
+		setEmptyText(getString(R.string.no_rankings));
 	}
 
 	@Override
@@ -147,6 +157,7 @@ public class LadderFragment extends BaseListFragment {
 			@Override
 			public void onRemove() {
 
+				getAnalyticsManager().trackEvent("Ladder", "Remove", "Character Watcher");
 				mWatchedCharacter = null;
 				mWatchedCharacterRank = 0;
 				fetchLadder(mId);
@@ -155,6 +166,7 @@ public class LadderFragment extends BaseListFragment {
 			@Override
 			public void onCharacterSelected(String character) {
 
+				getAnalyticsManager().trackEvent("Ladder", "Use", "Character Watcher");
 				mWatchedCharacter = character;
 				fetchLadder(mId);
 			}
@@ -308,12 +320,12 @@ public class LadderFragment extends BaseListFragment {
 						mWatchedCharacterRank = entry.getRank();
 					}
 					else {
-						Toast.makeText(getActivity(), getString(R.string.character_not_found, mCharacter), Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity(), getString(R.string.character_not_found, mCharacter), Toast.LENGTH_LONG).show();
 					}
 				}
 			}
 			else {
-				Toast.makeText(getActivity(), R.string.error_unavailable, Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity(), R.string.error_unavailable, Toast.LENGTH_LONG).show();
 			}
 		}
 	}

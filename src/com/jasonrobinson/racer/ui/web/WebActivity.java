@@ -31,6 +31,8 @@ public class WebActivity extends BaseActivity implements WebCallback {
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+		setTitle(R.string.forum_post);
+
 		String url = getIntent().getStringExtra(EXTRA_URL);
 		if (url == null) {
 			throw new IllegalArgumentException("url not found in intent");

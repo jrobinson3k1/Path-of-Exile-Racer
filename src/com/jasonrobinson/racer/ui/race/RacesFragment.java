@@ -8,10 +8,13 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -51,6 +54,7 @@ public class RacesFragment extends BaseListFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 
 		super.onActivityCreated(savedInstanceState);
+		registerForContextMenu(getListView());
 		fetchRaces();
 	}
 
@@ -84,6 +88,33 @@ public class RacesFragment extends BaseListFragment {
 		}
 		else {
 			super.onOptionsItemSelected(item);
+		}
+
+		return true;
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+
+		super.onCreateContextMenu(menu, v, menuInfo);
+		getActivity().getMenuInflater().inflate(R.menu.races_context_menu, menu);
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+
+		AdapterContextMenuInfo menuInfo = (AdapterContextMenuInfo) item.getMenuInfo();
+		Race race = (Race) getListView().getItemAtPosition(menuInfo.position);
+
+		int id = item.getItemId();
+		if (id == R.id.menu_ladder) {
+			mCallback.showLadder(race);
+		}
+		else if (id == R.id.menu_forum_post) {
+			mCallback.showUrl(race.getUrl());
+		}
+		else {
+			return super.onContextItemSelected(item);
 		}
 
 		return true;

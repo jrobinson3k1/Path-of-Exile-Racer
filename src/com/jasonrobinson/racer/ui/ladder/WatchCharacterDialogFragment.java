@@ -1,6 +1,5 @@
 package com.jasonrobinson.racer.ui.ladder;
 
-import roboguice.inject.InjectExtra;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -17,9 +16,6 @@ import com.jasonrobinson.racer.util.RawTypeface;
 public class WatchCharacterDialogFragment extends BaseDialogFragment {
 
 	public static final String ARG_NAME = "name";
-
-	@InjectExtra(value = ARG_NAME, optional = true)
-	private String mName;
 
 	private WatchCharacterDialogListener mListener;
 
@@ -41,6 +37,8 @@ public class WatchCharacterDialogFragment extends BaseDialogFragment {
 			throw new IllegalStateException(WatchCharacterDialogListener.class.getSimpleName() + " has not been set");
 		}
 
+		String name = getArguments().getString(ARG_NAME);
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.Theme_AppCompat));
 		builder.setIcon(R.drawable.ic_action_search);
 		builder.setTitle(R.string.watch_character);
@@ -48,7 +46,7 @@ public class WatchCharacterDialogFragment extends BaseDialogFragment {
 		final EditText nameEditText = (EditText) LayoutInflater.from(getActivity()).inflate(R.layout.watch_character_edittext, null);
 		nameEditText.setTypeface(RawTypeface.obtain(getActivity(), R.raw.fontin_regular));
 		nameEditText.setTextColor(Color.WHITE);
-		nameEditText.setText(mName);
+		nameEditText.setText(name);
 		builder.setView(nameEditText);
 
 		builder.setPositiveButton(R.string.watch, new DialogInterface.OnClickListener() {
