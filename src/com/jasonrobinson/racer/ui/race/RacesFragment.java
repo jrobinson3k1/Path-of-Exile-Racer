@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
+import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -142,7 +143,13 @@ public class RacesFragment extends BaseListFragment {
 			mCallback.showLadder(race);
 		}
 		else {
-			mCallback.showUrl(race.getUrl());
+			String url = race.getUrl();
+			if (!TextUtils.isEmpty(url)) {
+				mCallback.showUrl(url);
+			}
+			else {
+				Toast.makeText(getActivity(), R.string.no_forum_post, Toast.LENGTH_SHORT).show();
+			}
 		}
 	}
 
