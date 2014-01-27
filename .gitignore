@@ -28,3 +28,5 @@ proguard/
 *.iws
 .idea/
 res/values/analytics.xml
+keystore.keystore
+lint.xml
