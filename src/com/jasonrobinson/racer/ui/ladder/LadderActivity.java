@@ -75,16 +75,23 @@ public class LadderActivity extends BaseActivity {
 		return true;
 	}
 
-	private void keepScreenOn(boolean keepScreenOn) {
+	private void keepScreenOn(final boolean keepScreenOn) {
 
-		int flag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
-		if (keepScreenOn) {
-			getWindow().addFlags(flag);
-		}
-		else {
-			getWindow().clearFlags(flag);
-		}
+		runOnUiThread(new Runnable() {
 
-		getSettingsManager().setKeepScreenOn(keepScreenOn);
+			@Override
+			public void run() {
+
+				int flag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+				if (keepScreenOn) {
+					getWindow().addFlags(flag);
+				}
+				else {
+					getWindow().clearFlags(flag);
+				}
+
+				getSettingsManager().setKeepScreenOn(keepScreenOn);
+			}
+		});
 	}
 }
