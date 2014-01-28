@@ -41,7 +41,7 @@ public class LadderActivity extends BaseActivity {
 		setTitle(R.string.ladder);
 
 		mRaceTimeFragment.setData(mId, new Date(mStartAt), new Date(mEndAt));
-		mLadderFragment.fetchLadder(mId);
+		mLadderFragment.fetchLadder(mId, null);
 	}
 
 	@Override

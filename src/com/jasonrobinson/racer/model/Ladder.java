@@ -17,6 +17,8 @@ public class Ladder {
 		private Character character;
 		private Account account;
 
+		private int classRank;
+
 		public static class Character {
 
 			private String name;
@@ -111,6 +113,16 @@ public class Ladder {
 		public Account getAccount() {
 
 			return account;
+		}
+
+		public int getClassRank() {
+
+			return classRank;
+		}
+
+		public void setClassRank(int classRank) {
+
+			this.classRank = classRank;
 		}
 	}
 

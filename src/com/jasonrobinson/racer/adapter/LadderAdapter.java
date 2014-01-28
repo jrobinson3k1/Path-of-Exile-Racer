@@ -20,9 +20,12 @@ public class LadderAdapter extends BaseAdapter {
 	private Entry[] mPreviousEntries;
 	private Entry[] mEntries;
 
-	public LadderAdapter(Entry[] entries) {
+	private boolean mUseClassRank = false;
+
+	public LadderAdapter(Entry[] entries, boolean useClassRank) {
 
 		mEntries = entries;
+		mUseClassRank = useClassRank;
 	}
 
 	@Override
@@ -57,7 +60,7 @@ public class LadderAdapter extends BaseAdapter {
 		Character character = entry.getCharacter();
 		ViewHolder holder = (ViewHolder) view.getTag();
 
-		holder.rankTextView.setText(Integer.toString(entry.getRank()));
+		holder.rankTextView.setText(Integer.toString(mUseClassRank ? entry.getClassRank() : entry.getRank()));
 		holder.nameTextView.setText(character.getName());
 		if (entry.isDead()) {
 			holder.nameTextView.setPaintFlags(holder.nameTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -92,7 +95,7 @@ public class LadderAdapter extends BaseAdapter {
 
 	private CharSequence formatExperience(long experience) {
 
-		MathContext mc = new MathContext(4);
+		MathContext mc = new MathContext(3);
 		if (experience >= 1000000000) { // billion
 			return new BigDecimal((double) experience / 1000000000).round(mc).toString() + "B";
 		}
@@ -140,10 +143,12 @@ public class LadderAdapter extends BaseAdapter {
 		return null;
 	}
 
-	public void setEntries(Entry[] entries) {
+	public void setEntries(Entry[] entries, boolean useClassRank) {
 
 		mPreviousEntries = mEntries;
 		mEntries = entries;
+		mUseClassRank = useClassRank;
+
 		notifyDataSetChanged();
 	}
 

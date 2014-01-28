@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true"
-    android:padding="10dp" >
+    android:padding="8dp" >
 
     <TextView
         android:id="@+id/rank"
@@ -27,12 +27,13 @@
         android:id="@+id/poeClass"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="5" />
+        android:layout_weight="5"
+        android:singleLine="true" />
 
     <TextView
         android:id="@+id/experience"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="4" />
+        android:layout_weight="3" />
 
 </LinearLayout>
