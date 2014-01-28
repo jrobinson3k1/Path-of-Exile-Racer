@@ -75,7 +75,7 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
 				}
 			}
 
-			if (characterEntry != null && (poeClass == null || PoeClass.getClassForName(characterEntry.getCharacter().getPoeClass()) == poeClass)) {
+			if (characterEntry != null) {
 				ladder.getEntries().add(0, characterEntry);
 			}
 

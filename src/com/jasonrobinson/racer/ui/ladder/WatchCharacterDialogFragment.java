@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -45,7 +46,9 @@ public class WatchCharacterDialogFragment extends BaseDialogFragment {
 
 		final EditText nameEditText = (EditText) LayoutInflater.from(getActivity()).inflate(R.layout.watch_character_edittext, null);
 		nameEditText.setTypeface(RawTypeface.obtain(getActivity(), R.raw.fontin_regular));
-		nameEditText.setTextColor(Color.WHITE);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			nameEditText.setTextColor(Color.WHITE);
+		}
 		nameEditText.setText(name);
 		builder.setView(nameEditText);
 

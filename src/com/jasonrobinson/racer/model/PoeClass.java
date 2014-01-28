@@ -2,13 +2,13 @@ package com.jasonrobinson.racer.model;
 
 public enum PoeClass {
 
+	DUELIST("Duelist"),
 	MARAUDER("Marauder"),
 	RANGER("Ranger"),
-	WITCH("Witch"),
-	DUELIST("Duelist"),
-	TEMPLAR("Templar"),
+	SCION("Scion"),
 	SHADOW("Shadow"),
-	SCION("Scion");
+	TEMPLAR("Templar"),
+	WITCH("Witch");
 
 	private String mName;
 
