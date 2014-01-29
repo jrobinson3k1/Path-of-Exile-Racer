@@ -68,6 +68,9 @@ public class LadderActivity extends BaseActivity {
 			}
 		});
 
+		boolean enabled = getSettingsManager().isAutoRefreshEnabled();
+		setAutoRefresh(enabled);
+
 		mRaceTimeFragment.setData(mId, new Date(mStartAt), new Date(mEndAt));
 	}
 
@@ -121,7 +124,9 @@ public class LadderActivity extends BaseActivity {
 			@Override
 			public void run() {
 
-				mLadderFragment.setAutoRefresh(enabled);
+				if (mLadderFragment != null) {
+					mLadderFragment.setAutoRefresh(enabled);
+				}
 				getSettingsManager().setAutoRefresh(enabled);
 			}
 		});

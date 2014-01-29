@@ -12,7 +12,11 @@ import android.text.InputFilter;
 import android.text.Spanned;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.ui.base.BaseDialogFragment;
@@ -21,6 +25,10 @@ import com.jasonrobinson.racer.util.RawTypeface;
 public class WatchCharacterDialogFragment extends BaseDialogFragment {
 
 	public static final String ARG_NAME = "name";
+
+	private static final Pattern PATTERN_CHARACTER = Pattern.compile("[a-zA-Z_]*");
+
+	private EditText mNameEditText;
 
 	private WatchCharacterDialogListener mListener;
 
@@ -48,24 +56,17 @@ public class WatchCharacterDialogFragment extends BaseDialogFragment {
 		builder.setIcon(R.drawable.ic_action_search);
 		builder.setTitle(R.string.watch_character);
 
-		final EditText nameEditText = (EditText) LayoutInflater.from(getActivity()).inflate(R.layout.watch_character_edittext, null);
-		nameEditText.setFilters(new InputFilter[] { getCharacterInputFilter() });
-		nameEditText.setTypeface(RawTypeface.obtain(getActivity(), R.raw.fontin_regular));
+		mNameEditText = (EditText) LayoutInflater.from(getActivity()).inflate(R.layout.watch_character_edittext, null);
+		// nameEditText.setFilters(new InputFilter[] { getCharacterInputFilter()
+		// });
+		mNameEditText.setTypeface(RawTypeface.obtain(getActivity(), R.raw.fontin_regular));
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			nameEditText.setTextColor(Color.WHITE);
+			mNameEditText.setTextColor(Color.WHITE);
 		}
-		nameEditText.setText(name);
-		builder.setView(nameEditText);
+		mNameEditText.setText(name);
+		builder.setView(mNameEditText);
 
-		builder.setPositiveButton(R.string.watch, new DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-
-				String character = nameEditText.getText().toString();
-				mListener.onCharacterSelected(character);
-			}
-		});
+		builder.setPositiveButton(R.string.watch, null); // Overwritten later
 		builder.setNeutralButton(R.string.remove, new DialogInterface.OnClickListener() {
 
 			@Override
@@ -86,11 +87,36 @@ public class WatchCharacterDialogFragment extends BaseDialogFragment {
 		return builder.create();
 	}
 
+	@Override
+	public void onStart() {
+
+		super.onStart();
+		final AlertDialog d = (AlertDialog) getDialog();
+
+		// This allows us to do validation before accepting the input
+		Button b = d.getButton(AlertDialog.BUTTON_POSITIVE);
+		b.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+
+				String character = mNameEditText.getText().toString();
+				if (PATTERN_CHARACTER.matcher(character).matches()) {
+					mListener.onCharacterSelected(character);
+					d.dismiss();
+				}
+				else {
+					Toast.makeText(getActivity(), R.string.watcher_input_error, Toast.LENGTH_LONG).show();
+				}
+			}
+		});
+	}
+
+	// This is causing problems on some phones
+	// http://www.reddit.com/r/pathofexile/comments/1wft3z/mobile_app_path_of_exile_racer_11_released_now/cf1pkk0
 	private InputFilter getCharacterInputFilter() {
 
 		return new InputFilter() {
-
-			private final Pattern p = Pattern.compile("[a-zA-Z_]*");
 
 			@Override
 			public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
@@ -98,7 +124,7 @@ public class WatchCharacterDialogFragment extends BaseDialogFragment {
 				StringBuilder sb = new StringBuilder();
 				for (int i = start; i < end; i++) {
 					char c = source.charAt(i);
-					if (p.matcher(Character.toString(c)).matches()) {
+					if (PATTERN_CHARACTER.matcher(Character.toString(c)).matches()) {
 						sb.append(c);
 					}
 				}
