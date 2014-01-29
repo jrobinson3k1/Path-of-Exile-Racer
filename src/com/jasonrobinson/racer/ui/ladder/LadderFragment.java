@@ -168,6 +168,9 @@ public class LadderFragment extends BaseListFragment {
 
 				getAnalyticsManager().trackEvent("Ladder", "Use", "Character Watcher");
 				mWatchedCharacter = character;
+
+				getListView().smoothScrollToPosition(0);
+
 				fetchLadder();
 			}
 
@@ -263,6 +266,10 @@ public class LadderFragment extends BaseListFragment {
 
 			super.onPreExecute();
 			setRefreshing(true);
+
+			if (mReset) {
+				setListShown(false);
+			}
 		}
 
 		@Override
@@ -273,28 +280,37 @@ public class LadderFragment extends BaseListFragment {
 
 			if (result != null) {
 				Entry[] entries = result.getEntries().toArray(new Entry[0]);
-				if (mAdapter == null || mReset) {
-					mAdapter = new LadderAdapter(entries, mWatchedClass != null);
-					setListAdapter(mAdapter);
-				}
-				else {
-					mAdapter.setEntries(entries, mWatchedClass != null);
-				}
 
+				Entry watchedEntry = null;
 				if (!TextUtils.isEmpty(mWatchedCharacter)) {
-					Entry entry = LadderUtils.findEntry(result.getEntries(), mWatchedCharacter);
-					if (entry == null && mWatchedCharacterClass == null) {
+					watchedEntry = LadderUtils.findEntry(result.getEntries(), mWatchedCharacter);
+					if (watchedEntry == null && mWatchedCharacterClass == null) {
 						Toast.makeText(getActivity(), getString(R.string.character_not_found, mWatchedCharacter), Toast.LENGTH_LONG).show();
 						mWatchedCharacter = null;
 					}
 					else {
-						mWatchedCharacterClass = PoeClass.getClassForName(entry.getCharacter().getPoeClass());
+						if (watchedEntry != null) {
+							mWatchedCharacterClass = PoeClass.getClassForName(watchedEntry.getCharacter().getPoeClass());
+						}
 					}
 				}
+
+				boolean borderFirstItem = !TextUtils.isEmpty(mWatchedCharacter) && watchedEntry != null;
+				if (mAdapter == null || mReset) {
+					mAdapter = new LadderAdapter(entries, mWatchedClass != null, borderFirstItem);
+					setListAdapter(mAdapter);
+				}
+				else {
+					mAdapter.setBorderFirstItem(borderFirstItem);
+					mAdapter.setEntries(entries, mWatchedClass != null);
+				}
+
 			}
 			else {
 				Toast.makeText(getActivity(), R.string.error_unavailable, Toast.LENGTH_LONG).show();
 			}
+
+			setListShown(true);
 		}
 	}
 

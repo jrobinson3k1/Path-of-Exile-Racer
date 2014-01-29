@@ -40,7 +40,8 @@ public class BaseActivityImpl {
 
 	public void onCreate(Bundle savedInstanceState) {
 
-		mActivity.setTitle(mActivity.getTitle()); // ensuring formatting is
+		mActivity.overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+		mActivity.setTitle(mActivity.getTitle());
 	}
 
 	public void onStart() {
@@ -51,6 +52,10 @@ public class BaseActivityImpl {
 	public void onStop() {
 
 		mAnalyticsManager.onStop(mActivity);
+	}
+
+	public void finish() {
+
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {

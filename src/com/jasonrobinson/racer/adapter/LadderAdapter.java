@@ -3,8 +3,12 @@ package com.jasonrobinson.racer.adapter;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +24,14 @@ public class LadderAdapter extends BaseAdapter {
 	private Entry[] mPreviousEntries;
 	private Entry[] mEntries;
 
-	private boolean mUseClassRank = false;
+	private boolean mUseClassRank;
+	private boolean mBorderFirstItem;
 
-	public LadderAdapter(Entry[] entries, boolean useClassRank) {
+	public LadderAdapter(Entry[] entries, boolean useClassRank, boolean borderFirstItem) {
 
 		mEntries = entries;
 		mUseClassRank = useClassRank;
+		mBorderFirstItem = borderFirstItem;
 	}
 
 	@Override
@@ -56,9 +62,11 @@ public class LadderAdapter extends BaseAdapter {
 			view.setTag(new ViewHolder(view));
 		}
 
+		ViewHolder holder = (ViewHolder) view.getTag();
+		holder.bottomBorderView.setVisibility(mBorderFirstItem && position == 0 ? View.VISIBLE : View.INVISIBLE);
+
 		Entry entry = getItem(position);
 		Character character = entry.getCharacter();
-		ViewHolder holder = (ViewHolder) view.getTag();
 
 		holder.rankTextView.setText(Integer.toString(mUseClassRank ? entry.getClassRank() : entry.getRank()));
 		holder.nameTextView.setText(character.getName());
@@ -73,29 +81,41 @@ public class LadderAdapter extends BaseAdapter {
 		holder.classTextView.setText(character.getPoeClass());
 		holder.experienceTextView.setText(formatExperience(character.getExperience()));
 
-		RankChange rankChange = getRankChange(entry);
-		int bgColor;
-		switch (rankChange) {
-			case UP:
-				bgColor = context.getResources().getColor(R.color.rank_up);
-				break;
-			case DOWN:
-				bgColor = context.getResources().getColor(R.color.rank_down);
-				break;
-			case NONE:
-			default:
-				bgColor = context.getResources().getColor(R.color.rank_none);
-				break;
-		}
-
-		view.setBackgroundColor(bgColor);
+		applyRankChange(parent.getContext(), view, entry);
 
 		return view;
 	}
 
+	@SuppressWarnings("deprecation")
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	private void applyRankChange(Context context, View v, Entry entry) {
+
+		RankChange rankChange = getRankChange(entry);
+		Drawable drawable;
+		switch (rankChange) {
+			case UP:
+				drawable = new ColorDrawable(context.getResources().getColor(R.color.rank_up));
+				break;
+			case DOWN:
+				drawable = new ColorDrawable(context.getResources().getColor(R.color.rank_down));
+				break;
+			case NONE:
+			default:
+				drawable = new ColorDrawable(context.getResources().getColor(R.color.rank_none));
+				break;
+		}
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+			v.setBackground(drawable);
+		}
+		else {
+			v.setBackgroundDrawable(drawable);
+		}
+	}
+
 	private CharSequence formatExperience(long experience) {
 
-		MathContext mc = new MathContext(3);
+		MathContext mc = new MathContext(4);
 		if (experience >= 1000000000) { // billion
 			return new BigDecimal((double) experience / 1000000000).round(mc).toString() + "B";
 		}
@@ -152,6 +172,11 @@ public class LadderAdapter extends BaseAdapter {
 		notifyDataSetChanged();
 	}
 
+	public void setBorderFirstItem(boolean enable) {
+
+		mBorderFirstItem = enable;
+	}
+
 	private enum RankChange {
 		UP,
 		DOWN,
@@ -165,6 +190,7 @@ public class LadderAdapter extends BaseAdapter {
 		public TextView levelTextView;
 		public TextView classTextView;
 		public TextView experienceTextView;
+		public View bottomBorderView;
 
 		public ViewHolder(View v) {
 
@@ -173,6 +199,7 @@ public class LadderAdapter extends BaseAdapter {
 			levelTextView = (TextView) v.findViewById(R.id.level);
 			classTextView = (TextView) v.findViewById(R.id.poeClass);
 			experienceTextView = (TextView) v.findViewById(R.id.experience);
+			bottomBorderView = v.findViewById(R.id.bottomBorder);
 		}
 	}
 }
