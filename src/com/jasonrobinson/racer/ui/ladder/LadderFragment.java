@@ -242,6 +242,10 @@ public class LadderFragment extends BaseListFragment {
 
 	public void setAutoRefresh(boolean autoRefresh) {
 
+		if (mAutoRefresh == autoRefresh) {
+			return;
+		}
+
 		mAutoRefresh = autoRefresh;
 
 		if (mAutoRefresh) {

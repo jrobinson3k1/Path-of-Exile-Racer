@@ -30,6 +30,7 @@
     <string name="no_rankings">No rankings yet</string>
     <string name="no_forum_post">A forum post has not been created for this race yet</string>
     <string name="all">All</string>
+    <string name="watcher_input_error">Character names may only contain alphabet keys and underscores.</string>
 
     <!-- Preference Keys -->
     <string name="prefs_keepscreenon_key">keepscreenon</string>
