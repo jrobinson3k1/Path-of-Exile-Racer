@@ -3,8 +3,12 @@ package com.jasonrobinson.racer.adapter;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +24,14 @@ public class LadderAdapter extends BaseAdapter {
 	private Entry[] mPreviousEntries;
 	private Entry[] mEntries;
 
-	public LadderAdapter(Entry[] entries) {
+	private boolean mUseClassRank;
+	private boolean mBorderFirstItem;
+
+	public LadderAdapter(Entry[] entries, boolean useClassRank, boolean borderFirstItem) {
 
 		mEntries = entries;
+		mUseClassRank = useClassRank;
+		mBorderFirstItem = borderFirstItem;
 	}
 
 	@Override
@@ -53,11 +62,13 @@ public class LadderAdapter extends BaseAdapter {
 			view.setTag(new ViewHolder(view));
 		}
 
+		ViewHolder holder = (ViewHolder) view.getTag();
+		holder.bottomBorderView.setVisibility(mBorderFirstItem && position == 0 ? View.VISIBLE : View.INVISIBLE);
+
 		Entry entry = getItem(position);
 		Character character = entry.getCharacter();
-		ViewHolder holder = (ViewHolder) view.getTag();
 
-		holder.rankTextView.setText(Integer.toString(entry.getRank()));
+		holder.rankTextView.setText(Integer.toString(mUseClassRank ? entry.getClassRank() : entry.getRank()));
 		holder.nameTextView.setText(character.getName());
 		if (entry.isDead()) {
 			holder.nameTextView.setPaintFlags(holder.nameTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -70,24 +81,36 @@ public class LadderAdapter extends BaseAdapter {
 		holder.classTextView.setText(character.getPoeClass());
 		holder.experienceTextView.setText(formatExperience(character.getExperience()));
 
+		applyRankChange(parent.getContext(), view, entry);
+
+		return view;
+	}
+
+	@SuppressWarnings("deprecation")
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	private void applyRankChange(Context context, View v, Entry entry) {
+
 		RankChange rankChange = getRankChange(entry);
-		int bgColor;
+		Drawable drawable;
 		switch (rankChange) {
 			case UP:
-				bgColor = context.getResources().getColor(R.color.rank_up);
+				drawable = new ColorDrawable(context.getResources().getColor(R.color.rank_up));
 				break;
 			case DOWN:
-				bgColor = context.getResources().getColor(R.color.rank_down);
+				drawable = new ColorDrawable(context.getResources().getColor(R.color.rank_down));
 				break;
 			case NONE:
 			default:
-				bgColor = context.getResources().getColor(R.color.rank_none);
+				drawable = new ColorDrawable(context.getResources().getColor(R.color.rank_none));
 				break;
 		}
 
-		view.setBackgroundColor(bgColor);
-
-		return view;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+			v.setBackground(drawable);
+		}
+		else {
+			v.setBackgroundDrawable(drawable);
+		}
 	}
 
 	private CharSequence formatExperience(long experience) {
@@ -140,11 +163,18 @@ public class LadderAdapter extends BaseAdapter {
 		return null;
 	}
 
-	public void setEntries(Entry[] entries) {
+	public void setEntries(Entry[] entries, boolean useClassRank) {
 
 		mPreviousEntries = mEntries;
 		mEntries = entries;
+		mUseClassRank = useClassRank;
+
 		notifyDataSetChanged();
+	}
+
+	public void setBorderFirstItem(boolean enable) {
+
+		mBorderFirstItem = enable;
 	}
 
 	private enum RankChange {
@@ -160,6 +190,7 @@ public class LadderAdapter extends BaseAdapter {
 		public TextView levelTextView;
 		public TextView classTextView;
 		public TextView experienceTextView;
+		public View bottomBorderView;
 
 		public ViewHolder(View v) {
 
@@ -168,6 +199,7 @@ public class LadderAdapter extends BaseAdapter {
 			levelTextView = (TextView) v.findViewById(R.id.level);
 			classTextView = (TextView) v.findViewById(R.id.poeClass);
 			experienceTextView = (TextView) v.findViewById(R.id.experience);
+			bottomBorderView = v.findViewById(R.id.bottomBorder);
 		}
 	}
 }
