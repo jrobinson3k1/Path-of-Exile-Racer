@@ -54,6 +54,13 @@ public class BaseActivity extends RoboActionBarActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
+	@Override
+	public void finish() {
+
+		super.finish();
+		mImpl.finish();
+	}
+
 	public SettingsManager getSettingsManager() {
 
 		return mImpl.getSettingsManager();

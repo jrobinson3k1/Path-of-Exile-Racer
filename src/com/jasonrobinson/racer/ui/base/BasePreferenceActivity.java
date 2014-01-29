@@ -2,6 +2,8 @@ package com.jasonrobinson.racer.ui.base;
 
 import roboguice.activity.RoboPreferenceActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.jasonrobinson.racer.analytics.AnalyticsManager;
 import com.jasonrobinson.racer.util.SettingsManager;
@@ -30,6 +32,33 @@ public class BasePreferenceActivity extends RoboPreferenceActivity {
 
 		super.onStop();
 		mImpl.onStop();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+
+		if (mImpl.onCreateOptionsMenu(menu)) {
+			return true;
+		}
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		if (mImpl.onOptionsItemSelected(item)) {
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void finish() {
+
+		super.finish();
+		mImpl.finish();
 	}
 
 	public SettingsManager getSettingsManager() {
