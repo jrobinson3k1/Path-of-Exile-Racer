@@ -3,18 +3,20 @@ package com.jasonrobinson.racer.async;
 import java.net.SocketTimeoutException;
 import java.util.Locale;
 
+import retrofit.RetrofitError;
 import android.os.AsyncTask;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 
 import com.jasonrobinson.racer.async.LadderAsyncTask.LadderParams;
+import com.jasonrobinson.racer.async.LadderAsyncTask.LadderResult;
+import com.jasonrobinson.racer.enumeration.PoeClass;
 import com.jasonrobinson.racer.model.Ladder;
 import com.jasonrobinson.racer.model.Ladder.Entry;
-import com.jasonrobinson.racer.model.PoeClass;
 import com.jasonrobinson.racer.network.RaceClient;
 import com.jasonrobinson.racer.util.LadderUtils;
 
-public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladder> {
+public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, LadderResult> {
 
 	public static final int LIMIT_PER_REQUEST = 200;
 
@@ -23,8 +25,9 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
 	private static LruCache<String, Integer> sCharacterRankCache = new LruCache<String, Integer>(10);
 
 	@Override
-	protected Ladder doInBackground(LadderParams... params) {
+	protected LadderResult doInBackground(LadderParams... params) {
 
+		LadderResult result = new LadderResult();
 		LadderParams ladderParams = params[0];
 
 		String id = ladderParams.id;
@@ -46,7 +49,8 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
 			}
 
 			if (isCancelled()) {
-				return ladder;
+				result.ladder = ladder;
+				return result;
 			}
 
 			// Character Watcher
@@ -60,7 +64,8 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
 			}
 
 			if (isCancelled()) {
-				return ladder;
+				result.ladder = ladder;
+				return result;
 			}
 
 			// Filter by class
@@ -79,10 +84,16 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
 				ladder.getEntries().add(0, characterEntry);
 			}
 
-			return ladder;
+			result.ladder = ladder;
+			return result;
 		}
 		catch (SocketTimeoutException e) {
-			return null;
+			result.socketException = e;
+			return result;
+		}
+		catch (RetrofitError e) {
+			result.retrofitError = e;
+			return result;
 		}
 	}
 
@@ -265,6 +276,17 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
 			this.poeClass = poeClass;
 			this.character = character;
 			this.characterPoeClass = characterPoeClass;
+		}
+	}
+
+	public static class LadderResult {
+
+		public SocketTimeoutException socketException;
+		public RetrofitError retrofitError;
+		public Ladder ladder;
+
+		private LadderResult() {
+
 		}
 	}
 }

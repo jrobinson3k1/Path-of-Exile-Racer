@@ -24,6 +24,10 @@ public class Race {
 	private String endAt;
 	private Rule[] rules;
 
+	private Race() {
+
+	}
+
 	public static class Rule {
 
 		private long id;

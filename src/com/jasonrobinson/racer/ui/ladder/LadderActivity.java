@@ -18,7 +18,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.model.PoeClass;
+import com.jasonrobinson.racer.enumeration.PoeClass;
 import com.jasonrobinson.racer.ui.base.BaseActivity;
 import com.jasonrobinson.racer.util.RawTypeface;
 

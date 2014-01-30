@@ -4,6 +4,7 @@ import java.net.SocketTimeoutException;
 import java.util.List;
 
 import retrofit.RestAdapter;
+import retrofit.RetrofitError;
 import retrofit.http.GET;
 import retrofit.http.Path;
 import retrofit.http.Query;
@@ -15,13 +16,13 @@ public class RaceClient {
 
 	private static final String API_URL = "http://api.pathofexile.com";
 
-	public List<Race> fetchRaces() throws SocketTimeoutException {
+	public List<Race> fetchRaces() throws SocketTimeoutException, RetrofitError {
 
 		RaceService raceService = buildRaceService();
 		return raceService.races();
 	}
 
-	public Ladder fetchLadder(String id, int offset, int limit) throws SocketTimeoutException {
+	public Ladder fetchLadder(String id, int offset, int limit) throws SocketTimeoutException, RetrofitError {
 
 		RaceService raceService = buildRaceService();
 		return raceService.ladder(id, offset, limit);

@@ -3,12 +3,14 @@ package com.jasonrobinson.racer.ui.ladder;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import retrofit.RetrofitError;
 import android.os.AsyncTask.Status;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,14 +21,17 @@ import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.adapter.LadderAdapter;
 import com.jasonrobinson.racer.async.LadderAsyncTask;
 import com.jasonrobinson.racer.async.LadderAsyncTask.LadderParams;
+import com.jasonrobinson.racer.enumeration.PoeClass;
 import com.jasonrobinson.racer.model.Ladder;
 import com.jasonrobinson.racer.model.Ladder.Entry;
-import com.jasonrobinson.racer.model.PoeClass;
+import com.jasonrobinson.racer.model.ServerError;
 import com.jasonrobinson.racer.ui.base.BaseListFragment;
 import com.jasonrobinson.racer.ui.ladder.WatchCharacterDialogFragment.WatchCharacterDialogListener;
 import com.jasonrobinson.racer.util.LadderUtils;
 
 public class LadderFragment extends BaseListFragment {
+
+	private static final String TAG = LadderFragment.class.getSimpleName();
 
 	private static final String ARG_ID = "id";
 
@@ -269,46 +274,71 @@ public class LadderFragment extends BaseListFragment {
 		protected void onPreExecute() {
 
 			super.onPreExecute();
-			setRefreshing(true);
+			getActivity().runOnUiThread(new Runnable() {
 
-			if (mReset) {
-				setListShown(false);
-			}
+				@Override
+				public void run() {
+
+					setRefreshing(true);
+
+					if (mReset) {
+						setListShown(false);
+					}
+				}
+			});
 		}
 
+		// TODO: This method is a mess and needs to be cleaned up
 		@Override
-		protected void onPostExecute(Ladder result) {
+		protected void onPostExecute(LadderResult result) {
 
 			super.onPostExecute(result);
 			setRefreshing(false);
 
 			if (result != null) {
-				Entry[] entries = result.getEntries().toArray(new Entry[0]);
+				Ladder ladder = result.ladder;
+				if (ladder != null) {
+					Entry[] entries = ladder.getEntries().toArray(new Entry[0]);
 
-				Entry watchedEntry = null;
-				if (!TextUtils.isEmpty(mWatchedCharacter)) {
-					watchedEntry = LadderUtils.findEntry(result.getEntries(), mWatchedCharacter);
-					if (watchedEntry == null && mWatchedCharacterClass == null) {
-						Toast.makeText(getActivity(), getString(R.string.character_not_found, mWatchedCharacter), Toast.LENGTH_LONG).show();
-						mWatchedCharacter = null;
-					}
-					else {
-						if (watchedEntry != null) {
-							mWatchedCharacterClass = PoeClass.getClassForName(watchedEntry.getCharacter().getPoeClass());
+					Entry watchedEntry = null;
+					if (!TextUtils.isEmpty(mWatchedCharacter)) {
+						watchedEntry = LadderUtils.findEntry(ladder.getEntries(), mWatchedCharacter);
+						if (watchedEntry == null && mWatchedCharacterClass == null) {
+							Toast.makeText(getActivity(), getString(R.string.character_not_found, mWatchedCharacter), Toast.LENGTH_LONG).show();
+							mWatchedCharacter = null;
+						}
+						else {
+							if (watchedEntry != null) {
+								mWatchedCharacterClass = PoeClass.getClassForName(watchedEntry.getCharacter().getPoeClass());
+							}
 						}
 					}
-				}
 
-				boolean borderFirstItem = !TextUtils.isEmpty(mWatchedCharacter) && watchedEntry != null;
-				if (mAdapter == null || mReset) {
-					mAdapter = new LadderAdapter(entries, mWatchedClass != null, borderFirstItem);
-					setListAdapter(mAdapter);
+					boolean borderFirstItem = !TextUtils.isEmpty(mWatchedCharacter) && watchedEntry != null;
+					if (mAdapter == null || mReset) {
+						mAdapter = new LadderAdapter(entries, mWatchedClass != null, borderFirstItem);
+						setListAdapter(mAdapter);
+					}
+					else {
+						mAdapter.setBorderFirstItem(borderFirstItem);
+						mAdapter.setEntries(entries, mWatchedClass != null);
+					}
 				}
-				else {
-					mAdapter.setBorderFirstItem(borderFirstItem);
-					mAdapter.setEntries(entries, mWatchedClass != null);
+				else if (result.socketException != null) {
+					Toast.makeText(getActivity(), R.string.error_unavailable, Toast.LENGTH_LONG).show();
 				}
+				else if (result.retrofitError != null) {
+					RetrofitError error = result.retrofitError;
+					if (error.getResponse() != null) {
+						ServerError body = (ServerError) error.getBodyAs(ServerError.class);
 
+						Log.e(TAG, "Error code: " + body.getError().getCode() + ", Message: " + body.getError().getMessage());
+						Toast.makeText(getActivity(), body.getError().getMessage(), Toast.LENGTH_LONG).show();
+					}
+					else {
+						Toast.makeText(getActivity(), R.string.error_unavailable, Toast.LENGTH_LONG).show();
+					}
+				}
 			}
 			else {
 				Toast.makeText(getActivity(), R.string.error_unavailable, Toast.LENGTH_LONG).show();

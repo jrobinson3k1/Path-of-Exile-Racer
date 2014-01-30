@@ -9,6 +9,10 @@ public class Ladder {
 	private int total;
 	private List<Entry> entries;
 
+	private Ladder() {
+
+	}
+
 	public static class Entry {
 
 		private boolean online;

@@ -4,9 +4,16 @@ import java.net.SocketTimeoutException;
 import java.text.ParseException;
 import java.util.List;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.CalendarContract;
+import android.provider.CalendarContract.Events;
 import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
 import android.view.ContextMenu;
@@ -98,6 +105,27 @@ public class RacesFragment extends BaseListFragment {
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 
 		super.onCreateContextMenu(menu, v, menuInfo);
+		AdapterContextMenuInfo adapterInfo = (AdapterContextMenuInfo) menuInfo;
+		Race race = (Race) getListView().getItemAtPosition(adapterInfo.position);
+
+		// Check if the device has an app that can handle calendar events
+		boolean removeAddCalendar = false;
+		try {
+			Intent intent = buildCalendarIntent(race);
+			PackageManager pm = getActivity().getPackageManager();
+			List<ResolveInfo> list = pm.queryIntentActivities(intent, 0);
+			if (list == null || list.isEmpty()) {
+				removeAddCalendar = true;
+			}
+		}
+		catch (ParseException e) {
+			removeAddCalendar = true;
+		}
+
+		if (removeAddCalendar) {
+			menu.removeItem(R.id.menu_add_to_calendar);
+		}
+
 		getActivity().getMenuInflater().inflate(R.menu.races_context_menu, menu);
 	}
 
@@ -113,6 +141,15 @@ public class RacesFragment extends BaseListFragment {
 		}
 		else if (id == R.id.menu_forum_post) {
 			mCallback.showUrl(race.getUrl());
+		}
+		else if (id == R.id.menu_add_to_calendar) {
+			try {
+				Intent intent = buildCalendarIntent(race);
+				startActivityForResult(intent, 0);
+			}
+			catch (ParseException e) {
+				Toast.makeText(getActivity(), R.string.error_parse, Toast.LENGTH_LONG).show();
+			}
 		}
 		else {
 			return super.onContextItemSelected(item);
@@ -151,6 +188,40 @@ public class RacesFragment extends BaseListFragment {
 				Toast.makeText(getActivity(), R.string.no_forum_post, Toast.LENGTH_SHORT).show();
 			}
 		}
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+	private Intent buildCalendarIntent(Race race) throws ParseException {
+
+		long startTime = race.getStartAt().getTime();
+		long endTime = race.getEndAt().getTime();
+
+		Intent intent;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+			intent = new Intent(Intent.ACTION_INSERT);
+			intent.setData(Events.CONTENT_URI);
+			intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startTime);
+			intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime);
+			intent.putExtra(Events.TITLE, race.getId());
+			intent.putExtra(Events.DESCRIPTION, race.getDescription());
+			intent.putExtra(Events.AVAILABILITY, Events.AVAILABILITY_BUSY);
+		}
+		else {
+			intent = new Intent(Intent.ACTION_EDIT);
+			intent.setType("vnd.android.cursor.item/event");
+			intent.putExtra("beginTime", startTime);
+			intent.putExtra("endTime", endTime);
+			intent.putExtra("rrule", "FREQ=YEARLY");
+			intent.putExtra("title", race.getId());
+		}
+
+		return intent;
 	}
 
 	private void fetchRaces() {

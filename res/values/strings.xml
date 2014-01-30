@@ -10,7 +10,6 @@
     <string name="finished">Finished</string>
     <string name="refresh">Refresh</string>
     <string name="keep_screen_on">Keep Screen On</string>
-    <string name="auto_refresh">Auto Refresh</string>
     <string name="watch_character">Watch Character</string>
     <string name="open">OPEN</string>
     <string name="closed">CLOSED</string>
@@ -29,8 +28,13 @@
     <string name="forum_post">Forum Post</string>
     <string name="no_rankings">No rankings yet</string>
     <string name="no_forum_post">A forum post has not been created for this race yet</string>
+    
+    <!-- Need translation -->
+    <string name="auto_refresh">Auto Refresh</string>
     <string name="all">All</string>
     <string name="watcher_input_error">Character names may only contain alphabet keys and underscores.</string>
+    <string name="add_to_calendar">Add to Calendar</string>
+    <string name="error_parse">An error occurred while attempting to parse the dates.</string>
 
     <!-- Preference Keys -->
     <string name="prefs_keepscreenon_key">keepscreenon</string>
