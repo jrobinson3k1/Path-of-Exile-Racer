@@ -117,6 +117,12 @@ public class LadderActivity extends BaseActivity {
 		return true;
 	}
 
+	public boolean isRaceFinished() {
+
+		// 5 minutes past end time to account for local time difference
+		return (mEndAt + 1000 * 60 * 5) - System.currentTimeMillis() < 0;
+	}
+
 	private void setAutoRefresh(final boolean enabled) {
 
 		runOnUiThread(new Runnable() {
@@ -125,8 +131,14 @@ public class LadderActivity extends BaseActivity {
 			public void run() {
 
 				if (mLadderFragment != null) {
-					mLadderFragment.setAutoRefresh(enabled);
+					if (isRaceFinished()) {
+						mLadderFragment.setAutoRefresh(false);
+					}
+					else {
+						mLadderFragment.setAutoRefresh(enabled);
+					}
 				}
+
 				getSettingsManager().setAutoRefresh(enabled);
 			}
 		});

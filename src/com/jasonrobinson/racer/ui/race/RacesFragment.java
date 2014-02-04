@@ -1,6 +1,5 @@
 package com.jasonrobinson.racer.ui.race;
 
-import java.net.SocketTimeoutException;
 import java.text.ParseException;
 import java.util.List;
 
@@ -9,17 +8,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
-import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -29,13 +24,11 @@ import android.widget.Toast;
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.adapter.RaceAdapter;
 import com.jasonrobinson.racer.model.Race;
-import com.jasonrobinson.racer.network.RaceClient;
 import com.jasonrobinson.racer.ui.base.BaseListFragment;
 
 public class RacesFragment extends BaseListFragment {
 
-	private RacesTask mRacesTask;
-	private boolean mRefreshing;
+	private static final String TAG = RacesFragment.class.getSimpleName();
 
 	private RacesCallback mCallback;
 
@@ -59,56 +52,33 @@ public class RacesFragment extends BaseListFragment {
 	}
 
 	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+
+		super.onViewCreated(view, savedInstanceState);
+		setEmptyText(getString(R.string.races_unavailable));
+	}
+
+	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 
 		super.onActivityCreated(savedInstanceState);
 		registerForContextMenu(getListView());
-		fetchRaces();
-	}
-
-	@Override
-	public void onDestroyView() {
-
-		super.onDestroyView();
-		if (mRacesTask != null) {
-			mRacesTask.cancel(true);
-		}
-	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
-		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.refresh_menu, menu);
-
-		if (!mRefreshing) {
-			MenuItem refreshItem = menu.findItem(R.id.menu_refresh);
-			MenuItemCompat.setActionView(refreshItem, null);
-		}
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-
-		int id = item.getItemId();
-		if (id == R.id.menu_refresh) {
-			fetchRaces();
-		}
-		else {
-			super.onOptionsItemSelected(item);
-		}
-
-		return true;
 	}
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 
 		super.onCreateContextMenu(menu, v, menuInfo);
+		getActivity().getMenuInflater().inflate(R.menu.races_context_menu, menu);
+
 		AdapterContextMenuInfo adapterInfo = (AdapterContextMenuInfo) menuInfo;
 		Race race = (Race) getListView().getItemAtPosition(adapterInfo.position);
 
-		// Check if the device has an app that can handle calendar events
+		if (TextUtils.isEmpty(race.getUrl())) {
+			menu.removeItem(R.id.menu_forum_post);
+		}
+
+		// Check if the device can handle calendar intents
 		boolean removeAddCalendar = false;
 		try {
 			Intent intent = buildCalendarIntent(race);
@@ -125,8 +95,6 @@ public class RacesFragment extends BaseListFragment {
 		if (removeAddCalendar) {
 			menu.removeItem(R.id.menu_add_to_calendar);
 		}
-
-		getActivity().getMenuInflater().inflate(R.menu.races_context_menu, menu);
 	}
 
 	@Override
@@ -196,11 +164,11 @@ public class RacesFragment extends BaseListFragment {
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
-	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	private Intent buildCalendarIntent(Race race) throws ParseException {
 
-		long startTime = race.getStartAt().getTime();
-		long endTime = race.getEndAt().getTime();
+		long startTime = race.getStartAtDate().getTime();
+		long endTime = race.getEndAtDate().getTime();
 
 		Intent intent;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -208,9 +176,13 @@ public class RacesFragment extends BaseListFragment {
 			intent.setData(Events.CONTENT_URI);
 			intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startTime);
 			intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime);
-			intent.putExtra(Events.TITLE, race.getId());
+			intent.putExtra(Events.TITLE, race.getRaceId());
 			intent.putExtra(Events.DESCRIPTION, race.getDescription());
 			intent.putExtra(Events.AVAILABILITY, Events.AVAILABILITY_BUSY);
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+				intent.putExtra(CalendarContract.Events.CUSTOM_APP_PACKAGE, getActivity().getPackageName());
+			}
 		}
 		else {
 			intent = new Intent(Intent.ACTION_EDIT);
@@ -218,26 +190,16 @@ public class RacesFragment extends BaseListFragment {
 			intent.putExtra("beginTime", startTime);
 			intent.putExtra("endTime", endTime);
 			intent.putExtra("rrule", "FREQ=YEARLY");
-			intent.putExtra("title", race.getId());
+			intent.putExtra("title", race.getRaceId());
 		}
 
 		return intent;
 	}
 
-	private void fetchRaces() {
+	public void setData(List<Race> races) {
 
-		if (mRacesTask != null) {
-			mRacesTask.cancel(true);
-		}
-
-		mRacesTask = new RacesTask();
-		mRacesTask.execute();
-	}
-
-	private void setRefreshing(boolean refreshing) {
-
-		mRefreshing = refreshing;
-		getActivity().supportInvalidateOptionsMenu();
+		setListAdapter(new RaceAdapter(getActivity(), races));
+		setListShown(true);
 	}
 
 	public interface RacesCallback {
@@ -245,39 +207,5 @@ public class RacesFragment extends BaseListFragment {
 		public void showUrl(String url);
 
 		public void showLadder(Race race);
-	}
-
-	private class RacesTask extends AsyncTask<Void, Void, List<Race>> {
-
-		@Override
-		protected void onPreExecute() {
-
-			super.onPreExecute();
-			setRefreshing(true);
-		}
-
-		@Override
-		protected List<Race> doInBackground(Void... params) {
-
-			try {
-				return new RaceClient().fetchRaces();
-			}
-			catch (SocketTimeoutException e) {
-				return null;
-			}
-		}
-
-		@Override
-		protected void onPostExecute(List<Race> result) {
-
-			super.onPostExecute(result);
-			setRefreshing(false);
-			if (result != null) {
-				setListAdapter(new RaceAdapter(getActivity(), result));
-			}
-			else {
-				Toast.makeText(getActivity(), R.string.error_unavailable, Toast.LENGTH_SHORT).show();
-			}
-		}
 	}
 }

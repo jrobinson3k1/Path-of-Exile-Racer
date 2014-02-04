@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Race {
 
 	private static final SimpleDateFormat DATE_FORMAT;
@@ -15,7 +17,8 @@ public class Race {
 		DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
 
-	private String id;
+	@SerializedName("id")
+	private String raceId;
 	private String description;
 	private String url;
 	private boolean event;
@@ -24,19 +27,45 @@ public class Race {
 	private String endAt;
 	private Rule[] rules;
 
+	@SuppressWarnings("unused")
 	private Race() {
 
 	}
 
+	public Race(String raceId, String description, String url, boolean event, String registerAt, String startAt, String endAt, Rule[] rules) {
+
+		this.raceId = raceId;
+		this.description = description;
+		this.url = url;
+		this.event = event;
+		this.registerAt = registerAt;
+		this.startAt = startAt;
+		this.endAt = endAt;
+		this.rules = rules;
+	}
+
 	public static class Rule {
 
-		private long id;
+		@SerializedName("id")
+		private long ruleId;
 		private String name;
 		private String description;
 
-		public long getId() {
+		@SuppressWarnings("unused")
+		private Rule() {
 
-			return id;
+		}
+
+		public Rule(long ruleId, String name, String description) {
+
+			this.ruleId = ruleId;
+			this.name = name;
+			this.description = description;
+		}
+
+		public long getRuleId() {
+
+			return ruleId;
 		}
 
 		public String getName() {
@@ -50,9 +79,9 @@ public class Race {
 		}
 	}
 
-	public String getId() {
+	public String getRaceId() {
 
-		return id;
+		return raceId;
 	}
 
 	public String getDescription() {
@@ -70,17 +99,32 @@ public class Race {
 		return event;
 	}
 
-	public Date getRegisterAt() throws ParseException {
+	public String getRegisterAt() {
+
+		return registerAt;
+	}
+
+	public String getStartAt() {
+
+		return startAt;
+	}
+
+	public String getEndAt() {
+
+		return endAt;
+	}
+
+	public Date getRegisterAtDate() throws ParseException {
 
 		return DATE_FORMAT.parse(registerAt);
 	}
 
-	public Date getStartAt() throws ParseException {
+	public Date getStartAtDate() throws ParseException {
 
 		return DATE_FORMAT.parse(startAt);
 	}
 
-	public Date getEndAt() throws ParseException {
+	public Date getEndAtDate() throws ParseException {
 
 		return DATE_FORMAT.parse(endAt);
 	}
@@ -93,18 +137,18 @@ public class Race {
 	public boolean isInProgress() throws ParseException {
 
 		Date now = new Date(System.currentTimeMillis());
-		return now.after(getStartAt()) && now.before(getEndAt());
+		return now.after(getStartAtDate()) && now.before(getEndAtDate());
 	}
 
 	public boolean isFinished() throws ParseException {
 
 		Date now = new Date(System.currentTimeMillis());
-		return now.after(getEndAt());
+		return now.after(getEndAtDate());
 	}
 
 	public boolean isRegistrationOpen() throws ParseException {
 
 		Date now = new Date(System.currentTimeMillis());
-		return now.after(getRegisterAt()) && now.before(getEndAt());
+		return now.after(getRegisterAtDate()) && now.before(getEndAtDate());
 	}
 }
