@@ -18,6 +18,11 @@ public class SettingsManager {
 	@Inject
 	private Context mContext;
 
+	@Inject
+	private SettingsManager() {
+
+	}
+
 	public void setKeepScreenOn(boolean enable) {
 
 		putBoolean(KEY_KEEP_SCREEN_ON, enable);

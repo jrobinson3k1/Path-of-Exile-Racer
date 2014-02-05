@@ -3,7 +3,9 @@ package com.jasonrobinson.racer.adapter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -111,15 +113,16 @@ public class RaceAdapter extends BaseAdapter {
 		return view;
 	}
 
-	private CharSequence formatRules(Rule[] rules) {
+	private CharSequence formatRules(Collection<Rule> rules) {
 
-		if (rules == null || rules.length == 0) {
+		if (rules == null || rules.isEmpty()) {
 			return null;
 		}
 
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < rules.length; i++) {
-			Rule rule = rules[i];
+		Iterator<Rule> iterator = rules.iterator();
+		for (int i = 0; i < rules.size(); i++) {
+			Rule rule = iterator.next();
 
 			if (i != 0) {
 				sb.append(", ");

@@ -4,8 +4,6 @@ import java.net.SocketTimeoutException;
 import java.text.ParseException;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import retrofit.RetrofitError;
 import roboguice.inject.InjectFragment;
 import android.content.Context;
@@ -18,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.database.agent.RaceAgent;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.network.RaceClient;
 import com.jasonrobinson.racer.ui.base.BaseActivity;
@@ -32,9 +29,6 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 
 	@InjectFragment(tag = "races_fragment")
 	private RacesFragment mFragment;
-
-	@Inject
-	private RaceAgent mRaceAgent;
 
 	private RacesTask mRacesTask;
 	private boolean mRefreshing;
@@ -149,11 +143,16 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 		protected List<Race> doInBackground(Void... params) {
 
 			if (mFromCache) {
-				return fetchFromCache();
 			}
 			else {
-				return fetchFromWeb();
 			}
+			List<Race> races = fetchFromWeb();
+
+			Log.d(TAG, "Cacheing races (" + races.size() + " entries)");
+			int rows = getDatabaseManager().addOrUpdateRaceList(races);
+			Log.d(TAG, "Finished cacheing (" + rows + " entries)");
+
+			return fetchFromCache();
 		}
 
 		@Override
@@ -168,14 +167,14 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 				mFragment.setData(result);
 
 				if (!mFromCache) {
-					new RaceCacheTask(result).execute();
+					// new RaceCacheTask(result).execute();
 				}
 			}
 		}
 
 		private List<Race> fetchFromCache() {
 
-			return mRaceAgent.list();
+			return getDatabaseManager().getAllRaces();
 		}
 
 		private List<Race> fetchFromWeb() {
@@ -207,8 +206,8 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 		protected Void doInBackground(Void... params) {
 
 			Log.d(TAG, "Cacheing races (" + mRaces.size() + " entries)");
-			mRaceAgent.insertAll(mRaces);
-			Log.d(TAG, "Finished cacheing");
+			int rows = getDatabaseManager().addOrUpdateRaceList(mRaces);
+			Log.d(TAG, "Finished cacheing (" + rows + " entries)");
 
 			return null;
 		}

@@ -2,12 +2,17 @@ package com.jasonrobinson.racer.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
 import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+import com.j256.ormlite.table.DatabaseTable;
 
+@DatabaseTable
 public class Race {
 
 	private static final SimpleDateFormat DATE_FORMAT;
@@ -17,51 +22,39 @@ public class Race {
 		DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
 
+	@DatabaseField(id = true)
 	@SerializedName("id")
 	private String raceId;
+	@DatabaseField
 	private String description;
+	@DatabaseField
 	private String url;
+	@DatabaseField
 	private boolean event;
+	@DatabaseField
 	private String registerAt;
+	@DatabaseField
 	private String startAt;
+	@DatabaseField
 	private String endAt;
-	private Rule[] rules;
+	@ForeignCollectionField
+	private Collection<Rule> rules;
 
-	@SuppressWarnings("unused")
-	private Race() {
-
-	}
-
-	public Race(String raceId, String description, String url, boolean event, String registerAt, String startAt, String endAt, Rule[] rules) {
-
-		this.raceId = raceId;
-		this.description = description;
-		this.url = url;
-		this.event = event;
-		this.registerAt = registerAt;
-		this.startAt = startAt;
-		this.endAt = endAt;
-		this.rules = rules;
-	}
-
+	@DatabaseTable
 	public static class Rule {
 
+		@DatabaseField
 		@SerializedName("id")
 		private long ruleId;
+		@DatabaseField
 		private String name;
+		@DatabaseField
 		private String description;
 
-		@SuppressWarnings("unused")
-		private Rule() {
-
-		}
-
-		public Rule(long ruleId, String name, String description) {
-
-			this.ruleId = ruleId;
-			this.name = name;
-			this.description = description;
-		}
+		@DatabaseField(generatedId = true)
+		private transient long id;
+		@DatabaseField(foreign = true)
+		private transient Race race;
 
 		public long getRuleId() {
 
@@ -76,6 +69,11 @@ public class Race {
 		public String getDescription() {
 
 			return description;
+		}
+
+		public void setRace(Race race) {
+
+			this.race = race;
 		}
 	}
 
@@ -129,7 +127,7 @@ public class Race {
 		return DATE_FORMAT.parse(endAt);
 	}
 
-	public Rule[] getRules() {
+	public Collection<Rule> getRules() {
 
 		return rules;
 	}
