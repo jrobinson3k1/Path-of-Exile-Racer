@@ -3,7 +3,9 @@ package com.jasonrobinson.racer.adapter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -80,13 +82,13 @@ public class RaceAdapter extends BaseAdapter {
 			holder.timer = null;
 		}
 
-		holder.titleTextView.setText(race.getId());
+		holder.titleTextView.setText(race.getRaceId());
 
 		Date startDate = null;
 		Date endDate = null;
 		try {
-			startDate = race.getStartAt();
-			endDate = race.getEndAt();
+			startDate = race.getStartAtDate();
+			endDate = race.getEndAtDate();
 		}
 		catch (ParseException e) {
 			e.printStackTrace();
@@ -111,15 +113,16 @@ public class RaceAdapter extends BaseAdapter {
 		return view;
 	}
 
-	private CharSequence formatRules(Rule[] rules) {
+	private CharSequence formatRules(Collection<Rule> rules) {
 
-		if (rules == null || rules.length == 0) {
+		if (rules == null || rules.isEmpty()) {
 			return null;
 		}
 
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < rules.length; i++) {
-			Rule rule = rules[i];
+		Iterator<Rule> iterator = rules.iterator();
+		for (int i = 0; i < rules.size(); i++) {
+			Rule rule = iterator.next();
 
 			if (i != 0) {
 				sb.append(", ");
@@ -137,8 +140,8 @@ public class RaceAdapter extends BaseAdapter {
 		CharSequence startAtDate;
 
 		long millisNow = System.currentTimeMillis();
-		long millisUntil = race.getStartAt().getTime() - millisNow;
-		long millisRemaining = race.getEndAt().getTime() - millisNow;
+		long millisUntil = race.getStartAtDate().getTime() - millisNow;
+		long millisRemaining = race.getEndAtDate().getTime() - millisNow;
 
 		if (millisUntil <= 3600000) { // <60 minutes until start
 			long millis;
@@ -154,8 +157,8 @@ public class RaceAdapter extends BaseAdapter {
 			startAtTime = RacerTimeUtils.formatElapsedTime(millis / 1000);
 		}
 		else { // >60 minutes until start
-			startAtTime = formatTime(race.getStartAt());
-			startAtDate = formatDate(context, race.getStartAt());
+			startAtTime = formatTime(race.getStartAtDate());
+			startAtDate = formatDate(context, race.getStartAtDate());
 		}
 
 		holder.timeTextView.setText(startAtTime);

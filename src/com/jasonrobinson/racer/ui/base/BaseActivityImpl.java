@@ -14,6 +14,7 @@ import android.view.MenuItem;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.analytics.AnalyticsManager;
+import com.jasonrobinson.racer.db.DatabaseManager;
 import com.jasonrobinson.racer.ui.settings.SettingsActivity;
 import com.jasonrobinson.racer.util.CustomTypefaceSpan;
 import com.jasonrobinson.racer.util.RawTypeface;
@@ -25,6 +26,8 @@ public class BaseActivityImpl {
 	private AnalyticsManager mAnalyticsManager;
 	@Inject
 	private SettingsManager mSettingsManager;
+	@Inject
+	private DatabaseManager mDatabaseManager;
 
 	private Activity mActivity;
 
@@ -89,6 +92,11 @@ public class BaseActivityImpl {
 	public SettingsManager getSettingsManager() {
 
 		return mSettingsManager;
+	}
+
+	public DatabaseManager getdDatabaseManager() {
+
+		return mDatabaseManager;
 	}
 
 	public CharSequence formatTitleText(CharSequence title) {

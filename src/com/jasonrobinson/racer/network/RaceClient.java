@@ -8,6 +8,7 @@ import retrofit.RetrofitError;
 import retrofit.http.GET;
 import retrofit.http.Path;
 import retrofit.http.Query;
+import android.content.Context;
 
 import com.jasonrobinson.racer.model.Ladder;
 import com.jasonrobinson.racer.model.Race;
@@ -16,7 +17,7 @@ public class RaceClient {
 
 	private static final String API_URL = "http://api.pathofexile.com";
 
-	public List<Race> fetchRaces() throws SocketTimeoutException, RetrofitError {
+	public List<Race> fetchRaces(Context context) throws SocketTimeoutException, RetrofitError {
 
 		RaceService raceService = buildRaceService();
 		return raceService.races();

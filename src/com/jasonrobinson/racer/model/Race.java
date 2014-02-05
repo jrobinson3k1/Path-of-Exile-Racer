@@ -2,10 +2,17 @@ package com.jasonrobinson.racer.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+import com.j256.ormlite.table.DatabaseTable;
+
+@DatabaseTable
 public class Race {
 
 	private static final SimpleDateFormat DATE_FORMAT;
@@ -15,28 +22,43 @@ public class Race {
 		DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
 
-	private String id;
+	@DatabaseField(id = true)
+	@SerializedName("id")
+	private String raceId;
+	@DatabaseField
 	private String description;
+	@DatabaseField
 	private String url;
+	@DatabaseField
 	private boolean event;
+	@DatabaseField
 	private String registerAt;
+	@DatabaseField
 	private String startAt;
+	@DatabaseField
 	private String endAt;
-	private Rule[] rules;
+	@ForeignCollectionField
+	private Collection<Rule> rules;
 
-	private Race() {
-
-	}
-
+	@DatabaseTable
 	public static class Rule {
 
-		private long id;
+		@DatabaseField
+		@SerializedName("id")
+		private long ruleId;
+		@DatabaseField
 		private String name;
+		@DatabaseField
 		private String description;
 
-		public long getId() {
+		@DatabaseField(generatedId = true)
+		private transient long id;
+		@DatabaseField(foreign = true)
+		private transient Race race;
 
-			return id;
+		public long getRuleId() {
+
+			return ruleId;
 		}
 
 		public String getName() {
@@ -48,11 +70,16 @@ public class Race {
 
 			return description;
 		}
+
+		public void setRace(Race race) {
+
+			this.race = race;
+		}
 	}
 
-	public String getId() {
+	public String getRaceId() {
 
-		return id;
+		return raceId;
 	}
 
 	public String getDescription() {
@@ -70,22 +97,37 @@ public class Race {
 		return event;
 	}
 
-	public Date getRegisterAt() throws ParseException {
+	public String getRegisterAt() {
+
+		return registerAt;
+	}
+
+	public String getStartAt() {
+
+		return startAt;
+	}
+
+	public String getEndAt() {
+
+		return endAt;
+	}
+
+	public Date getRegisterAtDate() throws ParseException {
 
 		return DATE_FORMAT.parse(registerAt);
 	}
 
-	public Date getStartAt() throws ParseException {
+	public Date getStartAtDate() throws ParseException {
 
 		return DATE_FORMAT.parse(startAt);
 	}
 
-	public Date getEndAt() throws ParseException {
+	public Date getEndAtDate() throws ParseException {
 
 		return DATE_FORMAT.parse(endAt);
 	}
 
-	public Rule[] getRules() {
+	public Collection<Rule> getRules() {
 
 		return rules;
 	}
@@ -93,18 +135,18 @@ public class Race {
 	public boolean isInProgress() throws ParseException {
 
 		Date now = new Date(System.currentTimeMillis());
-		return now.after(getStartAt()) && now.before(getEndAt());
+		return now.after(getStartAtDate()) && now.before(getEndAtDate());
 	}
 
 	public boolean isFinished() throws ParseException {
 
 		Date now = new Date(System.currentTimeMillis());
-		return now.after(getEndAt());
+		return now.after(getEndAtDate());
 	}
 
 	public boolean isRegistrationOpen() throws ParseException {
 
 		Date now = new Date(System.currentTimeMillis());
-		return now.after(getRegisterAt()) && now.before(getEndAt());
+		return now.after(getRegisterAtDate()) && now.before(getEndAtDate());
 	}
 }

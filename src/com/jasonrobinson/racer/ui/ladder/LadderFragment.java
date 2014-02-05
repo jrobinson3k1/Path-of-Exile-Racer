@@ -136,7 +136,7 @@ public class LadderFragment extends BaseListFragment {
 		if (id == R.id.menu_refresh) {
 			fetchLadder();
 
-			getAnalyticsManager().trackEvent("Ladder", "Click", "Manual Refresh");
+			getAnalyticsManager().trackEvent("Ladder", "Refresh", "Manual");
 		}
 		else if (id == R.id.menu_watch_character) {
 			showCharacterDialog();
@@ -354,7 +354,15 @@ public class LadderFragment extends BaseListFragment {
 		public void run() {
 
 			if (mId != null) {
-				fetchLadder();
+				getActivity().runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+
+						fetchLadder();
+						getAnalyticsManager().trackEvent("Ladder", "Refresh", "Automatic");
+					}
+				});
 			}
 		}
 	};
