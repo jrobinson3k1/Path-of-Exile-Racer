@@ -15,6 +15,7 @@ import android.util.Log;
 import com.j256.ormlite.dao.Dao.CreateOrUpdateStatus;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.QueryBuilder;
+import com.jasonrobinson.racer.enumeration.RaceOptions;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.model.Race.Rule;
 
@@ -32,7 +33,20 @@ public class DatabaseManager {
 		RoboGuice.injectMembers(context, this);
 	}
 
-	public List<Race> getAllRaces() {
+	public List<Race> getRaces(RaceOptions option) {
+
+		switch (option) {
+			case FINISHED:
+				return getAllFinishedRaces();
+			case UNFINISHED:
+				return getAllUnfinishedRaces();
+			case ALL:
+			default:
+				return getAllRaces();
+		}
+	}
+
+	private List<Race> getAllRaces() {
 
 		try {
 			return mHelper.getRaceDao().queryForAll();
@@ -43,7 +57,7 @@ public class DatabaseManager {
 		}
 	}
 
-	public List<Race> getAllFinishedRaces() {
+	private List<Race> getAllFinishedRaces() {
 
 		try {
 			QueryBuilder<Race, String> queryBuilder = mHelper.getRaceDao().queryBuilder();
@@ -56,7 +70,7 @@ public class DatabaseManager {
 		}
 	}
 
-	public List<Race> getAllUnfinishedRaces() {
+	private List<Race> getAllUnfinishedRaces() {
 
 		try {
 			QueryBuilder<Race, String> queryBuilder = mHelper.getRaceDao().queryBuilder();

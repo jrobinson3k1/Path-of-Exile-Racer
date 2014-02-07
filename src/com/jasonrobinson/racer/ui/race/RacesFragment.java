@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.adapter.RaceAdapter;
+import com.jasonrobinson.racer.enumeration.RaceOptions;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.ui.base.BaseListFragment;
 
@@ -29,18 +30,27 @@ public class RacesFragment extends BaseListFragment {
 
 	private static final String TAG = RacesFragment.class.getSimpleName();
 
+	public static final String ARG_OPTION = "option";
+
+	private RaceOptions mRaceOption;
 	private RacesCallback mCallback;
 
-	public static RacesFragment newInstance() {
+	public static RacesFragment newInstance(RaceOptions option) {
 
-		return new RacesFragment();
+		RacesFragment fragment = new RacesFragment();
+
+		Bundle args = new Bundle();
+		args.putSerializable(ARG_OPTION, option);
+		fragment.setArguments(args);
+
+		return fragment;
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
+		mRaceOption = (RaceOptions) getArguments().getSerializable(ARG_OPTION);
 	}
 
 	@Override
@@ -62,6 +72,8 @@ public class RacesFragment extends BaseListFragment {
 
 		super.onActivityCreated(savedInstanceState);
 		registerForContextMenu(getListView());
+
+		setData(getDatabaseManager().getRaces(mRaceOption));
 	}
 
 	@Override

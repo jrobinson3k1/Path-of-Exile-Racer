@@ -1,6 +1,17 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/races_fragment"
-    android:name="com.jasonrobinson.racer.ui.race.RacesFragment"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:tag="races_fragment" />
+    android:orientation="vertical" >
+
+    <com.astuetz.PagerSlidingTabStrip
+        android:id="@+id/tabs"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:tag="tabs" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:tag="pager" />
+</LinearLayout>

@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.support.v4.app.Fragment;
 
 import com.jasonrobinson.racer.analytics.AnalyticsManager;
+import com.jasonrobinson.racer.db.DatabaseManager;
 import com.jasonrobinson.racer.util.SettingsManager;
 
 public class BaseFragmentImpl {
@@ -15,6 +16,8 @@ public class BaseFragmentImpl {
 	private AnalyticsManager mAnalyticsManager;
 	@Inject
 	private SettingsManager mSettingsManager;
+	@Inject
+	private DatabaseManager mDatabaseManager;
 
 	private Fragment mFragment;
 
@@ -56,5 +59,10 @@ public class BaseFragmentImpl {
 	public SettingsManager getSettingsManager() {
 
 		return mSettingsManager;
+	}
+
+	public DatabaseManager getdDatabaseManager() {
+
+		return mDatabaseManager;
 	}
 }

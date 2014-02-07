@@ -1,32 +1,36 @@
 package com.jasonrobinson.racer.ui.race;
 
-import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.List;
 
-import retrofit.RetrofitError;
-import roboguice.inject.InjectFragment;
+import roboguice.inject.InjectView;
+import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.MenuItemCompat;
-import android.util.Log;
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.astuetz.PagerSlidingTabStrip;
 import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.async.RaceAsyncTask;
+import com.jasonrobinson.racer.enumeration.RaceOptions;
 import com.jasonrobinson.racer.model.Race;
-import com.jasonrobinson.racer.network.RaceClient;
 import com.jasonrobinson.racer.ui.base.BaseActivity;
 import com.jasonrobinson.racer.ui.ladder.LadderActivity;
+import com.jasonrobinson.racer.ui.race.RacesActivity.RacesPagerAdapter.RacesAdapterParams;
 import com.jasonrobinson.racer.ui.race.RacesFragment.RacesCallback;
 import com.jasonrobinson.racer.ui.web.WebActivity;
 
 public class RacesActivity extends BaseActivity implements RacesCallback {
 
-	private static final String TAG = RacesActivity.class.getSimpleName();
-
-	@InjectFragment(tag = "races_fragment")
-	private RacesFragment mFragment;
+	@InjectView(tag = "tabs")
+	private PagerSlidingTabStrip mTabs;
+	@InjectView(tag = "pager")
+	private ViewPager mPager;
 
 	private RacesTask mRacesTask;
 	private boolean mRefreshing;
@@ -38,7 +42,14 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 		setContentView(R.layout.racer_activity);
 		setTitle(R.string.races);
 
-		fetchRaces();
+		List<RacesAdapterParams> params = new ArrayList<RacesAdapterParams>();
+		params.add(new RacesAdapterParams(RaceOptions.UNFINISHED, "Unfinished"));
+		params.add(new RacesAdapterParams(RaceOptions.FINISHED, "Finished"));
+
+		mPager.setAdapter(new RacesPagerAdapter(getSupportFragmentManager(), params));
+		mTabs.setViewPager(mPager);
+
+		// fetchRaces();
 	}
 
 	@Override
@@ -102,7 +113,7 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 			mRacesTask.cancel(true);
 		}
 
-		mRacesTask = new RacesTask();
+		mRacesTask = new RacesTask(this);
 		mRacesTask.execute();
 	}
 
@@ -112,7 +123,53 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 		supportInvalidateOptionsMenu();
 	}
 
-	private class RacesTask extends AsyncTask<Void, Void, List<Race>> {
+	public static class RacesPagerAdapter extends FragmentPagerAdapter {
+
+		private List<RacesAdapterParams> mParams;
+
+		public RacesPagerAdapter(FragmentManager fm, List<RacesAdapterParams> params) {
+
+			super(fm);
+			mParams = params;
+		}
+
+		@Override
+		public RacesFragment getItem(int position) {
+
+			return RacesFragment.newInstance(mParams.get(position).option);
+		}
+
+		@Override
+		public int getCount() {
+
+			return mParams.size();
+		}
+
+		@Override
+		public CharSequence getPageTitle(int position) {
+
+			return mParams.get(position).title;
+		}
+
+		public static class RacesAdapterParams {
+
+			public RaceOptions option;
+			public String title;
+
+			public RacesAdapterParams(RaceOptions option, String title) {
+
+				this.option = option;
+				this.title = title;
+			}
+		}
+	}
+
+	private class RacesTask extends RaceAsyncTask {
+
+		public RacesTask(Context context) {
+
+			super(context);
+		}
 
 		@Override
 		protected void onPreExecute() {
@@ -122,46 +179,14 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 		}
 
 		@Override
-		protected List<Race> doInBackground(Void... params) {
-
-			List<Race> races = fetchFromWeb();
-
-			Log.d(TAG, "Cacheing races (" + races.size() + " entries)");
-			int rows = getDatabaseManager().addOrUpdateRaceList(races);
-			Log.d(TAG, "Finished cacheing (" + rows + " entries)");
-
-			return fetchFromCache();
-		}
-
-		@Override
 		protected void onPostExecute(List<Race> result) {
 
 			super.onPostExecute(result);
 			setRefreshing(false);
 
 			if (result != null) {
-				mFragment.setData(result);
+				// mFragment.setData(result);
 			}
-		}
-
-		private List<Race> fetchFromCache() {
-
-			return getDatabaseManager().getAllUnfinishedRaces();
-		}
-
-		private List<Race> fetchFromWeb() {
-
-			try {
-				return new RaceClient().fetchRaces();
-			}
-			catch (SocketTimeoutException e) {
-				e.printStackTrace();
-			}
-			catch (RetrofitError e) {
-				e.printStackTrace();
-			}
-
-			return null;
 		}
 	}
 }

@@ -4,6 +4,7 @@ import roboguice.fragment.RoboFragment;
 import android.app.Activity;
 
 import com.jasonrobinson.racer.analytics.AnalyticsManager;
+import com.jasonrobinson.racer.db.DatabaseManager;
 import com.jasonrobinson.racer.util.SettingsManager;
 
 public abstract class BaseFragment extends RoboFragment {
@@ -30,5 +31,10 @@ public abstract class BaseFragment extends RoboFragment {
 	public SettingsManager getSettingsManager() {
 
 		return mImpl.getSettingsManager();
+	}
+
+	public DatabaseManager getDatabaseManager() {
+
+		return mImpl.getdDatabaseManager();
 	}
 }
