@@ -10,6 +10,7 @@ import com.jasonrobinson.racer.ui.base.BasePreferenceActivity;
 
 public class SettingsActivity extends BasePreferenceActivity {
 
+	@SuppressWarnings("deprecation")
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

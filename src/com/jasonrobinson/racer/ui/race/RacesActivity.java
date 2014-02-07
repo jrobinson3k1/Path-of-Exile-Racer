@@ -1,12 +1,10 @@
 package com.jasonrobinson.racer.ui.race;
 
 import java.net.SocketTimeoutException;
-import java.text.ParseException;
 import java.util.List;
 
 import retrofit.RetrofitError;
 import roboguice.inject.InjectFragment;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -92,13 +90,8 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 
 		Intent intent = new Intent(this, LadderActivity.class);
 		intent.putExtra(LadderActivity.EXTRA_ID, race.getRaceId());
-		try {
-			intent.putExtra(LadderActivity.EXTRA_START_AT, race.getStartAtDate().getTime());
-			intent.putExtra(LadderActivity.EXTRA_END_AT, race.getEndAtDate().getTime());
-		}
-		catch (ParseException e) {
-			throw new RuntimeException(e);
-		}
+		intent.putExtra(LadderActivity.EXTRA_START_AT, race.getStartAt().getTime());
+		intent.putExtra(LadderActivity.EXTRA_END_AT, race.getEndAt().getTime());
 
 		startActivity(intent);
 	}
@@ -109,7 +102,7 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 			mRacesTask.cancel(true);
 		}
 
-		mRacesTask = new RacesTask(this, true);
+		mRacesTask = new RacesTask();
 		mRacesTask.execute();
 	}
 
@@ -121,31 +114,16 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 
 	private class RacesTask extends AsyncTask<Void, Void, List<Race>> {
 
-		private Context mContext;
-		private boolean mFromCache;
-
-		public RacesTask(Context context, boolean fromCache) {
-
-			mContext = context.getApplicationContext();
-			mFromCache = fromCache;
-		}
-
 		@Override
 		protected void onPreExecute() {
 
 			super.onPreExecute();
-			if (!mFromCache) {
-				setRefreshing(true);
-			}
+			setRefreshing(true);
 		}
 
 		@Override
 		protected List<Race> doInBackground(Void... params) {
 
-			if (mFromCache) {
-			}
-			else {
-			}
 			List<Race> races = fetchFromWeb();
 
 			Log.d(TAG, "Cacheing races (" + races.size() + " entries)");
@@ -159,16 +137,10 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 		protected void onPostExecute(List<Race> result) {
 
 			super.onPostExecute(result);
-			if (!mFromCache) {
-				setRefreshing(false);
-			}
+			setRefreshing(false);
 
 			if (result != null) {
 				mFragment.setData(result);
-
-				if (!mFromCache) {
-					// new RaceCacheTask(result).execute();
-				}
 			}
 		}
 
@@ -180,7 +152,7 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 		private List<Race> fetchFromWeb() {
 
 			try {
-				return new RaceClient().fetchRaces(mContext);
+				return new RaceClient().fetchRaces();
 			}
 			catch (SocketTimeoutException e) {
 				e.printStackTrace();
@@ -188,26 +160,6 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 			catch (RetrofitError e) {
 				e.printStackTrace();
 			}
-
-			return null;
-		}
-	}
-
-	private class RaceCacheTask extends AsyncTask<Void, Void, Void> {
-
-		private List<Race> mRaces;
-
-		public RaceCacheTask(List<Race> races) {
-
-			mRaces = races;
-		}
-
-		@Override
-		protected Void doInBackground(Void... params) {
-
-			Log.d(TAG, "Cacheing races (" + mRaces.size() + " entries)");
-			int rows = getDatabaseManager().addOrUpdateRaceList(mRaces);
-			Log.d(TAG, "Finished cacheing (" + rows + " entries)");
 
 			return null;
 		}

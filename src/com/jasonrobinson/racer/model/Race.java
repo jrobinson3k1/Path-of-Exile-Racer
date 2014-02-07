@@ -1,6 +1,5 @@
 package com.jasonrobinson.racer.model;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -32,11 +31,11 @@ public class Race {
 	@DatabaseField
 	private boolean event;
 	@DatabaseField
-	private String registerAt;
+	private Date registerAt;
 	@DatabaseField
-	private String startAt;
+	private Date startAt;
 	@DatabaseField
-	private String endAt;
+	private Date endAt;
 	@ForeignCollectionField
 	private Collection<Rule> rules;
 
@@ -51,8 +50,10 @@ public class Race {
 		@DatabaseField
 		private String description;
 
+		@SuppressWarnings("unused")
 		@DatabaseField(generatedId = true)
 		private transient long id;
+		@SuppressWarnings("unused")
 		@DatabaseField(foreign = true)
 		private transient Race race;
 
@@ -97,34 +98,19 @@ public class Race {
 		return event;
 	}
 
-	public String getRegisterAt() {
+	public Date getRegisterAt() {
 
 		return registerAt;
 	}
 
-	public String getStartAt() {
+	public Date getStartAt() {
 
 		return startAt;
 	}
 
-	public String getEndAt() {
+	public Date getEndAt() {
 
 		return endAt;
-	}
-
-	public Date getRegisterAtDate() throws ParseException {
-
-		return DATE_FORMAT.parse(registerAt);
-	}
-
-	public Date getStartAtDate() throws ParseException {
-
-		return DATE_FORMAT.parse(startAt);
-	}
-
-	public Date getEndAtDate() throws ParseException {
-
-		return DATE_FORMAT.parse(endAt);
 	}
 
 	public Collection<Rule> getRules() {
@@ -132,21 +118,21 @@ public class Race {
 		return rules;
 	}
 
-	public boolean isInProgress() throws ParseException {
+	public boolean isInProgress() {
 
 		Date now = new Date(System.currentTimeMillis());
-		return now.after(getStartAtDate()) && now.before(getEndAtDate());
+		return now.after(getStartAt()) && now.before(getEndAt());
 	}
 
-	public boolean isFinished() throws ParseException {
+	public boolean isFinished() {
 
 		Date now = new Date(System.currentTimeMillis());
-		return now.after(getEndAtDate());
+		return now.after(getEndAt());
 	}
 
-	public boolean isRegistrationOpen() throws ParseException {
+	public boolean isRegistrationOpen() {
 
 		Date now = new Date(System.currentTimeMillis());
-		return now.after(getRegisterAtDate()) && now.before(getEndAtDate());
+		return now.after(getRegisterAt()) && now.before(getEndAt());
 	}
 }

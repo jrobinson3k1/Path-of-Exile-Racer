@@ -1,7 +1,6 @@
 package com.jasonrobinson.racer.adapter;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -84,16 +83,8 @@ public class RaceAdapter extends BaseAdapter {
 
 		holder.titleTextView.setText(race.getRaceId());
 
-		Date startDate = null;
-		Date endDate = null;
-		try {
-			startDate = race.getStartAtDate();
-			endDate = race.getEndAtDate();
-		}
-		catch (ParseException e) {
-			e.printStackTrace();
-			onError(holder);
-		}
+		Date startDate = race.getStartAt();
+		Date endDate = race.getEndAt();
 
 		if (startDate != null && endDate != null) {
 			long millisNow = System.currentTimeMillis();
@@ -134,14 +125,14 @@ public class RaceAdapter extends BaseAdapter {
 		return sb;
 	}
 
-	private void updateTimeViews(Context context, ViewHolder holder, Race race) throws ParseException {
+	private void updateTimeViews(Context context, ViewHolder holder, Race race) {
 
 		CharSequence startAtTime;
 		CharSequence startAtDate;
 
 		long millisNow = System.currentTimeMillis();
-		long millisUntil = race.getStartAtDate().getTime() - millisNow;
-		long millisRemaining = race.getEndAtDate().getTime() - millisNow;
+		long millisUntil = race.getStartAt().getTime() - millisNow;
+		long millisRemaining = race.getEndAt().getTime() - millisNow;
 
 		if (millisUntil <= 3600000) { // <60 minutes until start
 			long millis;
@@ -157,8 +148,8 @@ public class RaceAdapter extends BaseAdapter {
 			startAtTime = RacerTimeUtils.formatElapsedTime(millis / 1000);
 		}
 		else { // >60 minutes until start
-			startAtTime = formatTime(race.getStartAtDate());
-			startAtDate = formatDate(context, race.getStartAtDate());
+			startAtTime = formatTime(race.getStartAt());
+			startAtDate = formatDate(context, race.getStartAt());
 		}
 
 		holder.timeTextView.setText(startAtTime);
@@ -235,13 +226,7 @@ public class RaceAdapter extends BaseAdapter {
 		@Override
 		public void onTick(long millisUntilFinished) {
 
-			try {
-				updateTimeViews(mContext, mViewHolder, mRace);
-			}
-			catch (ParseException e) {
-				e.printStackTrace();
-				onError(mViewHolder);
-			}
+			updateTimeViews(mContext, mViewHolder, mRace);
 		}
 	}
 

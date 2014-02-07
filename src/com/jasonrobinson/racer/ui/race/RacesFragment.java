@@ -1,6 +1,5 @@
 package com.jasonrobinson.racer.ui.race;
 
-import java.text.ParseException;
 import java.util.List;
 
 import android.annotation.TargetApi;
@@ -79,20 +78,10 @@ public class RacesFragment extends BaseListFragment {
 		}
 
 		// Check if the device can handle calendar intents
-		boolean removeAddCalendar = false;
-		try {
-			Intent intent = buildCalendarIntent(race);
-			PackageManager pm = getActivity().getPackageManager();
-			List<ResolveInfo> list = pm.queryIntentActivities(intent, 0);
-			if (list == null || list.isEmpty()) {
-				removeAddCalendar = true;
-			}
-		}
-		catch (ParseException e) {
-			removeAddCalendar = true;
-		}
-
-		if (removeAddCalendar) {
+		Intent intent = buildCalendarIntent(race);
+		PackageManager pm = getActivity().getPackageManager();
+		List<ResolveInfo> list = pm.queryIntentActivities(intent, 0);
+		if (list == null || list.isEmpty()) {
 			menu.removeItem(R.id.menu_add_to_calendar);
 		}
 	}
@@ -111,13 +100,8 @@ public class RacesFragment extends BaseListFragment {
 			mCallback.showUrl(race.getUrl());
 		}
 		else if (id == R.id.menu_add_to_calendar) {
-			try {
-				Intent intent = buildCalendarIntent(race);
-				startActivityForResult(intent, 0);
-			}
-			catch (ParseException e) {
-				Toast.makeText(getActivity(), R.string.error_parse, Toast.LENGTH_LONG).show();
-			}
+			Intent intent = buildCalendarIntent(race);
+			startActivityForResult(intent, 0);
 		}
 		else {
 			return super.onContextItemSelected(item);
@@ -132,19 +116,7 @@ public class RacesFragment extends BaseListFragment {
 		super.onListItemClick(l, v, position, id);
 		Race race = (Race) l.getItemAtPosition(position);
 
-		boolean registrationOpen;
-		boolean finished;
-		try {
-			registrationOpen = race.isRegistrationOpen();
-			finished = race.isFinished();
-		}
-		catch (ParseException e) {
-			e.printStackTrace();
-			registrationOpen = false;
-			finished = false;
-		}
-
-		if (registrationOpen || finished) {
+		if (race.isRegistrationOpen() || race.isFinished()) {
 			mCallback.showLadder(race);
 		}
 		else {
@@ -165,10 +137,10 @@ public class RacesFragment extends BaseListFragment {
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-	private Intent buildCalendarIntent(Race race) throws ParseException {
+	private Intent buildCalendarIntent(Race race) {
 
-		long startTime = race.getStartAtDate().getTime();
-		long endTime = race.getEndAtDate().getTime();
+		long startTime = race.getStartAt().getTime();
+		long endTime = race.getEndAt().getTime();
 
 		Intent intent;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
