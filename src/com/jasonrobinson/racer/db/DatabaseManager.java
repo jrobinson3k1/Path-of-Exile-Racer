@@ -1,6 +1,7 @@
 package com.jasonrobinson.racer.db;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -9,14 +10,18 @@ import javax.inject.Inject;
 import roboguice.RoboGuice;
 import roboguice.inject.ContextSingleton;
 import android.content.Context;
+import android.util.Log;
 
 import com.j256.ormlite.dao.Dao.CreateOrUpdateStatus;
 import com.j256.ormlite.stmt.DeleteBuilder;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.model.Race.Rule;
 
 @ContextSingleton
 public class DatabaseManager {
+
+	private static final String TAG = DatabaseManager.class.getSimpleName();
 
 	@Inject
 	private DatabaseHelper mHelper;
@@ -29,14 +34,39 @@ public class DatabaseManager {
 
 	public List<Race> getAllRaces() {
 
-		List<Race> races = null;
 		try {
-			races = mHelper.getRaceDao().queryForAll();
+			return mHelper.getRaceDao().queryForAll();
 		}
 		catch (SQLException e) {
-			e.printStackTrace();
+			Log.e(TAG, "Failed to retrieve all races", e);
+			return null;
 		}
-		return races;
+	}
+
+	public List<Race> getAllFinishedRaces() {
+
+		try {
+			QueryBuilder<Race, String> queryBuilder = mHelper.getRaceDao().queryBuilder();
+			queryBuilder.where().le("endAt", new Date(System.currentTimeMillis()));
+			return queryBuilder.query();
+		}
+		catch (SQLException e) {
+			Log.e(TAG, "Failed to retrieve all finished races", e);
+			return null;
+		}
+	}
+
+	public List<Race> getAllUnfinishedRaces() {
+
+		try {
+			QueryBuilder<Race, String> queryBuilder = mHelper.getRaceDao().queryBuilder();
+			queryBuilder.where().gt("endAt", new Date(System.currentTimeMillis()));
+			return queryBuilder.query();
+		}
+		catch (SQLException e) {
+			Log.e(TAG, "Failed to retrieve all finished races", e);
+			return null;
+		}
 	}
 
 	public boolean addOrUpdateRace(Race race) {
@@ -61,7 +91,7 @@ public class DatabaseManager {
 			return true;
 		}
 		catch (SQLException e) {
-			e.printStackTrace();
+			Log.e(TAG, "Failed to cache a race", e);
 			return false;
 		}
 	}
@@ -84,7 +114,7 @@ public class DatabaseManager {
 			});
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			Log.e(TAG, "Failed to batch cache races", e);
 		}
 
 		return 0;

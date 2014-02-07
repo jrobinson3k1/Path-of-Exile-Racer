@@ -146,7 +146,7 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 
 		private List<Race> fetchFromCache() {
 
-			return getDatabaseManager().getAllRaces();
+			return getDatabaseManager().getAllUnfinishedRaces();
 		}
 
 		private List<Race> fetchFromWeb() {

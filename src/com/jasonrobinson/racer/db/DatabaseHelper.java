@@ -62,7 +62,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 				mRaceDao = getDao(Race.class);
 			}
 			catch (SQLException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 
@@ -76,7 +76,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 				mRuleDao = getDao(Rule.class);
 			}
 			catch (SQLException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 

@@ -1,10 +1,7 @@
 package com.jasonrobinson.racer.model;
 
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import com.google.gson.annotations.SerializedName;
 import com.j256.ormlite.field.DatabaseField;
@@ -13,13 +10,6 @@ import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable
 public class Race {
-
-	private static final SimpleDateFormat DATE_FORMAT;
-
-	static {
-		DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
-		DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
-	}
 
 	@DatabaseField(id = true)
 	@SerializedName("id")
@@ -39,6 +29,10 @@ public class Race {
 	@ForeignCollectionField
 	private Collection<Rule> rules;
 
+	private Race() {
+
+	}
+
 	@DatabaseTable
 	public static class Rule {
 
@@ -56,6 +50,10 @@ public class Race {
 		@SuppressWarnings("unused")
 		@DatabaseField(foreign = true)
 		private transient Race race;
+
+		private Rule() {
+
+		}
 
 		public long getRuleId() {
 

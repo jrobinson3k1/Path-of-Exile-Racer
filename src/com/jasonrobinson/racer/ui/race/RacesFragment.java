@@ -81,7 +81,7 @@ public class RacesFragment extends BaseListFragment {
 		Intent intent = buildCalendarIntent(race);
 		PackageManager pm = getActivity().getPackageManager();
 		List<ResolveInfo> list = pm.queryIntentActivities(intent, 0);
-		if (list == null || list.isEmpty()) {
+		if (list == null || list.isEmpty() || race.isFinished() || race.isInProgress()) {
 			menu.removeItem(R.id.menu_add_to_calendar);
 		}
 	}

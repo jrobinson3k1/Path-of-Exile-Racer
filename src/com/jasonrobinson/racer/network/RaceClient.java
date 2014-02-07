@@ -42,7 +42,12 @@ public class RaceClient {
 
 	private RaceService buildRaceService(Converter converter) {
 
-		RestAdapter restAdapter = new RestAdapter.Builder().setServer(API_URL).setConverter(converter).build();
+		RestAdapter.Builder restAdapterBuilder = new RestAdapter.Builder().setServer(API_URL);
+		if (converter != null) {
+			restAdapterBuilder.setConverter(converter);
+		}
+		RestAdapter restAdapter = restAdapterBuilder.build();
+
 		return restAdapter.create(RaceService.class);
 	}
 
