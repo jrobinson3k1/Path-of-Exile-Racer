@@ -34,3 +34,4 @@ libs/ormlite-android-4.48.jar.properties
 libs/ormlite-core-4.48.jar.properties
 res/values/com_crashlytics_export_strings.xml
 res/values/crashlytics_key.xml
+libs/android-support-v4.jar.properties

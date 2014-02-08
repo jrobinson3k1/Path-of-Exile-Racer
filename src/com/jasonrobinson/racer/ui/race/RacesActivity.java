@@ -1,13 +1,14 @@
 package com.jasonrobinson.racer.ui.race;
 
-import com.crashlytics.android.Crashlytics;
 import java.util.ArrayList;
 import java.util.List;
 
 import roboguice.inject.InjectView;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.MenuItemCompat;
@@ -16,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.astuetz.PagerSlidingTabStrip;
+import com.crashlytics.android.Crashlytics;
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.async.RaceAsyncTask;
 import com.jasonrobinson.racer.enumeration.RaceOptions;
@@ -25,8 +27,11 @@ import com.jasonrobinson.racer.ui.ladder.LadderActivity;
 import com.jasonrobinson.racer.ui.race.RacesActivity.RacesPagerAdapter.RacesAdapterParams;
 import com.jasonrobinson.racer.ui.race.RacesFragment.RacesCallback;
 import com.jasonrobinson.racer.ui.web.WebActivity;
+import com.jasonrobinson.racer.util.DepthPageTransformer;
 
 public class RacesActivity extends BaseActivity implements RacesCallback {
+
+	private static final long FETCH_INTERVAL = 1000 * 60 * 60 * 24; // 24 hours
 
 	@InjectView(tag = "tabs")
 	private PagerSlidingTabStrip mTabs;
@@ -45,13 +50,21 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 		setTitle(R.string.races);
 
 		List<RacesAdapterParams> params = new ArrayList<RacesAdapterParams>();
-		params.add(new RacesAdapterParams(RaceOptions.UNFINISHED, "Unfinished"));
-		params.add(new RacesAdapterParams(RaceOptions.FINISHED, "Finished"));
+		params.add(new RacesAdapterParams(RaceOptions.UNFINISHED, getString(R.string.upcoming)));
+		params.add(new RacesAdapterParams(RaceOptions.FINISHED, getString(R.string.finished)));
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			mPager.setPageTransformer(true, new DepthPageTransformer());
+		}
 
 		mPager.setAdapter(new RacesPagerAdapter(getSupportFragmentManager(), params));
 		mTabs.setViewPager(mPager);
 
-		// fetchRaces();
+		long lastFetch = getSettingsManager().getLastRaceFetch();
+		long now = System.currentTimeMillis();
+		if (now - lastFetch >= FETCH_INTERVAL) {
+			fetchRaces();
+		}
 	}
 
 	@Override
@@ -84,7 +97,7 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 			fetchRaces();
 		}
 		else {
-			super.onOptionsItemSelected(item);
+			return super.onOptionsItemSelected(item);
 		}
 
 		return true;
@@ -103,8 +116,6 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 
 		Intent intent = new Intent(this, LadderActivity.class);
 		intent.putExtra(LadderActivity.EXTRA_ID, race.getRaceId());
-		intent.putExtra(LadderActivity.EXTRA_START_AT, race.getStartAt().getTime());
-		intent.putExtra(LadderActivity.EXTRA_END_AT, race.getEndAt().getTime());
 
 		startActivity(intent);
 	}
@@ -170,7 +181,7 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 
 		public RacesTask(Context context) {
 
-			super(context);
+			super(context, false);
 		}
 
 		@Override
@@ -185,9 +196,13 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 
 			super.onPostExecute(result);
 			setRefreshing(false);
+			getSettingsManager().updateLastRaceFetch();
 
-			if (result != null) {
-				// mFragment.setData(result);
+			List<Fragment> fragments = getSupportFragmentManager().getFragments();
+			for (Fragment fragment : fragments) {
+				if (fragment instanceof RacesFragment && fragment.isVisible()) {
+					((RacesFragment) fragment).refresh();
+				}
 			}
 		}
 	}

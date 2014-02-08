@@ -35,10 +35,14 @@
     <string name="watcher_input_error">Character names may only contain alphabet keys and underscores.</string>
     <string name="add_to_calendar">Add to Calendar</string>
     <string name="error_parse">An error occurred while attempting to parse the dates.</string>
-    <string name="races_unavailable">Unable to retrieve races at this time.</string>
+    <string name="races_unavailable">No races yet.</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="expand_all">Expand All</string>
+    <string name="collapse_all">Collapse All</string>
 
     <!-- Preference Keys -->
     <string name="prefs_keepscreenon_key">keepscreenon</string>
     <string name="prefs_autorefresh_key">autorefresh</string>
+    <string name="prefs_lastracefetch_key">lastracefetch</string>
 
 </resources>

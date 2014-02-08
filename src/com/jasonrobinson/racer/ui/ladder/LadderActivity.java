@@ -1,46 +1,43 @@
 package com.jasonrobinson.racer.ui.ladder;
 
-import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import roboguice.inject.InjectExtra;
 import roboguice.inject.InjectFragment;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.OnNavigationListener;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.BaseAdapter;
-import android.widget.TextView;
 
 import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.adapter.ClassSpinnerAdapter;
 import com.jasonrobinson.racer.enumeration.PoeClass;
+import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.ui.base.BaseActivity;
-import com.jasonrobinson.racer.util.RawTypeface;
+import com.jasonrobinson.racer.ui.ladder.RaceTimeFragment.RaceTimeCallback;
 
-public class LadderActivity extends BaseActivity {
+public class LadderActivity extends BaseActivity implements RaceTimeCallback {
+
+	private static final long DISABLE_REFRESH_EXTENSION = 1000 * 60 * 5; // 5
+																			// minutes
 
 	public static final String EXTRA_ID = "id";
-	public static final String EXTRA_START_AT = "startAt";
-	public static final String EXTRA_END_AT = "endAt";
 
 	@InjectFragment(tag = "raceTime_fragment")
 	RaceTimeFragment mRaceTimeFragment;
 	@InjectFragment(tag = "ladder_fragment")
 	LadderFragment mLadderFragment;
 
+	private Timer mDisableRefreshTimer;
+
 	private ClassSpinnerAdapter mNavAdapter;
 
 	@InjectExtra(value = EXTRA_ID)
 	private String mId;
-	@InjectExtra(value = EXTRA_START_AT)
-	private long mStartAt;
-	@InjectExtra(value = EXTRA_END_AT)
-	private long mEndAt;
+	private Race mRace;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +45,7 @@ public class LadderActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.ladder_activity);
 
+		mRace = getDatabaseManager().getRace(mId);
 		mNavAdapter = new ClassSpinnerAdapter(PoeClass.values(), true);
 
 		ActionBar actionBar = getSupportActionBar();
@@ -69,9 +67,16 @@ public class LadderActivity extends BaseActivity {
 		});
 
 		boolean enabled = getSettingsManager().isAutoRefreshEnabled();
-		setAutoRefresh(enabled);
+		setAutoRefreshEnabled(enabled, false);
 
-		mRaceTimeFragment.setData(mId, new Date(mStartAt), new Date(mEndAt));
+		mRaceTimeFragment.setData(mRace);
+	}
+
+	@Override
+	protected void onDestroy() {
+
+		super.onDestroy();
+		cancelDisableRefreshTimer();
 	}
 
 	@Override
@@ -86,7 +91,7 @@ public class LadderActivity extends BaseActivity {
 
 		checked = getSettingsManager().isAutoRefreshEnabled();
 		menu.findItem(R.id.menu_auto_refresh).setChecked(checked);
-		setAutoRefresh(checked);
+		setAutoRefreshEnabled(checked, false);
 
 		return true;
 	}
@@ -106,7 +111,7 @@ public class LadderActivity extends BaseActivity {
 		}
 		else if (id == R.id.menu_auto_refresh) {
 			item.setChecked(!item.isChecked());
-			setAutoRefresh(item.isChecked());
+			setAutoRefreshEnabled(item.isChecked(), true);
 
 			getAnalyticsManager().trackEvent("Ladder", item.isChecked() ? "Enable" : "Disable", "Auto Refresh");
 		}
@@ -117,13 +122,44 @@ public class LadderActivity extends BaseActivity {
 		return true;
 	}
 
-	public boolean isRaceFinished() {
+	@Override
+	public void onRaceFinished() {
 
-		// 5 minutes past end time to account for local time difference
-		return (mEndAt + 1000 * 60 * 5) - System.currentTimeMillis() < 0;
+		cancelDisableRefreshTimer();
+		if (isDelayedRaceFinished()) {
+			onDelayedRaceFinished();
+		}
+		else {
+			mDisableRefreshTimer = new Timer();
+			mDisableRefreshTimer.schedule(new DisableRefreshTimerTask(), getTimeUntilDelayedFinish());
+		}
 	}
 
-	private void setAutoRefresh(final boolean enabled) {
+	private void onDelayedRaceFinished() {
+
+		setAutoRefreshEnabled(false, false);
+		setRefreshEnabled(false);
+	}
+
+	private void cancelDisableRefreshTimer() {
+
+		if (mDisableRefreshTimer != null) {
+			mDisableRefreshTimer.cancel();
+			mDisableRefreshTimer.purge();
+		}
+	}
+
+	private long getTimeUntilDelayedFinish() {
+
+		return (mRace.getEndAt().getTime() + DISABLE_REFRESH_EXTENSION) - System.currentTimeMillis();
+	}
+
+	private boolean isDelayedRaceFinished() {
+
+		return getTimeUntilDelayedFinish() < 0;
+	}
+
+	private void setAutoRefreshEnabled(final boolean enabled, final boolean save) {
 
 		runOnUiThread(new Runnable() {
 
@@ -131,15 +167,31 @@ public class LadderActivity extends BaseActivity {
 			public void run() {
 
 				if (mLadderFragment != null) {
-					if (isRaceFinished()) {
-						mLadderFragment.setAutoRefresh(false);
+					if (isDelayedRaceFinished()) {
+						mLadderFragment.setAutoRefreshEnabled(false);
 					}
 					else {
-						mLadderFragment.setAutoRefresh(enabled);
+						mLadderFragment.setAutoRefreshEnabled(enabled);
 					}
 				}
 
-				getSettingsManager().setAutoRefresh(enabled);
+				if (save) {
+					getSettingsManager().setAutoRefresh(enabled);
+				}
+			}
+		});
+	}
+
+	private void setRefreshEnabled(final boolean enabled) {
+
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				if (mLadderFragment != null) {
+					mLadderFragment.setRefreshEnabled(enabled);
+				}
 			}
 		});
 	}
@@ -164,70 +216,12 @@ public class LadderActivity extends BaseActivity {
 		});
 	}
 
-	private class ClassSpinnerAdapter extends BaseAdapter {
-
-		PoeClass[] mPoeClasses;
-		boolean mShowAll;
-
-		public ClassSpinnerAdapter(PoeClass[] poeClasses, boolean showAll) {
-
-			mPoeClasses = poeClasses;
-			mShowAll = showAll;
-		}
+	private class DisableRefreshTimerTask extends TimerTask {
 
 		@Override
-		public int getCount() {
+		public void run() {
 
-			return mPoeClasses.length + (mShowAll ? 1 : 0);
-		}
-
-		@Override
-		public PoeClass getItem(int position) {
-
-			if (mShowAll && position == 0) {
-				return null;
-			}
-
-			return mPoeClasses[mShowAll ? position - 1 : position];
-		}
-
-		@Override
-		public long getItemId(int position) {
-
-			return position;
-		}
-
-		@Override
-		public View getDropDownView(int position, View convertView, ViewGroup parent) {
-
-			return getView(position, convertView, parent, android.R.layout.simple_spinner_dropdown_item);
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-
-			return getView(position, convertView, parent, android.R.layout.simple_spinner_item);
-		}
-
-		private View getView(int position, View convertView, ViewGroup parent, int layoutResId) {
-
-			View v = convertView;
-			TextView textView;
-			if (v == null) {
-				v = LayoutInflater.from(parent.getContext()).inflate(layoutResId, parent, false);
-				textView = (TextView) v.findViewById(android.R.id.text1);
-				textView.setTextColor(Color.WHITE);
-				textView.setTypeface(RawTypeface.obtain(parent.getContext(), R.raw.fontin_regular));
-			}
-			else {
-				textView = (TextView) v.findViewById(android.R.id.text1);
-			}
-
-			PoeClass poeClass = getItem(position);
-
-			textView.setText(poeClass == null ? parent.getContext().getString(R.string.all) : poeClass.toString());
-
-			return v;
+			onDelayedRaceFinished();
 		}
 	}
 }

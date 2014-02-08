@@ -40,6 +40,8 @@ public class DatabaseManager {
 				return getAllFinishedRaces();
 			case UNFINISHED:
 				return getAllUnfinishedRaces();
+			case IN_PROGRESS:
+				return getAllInProgressRaces();
 			case ALL:
 			default:
 				return getAllRaces();
@@ -79,6 +81,32 @@ public class DatabaseManager {
 		}
 		catch (SQLException e) {
 			Log.e(TAG, "Failed to retrieve all finished races", e);
+			return null;
+		}
+	}
+
+	private List<Race> getAllInProgressRaces() {
+
+		Date now = new Date(System.currentTimeMillis());
+
+		try {
+			QueryBuilder<Race, String> queryBuilder = mHelper.getRaceDao().queryBuilder();
+			queryBuilder.where().gt("endAt", now).and().lt("startAt", now);
+			return queryBuilder.query();
+		}
+		catch (SQLException e) {
+			Log.e(TAG, "Failed to retrieve all finished races", e);
+			return null;
+		}
+	}
+
+	public Race getRace(String id) {
+
+		try {
+			return mHelper.getRaceDao().queryForId(id);
+		}
+		catch (SQLException e) {
+			Log.e(TAG, "Failed to retrieve race with id " + id, e);
 			return null;
 		}
 	}

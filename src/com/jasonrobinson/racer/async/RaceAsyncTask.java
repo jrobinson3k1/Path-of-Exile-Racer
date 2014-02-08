@@ -22,27 +22,36 @@ public class RaceAsyncTask extends AsyncTask<Void, Void, List<Race>> {
 
 	@Inject
 	private DatabaseManager mDatabaseManager;
+	private boolean mReturnData;
 
-	public RaceAsyncTask(Context context) {
+	public RaceAsyncTask(Context context, boolean returnData) {
 
 		RoboGuice.injectMembers(context, this);
+		mReturnData = returnData;
 	}
 
 	@Override
 	protected List<Race> doInBackground(Void... params) {
 
+		Log.d(TAG, "Downloading races");
 		List<Race> races = fetchFromWeb();
+		Log.d(TAG, "Finished downloading (" + races.size() + " entries)");
 
 		Log.d(TAG, "Cacheing races (" + races.size() + " entries)");
 		int rows = mDatabaseManager.addOrUpdateRaceList(races);
 		Log.d(TAG, "Finished cacheing (" + rows + " entries)");
 
-		return fetchFromCache();
+		if (mReturnData) {
+			return fetchFromCache();
+		}
+		else {
+			return null;
+		}
 	}
 
 	private List<Race> fetchFromCache() {
 
-		return mDatabaseManager.getRaces(RaceOptions.UNFINISHED);
+		return mDatabaseManager.getRaces(RaceOptions.ALL);
 	}
 
 	private List<Race> fetchFromWeb() {

@@ -4,5 +4,6 @@ public enum RaceOptions {
 
 	ALL,
 	FINISHED,
-	UNFINISHED
+	UNFINISHED,
+	IN_PROGRESS
 }

@@ -14,23 +14,27 @@ import android.provider.CalendarContract.Events;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.ListView;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.Toast;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.adapter.RaceAdapter;
 import com.jasonrobinson.racer.enumeration.RaceOptions;
 import com.jasonrobinson.racer.model.Race;
-import com.jasonrobinson.racer.ui.base.BaseListFragment;
+import com.jasonrobinson.racer.ui.base.BaseExpandableListFragment;
 
-public class RacesFragment extends BaseListFragment {
+public class RacesFragment extends BaseExpandableListFragment {
 
 	private static final String TAG = RacesFragment.class.getSimpleName();
 
 	public static final String ARG_OPTION = "option";
+
+	private RaceAdapter mAdapter;
 
 	private RaceOptions mRaceOption;
 	private RacesCallback mCallback;
@@ -50,6 +54,7 @@ public class RacesFragment extends BaseListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
 		mRaceOption = (RaceOptions) getArguments().getSerializable(ARG_OPTION);
 	}
 
@@ -71,19 +76,49 @@ public class RacesFragment extends BaseListFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 
 		super.onActivityCreated(savedInstanceState);
-		registerForContextMenu(getListView());
+		registerForContextMenu(getExpandableListView());
+		refresh();
+	}
 
-		setData(getDatabaseManager().getRaces(mRaceOption));
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+		super.onCreateOptionsMenu(menu, inflater);
+		inflater.inflate(R.menu.races_menu, menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		int id = item.getItemId();
+		if (id == R.id.menu_expand_all) {
+			expandAllGroups();
+		}
+		else if (id == R.id.menu_collapse_all) {
+			collapseAllGroups();
+		}
+		else {
+			return super.onOptionsItemSelected(item);
+		}
+
+		return true;
 	}
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 
 		super.onCreateContextMenu(menu, v, menuInfo);
+		ExpandableListContextMenuInfo adapterInfo = (ExpandableListContextMenuInfo) menuInfo;
+		if (ExpandableListView.getPackedPositionType(adapterInfo.packedPosition) != ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+			return;
+		}
+
+		int groupPosition = ExpandableListView.getPackedPositionGroup(adapterInfo.packedPosition);
+		int childPosition = ExpandableListView.getPackedPositionChild(adapterInfo.packedPosition);
+
 		getActivity().getMenuInflater().inflate(R.menu.races_context_menu, menu);
 
-		AdapterContextMenuInfo adapterInfo = (AdapterContextMenuInfo) menuInfo;
-		Race race = (Race) getListView().getItemAtPosition(adapterInfo.position);
+		Race race = mAdapter.getChild(groupPosition, childPosition);
 
 		if (TextUtils.isEmpty(race.getUrl())) {
 			menu.removeItem(R.id.menu_forum_post);
@@ -101,8 +136,14 @@ public class RacesFragment extends BaseListFragment {
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 
-		AdapterContextMenuInfo menuInfo = (AdapterContextMenuInfo) item.getMenuInfo();
-		Race race = (Race) getListView().getItemAtPosition(menuInfo.position);
+		ExpandableListContextMenuInfo menuInfo = (ExpandableListContextMenuInfo) item.getMenuInfo();
+		if (ExpandableListView.getPackedPositionType(menuInfo.packedPosition) != ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+			return false;
+		}
+
+		int groupPosition = ExpandableListView.getPackedPositionGroup(menuInfo.packedPosition);
+		int childPosition = ExpandableListView.getPackedPositionChild(menuInfo.packedPosition);
+		Race race = mAdapter.getChild(groupPosition, childPosition);
 
 		int id = item.getItemId();
 		if (id == R.id.menu_ladder) {
@@ -123,10 +164,9 @@ public class RacesFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
+	public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
-		super.onListItemClick(l, v, position, id);
-		Race race = (Race) l.getItemAtPosition(position);
+		Race race = mAdapter.getChild(groupPosition, childPosition);
 
 		if (race.isRegistrationOpen() || race.isFinished()) {
 			mCallback.showLadder(race);
@@ -140,12 +180,24 @@ public class RacesFragment extends BaseListFragment {
 				Toast.makeText(getActivity(), R.string.no_forum_post, Toast.LENGTH_SHORT).show();
 			}
 		}
+
+		return true;
 	}
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	private void expandAllGroups() {
 
-		super.onActivityResult(requestCode, resultCode, data);
+		int groupCount = getExpandableListAdapter().getGroupCount();
+		for (int i = 0; i < groupCount; i++) {
+			getExpandableListView().expandGroup(i);
+		}
+	}
+
+	private void collapseAllGroups() {
+
+		int groupCount = getExpandableListAdapter().getGroupCount();
+		for (int i = 0; i < groupCount; i++) {
+			getExpandableListView().collapseGroup(i);
+		}
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -180,10 +232,25 @@ public class RacesFragment extends BaseListFragment {
 		return intent;
 	}
 
-	public void setData(List<Race> races) {
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+	private void setData(List<Race> races) {
 
-		setListAdapter(new RaceAdapter(getActivity(), races));
+		mAdapter = new RaceAdapter(getActivity(), races);
+		setListAdapter(mAdapter);
 		setListShown(true);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+			getExpandableListView().expandGroup(0, false);
+		}
+		else {
+			getExpandableListView().expandGroup(0);
+		}
+	}
+
+	public void refresh() {
+
+		List<Race> races = getDatabaseManager().getRaces(mRaceOption);
+		setData(races);
 	}
 
 	public interface RacesCallback {

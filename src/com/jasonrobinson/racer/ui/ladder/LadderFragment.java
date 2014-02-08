@@ -24,6 +24,7 @@ import com.jasonrobinson.racer.async.LadderAsyncTask.LadderParams;
 import com.jasonrobinson.racer.enumeration.PoeClass;
 import com.jasonrobinson.racer.model.Ladder;
 import com.jasonrobinson.racer.model.Ladder.Entry;
+import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.model.ServerError;
 import com.jasonrobinson.racer.ui.base.BaseListFragment;
 import com.jasonrobinson.racer.ui.ladder.WatchCharacterDialogFragment.WatchCharacterDialogListener;
@@ -37,20 +38,21 @@ public class LadderFragment extends BaseListFragment {
 
 	private static final String TAG_WATCH_CHARACTER = "watchCharacter";
 
-	private String mId;
+	private Race mRace;
 
 	private String mWatchedCharacter;
 	private PoeClass mWatchedCharacterClass;
 	private PoeClass mWatchedClass;
 
-	private Timer mTimer;
+	private Timer mAutoRefreshTimer;
 	private boolean mRefreshing;
 
 	private LadderAdapter mAdapter;
 	private LadderTask mTask;
 
 	private boolean mTracked;
-	private boolean mAutoRefresh;
+	private boolean mRefreshEnabled = true;
+	private boolean mAutoRefreshEnabled;
 
 	public static final LadderFragment newInstance(String id) {
 
@@ -84,7 +86,7 @@ public class LadderFragment extends BaseListFragment {
 		if (getArguments() != null) {
 			String id = getArguments().getString(ARG_ID);
 			if (id != null) {
-				mId = id;
+				mRace = getDatabaseManager().getRace(id);
 				fetchLadder();
 			}
 		}
@@ -94,7 +96,7 @@ public class LadderFragment extends BaseListFragment {
 	public void onResume() {
 
 		super.onResume();
-		if (mTask != null && mTask.getStatus() != Status.RUNNING && mId != null) {
+		if (mTask != null && mTask.getStatus() != Status.RUNNING && mRace != null) {
 			fetchLadder();
 		}
 	}
@@ -123,8 +125,9 @@ public class LadderFragment extends BaseListFragment {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.refresh_menu, menu);
 
+		MenuItem refreshItem = menu.findItem(R.id.menu_refresh);
+		refreshItem.setEnabled(mRefreshEnabled);
 		if (!mRefreshing) {
-			MenuItem refreshItem = menu.findItem(R.id.menu_refresh);
 			MenuItemCompat.setActionView(refreshItem, null);
 		}
 	}
@@ -191,12 +194,14 @@ public class LadderFragment extends BaseListFragment {
 
 	private void fetchLadder() {
 
-		fetchLadder(mId, mWatchedClass);
+		fetchLadder(mRace.getRaceId(), mWatchedClass);
 	}
 
 	public void fetchLadder(String id, PoeClass poeClass) {
 
-		mId = id;
+		if (mRace == null || !mRace.getRaceId().equals(id)) {
+			mRace = getDatabaseManager().getRace(id);
+		}
 
 		boolean resetAdapter = mWatchedClass != poeClass;
 		mWatchedClass = poeClass;
@@ -212,22 +217,23 @@ public class LadderFragment extends BaseListFragment {
 
 		if (!mTracked) {
 			mTracked = true;
-			getAnalyticsManager().trackEvent("Ladder", "View", mId);
+			getAnalyticsManager().trackEvent("Ladder", "View", id);
 		}
 	}
 
 	private void cancelAutoRefresh() {
 
-		if (mTimer != null) {
-			mTimer.cancel();
+		if (mAutoRefreshTimer != null) {
+			mAutoRefreshTimer.cancel();
+			mAutoRefreshTimer.purge();
 		}
 	}
 
 	private void startAutoRefresh() {
 
 		cancelAutoRefresh();
-		mTimer = new Timer();
-		mTimer.schedule(new RefreshTimerTask(), 30000);
+		mAutoRefreshTimer = new Timer();
+		mAutoRefreshTimer.schedule(new RefreshTimerTask(), 30000);
 	}
 
 	private void setRefreshing(boolean refreshing) {
@@ -239,26 +245,40 @@ public class LadderFragment extends BaseListFragment {
 			cancelAutoRefresh();
 		}
 		else {
-			if (mAutoRefresh) {
+			if (mAutoRefreshEnabled) {
 				startAutoRefresh();
 			}
 		}
 	}
 
-	public void setAutoRefresh(boolean autoRefresh) {
+	public void setAutoRefreshEnabled(boolean enabled) {
 
-		if (mAutoRefresh == autoRefresh) {
+		if (mAutoRefreshEnabled == enabled) {
 			return;
 		}
 
-		mAutoRefresh = autoRefresh;
+		mAutoRefreshEnabled = enabled;
 
-		if (mAutoRefresh) {
+		if (mAutoRefreshEnabled) {
 			startAutoRefresh();
 		}
 		else {
 			cancelAutoRefresh();
 		}
+	}
+
+	public void onRaceFinished() {
+
+	}
+
+	public void setRefreshEnabled(boolean enabled) {
+
+		if (mRefreshEnabled = enabled) {
+			return;
+		}
+
+		mRefreshEnabled = enabled;
+		getActivity().supportInvalidateOptionsMenu();
 	}
 
 	private class LadderTask extends LadderAsyncTask {
@@ -353,7 +373,7 @@ public class LadderFragment extends BaseListFragment {
 		@Override
 		public void run() {
 
-			if (mId != null) {
+			if (mRace != null) {
 				getActivity().runOnUiThread(new Runnable() {
 
 					@Override

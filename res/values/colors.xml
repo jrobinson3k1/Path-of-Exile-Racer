@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="main_color">#3399CC</color>
+    
+    <!-- Ranks -->
     <color name="rank_up">#FFECEC</color>
     <color name="rank_down">#E3FBE9</color>
     <color name="rank_none">#00000000</color>
