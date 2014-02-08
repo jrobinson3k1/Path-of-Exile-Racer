@@ -35,6 +35,10 @@
         <activity
             android:name="com.jasonrobinson.racer.ui.settings.SettingsActivity"
             android:configChanges="orientation|screenSize" />
+
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="@string/crashlytics_key" />
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package com.jasonrobinson.racer.ui.race;
 
+import com.crashlytics.android.Crashlytics;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +40,7 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+		Crashlytics.start(this);
 		setContentView(R.layout.racer_activity);
 		setTitle(R.string.races);
 
