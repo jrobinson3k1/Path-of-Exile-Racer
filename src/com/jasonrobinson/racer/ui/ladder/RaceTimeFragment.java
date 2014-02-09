@@ -62,6 +62,15 @@ public class RaceTimeFragment extends BaseFragment {
 		mNameTextView.setTypeface(RawTypeface.obtain(getActivity(), R.raw.fontin_bold));
 	}
 
+	@Override
+	public void onDestroyView() {
+
+		super.onDestroyView();
+		if (mRemainingTimer != null) {
+			mRemainingTimer.cancel();
+		}
+	}
+
 	public void setData(Race race) {
 
 		String name = race.getRaceId();

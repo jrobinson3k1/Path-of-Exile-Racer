@@ -7,6 +7,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.support.v4.app.TaskStackBuilder;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.view.Menu;
@@ -75,13 +77,24 @@ public class BaseActivityImpl {
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		int id = item.getItemId();
-		if (id == R.id.menu_settings) {
+		if (id == android.R.id.home) {
+			Intent upIntent = NavUtils.getParentActivityIntent(mActivity);
+			if (NavUtils.shouldUpRecreateTask(mActivity, upIntent)) {
+				TaskStackBuilder.create(mActivity).addNextIntentWithParentStack(upIntent).startActivities();
+			}
+			else {
+				NavUtils.navigateUpFromSameTask(mActivity);
+			}
+		}
+		else if (id == R.id.menu_settings) {
 			Intent intent = new Intent(mActivity, SettingsActivity.class);
 			mActivity.startActivity(intent);
-			return true;
+		}
+		else {
+			return false;
 		}
 
-		return false;
+		return true;
 	}
 
 	public AnalyticsManager getAnalyticsManager() {

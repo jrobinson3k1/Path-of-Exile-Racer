@@ -8,7 +8,10 @@
         android:id="@+id/menu_forum_post"
         android:title="@string/forum_post"/>
     <item
-        android:id="@+id/menu_add_to_calendar"
-        android:title="@string/add_to_calendar"/>
+        android:id="@+id/menu_add_notification"
+        android:title="@string/add_notification"/>
+    <item
+        android:id="@+id/menu_remove_notification"
+        android:title="@string/remove_notification"/>
 
 </menu>

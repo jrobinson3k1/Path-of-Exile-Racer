@@ -33,12 +33,14 @@
     <string name="auto_refresh">Auto Refresh</string>
     <string name="all">All</string>
     <string name="watcher_input_error">Character names may only contain alphabetic keys and underscores.</string>
-    <string name="add_to_calendar">Add to Calendar</string>
+    <string name="add_notification">Add Notification</string>
+    <string name="remove_notification">Remove Notification</string>
     <string name="error_parse">An error occurred while attempting to parse the dates.</string>
     <string name="races_unavailable">No races yet.</string>
     <string name="upcoming">Upcoming</string>
     <string name="expand_all">Expand All</string>
     <string name="collapse_all">Collapse All</string>
+    <string name="starts_at">Starts at %1$s</string>
 
     <!-- Preference Keys -->
     <string name="prefs_keepscreenon_key">keepscreenon</string>

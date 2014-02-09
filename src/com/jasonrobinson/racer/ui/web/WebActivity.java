@@ -3,7 +3,6 @@ package com.jasonrobinson.racer.ui.web;
 import roboguice.inject.InjectFragment;
 import roboguice.inject.InjectView;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -47,20 +46,6 @@ public class WebActivity extends BaseActivity implements WebCallback {
 		if (!mWebFragment.onBackPressed()) {
 			super.onBackPressed();
 		}
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				finish();
-				break;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-
-		return true;
 	}
 
 	@Override

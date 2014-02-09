@@ -100,10 +100,7 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		int id = item.getItemId();
-		if (id == android.R.id.home) {
-			finish();
-		}
-		else if (id == R.id.menu_keep_screen_on) {
+		if (id == R.id.menu_keep_screen_on) {
 			item.setChecked(!item.isChecked());
 			keepScreenOn(item.isChecked());
 

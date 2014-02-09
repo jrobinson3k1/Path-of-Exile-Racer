@@ -5,12 +5,8 @@ import java.util.List;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.CalendarContract;
-import android.provider.CalendarContract.Events;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -27,6 +23,7 @@ import com.jasonrobinson.racer.adapter.RaceAdapter;
 import com.jasonrobinson.racer.enumeration.RaceOptions;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.ui.base.BaseExpandableListFragment;
+import com.jasonrobinson.racer.util.AlarmUtils;
 
 public class RacesFragment extends BaseExpandableListFragment {
 
@@ -130,12 +127,11 @@ public class RacesFragment extends BaseExpandableListFragment {
 			menu.removeItem(R.id.menu_forum_post);
 		}
 
-		// Check if the device can handle calendar intents
-		Intent intent = buildCalendarIntent(race);
-		PackageManager pm = getActivity().getPackageManager();
-		List<ResolveInfo> list = pm.queryIntentActivities(intent, 0);
-		if (list == null || list.isEmpty() || race.isFinished() || race.isInProgress()) {
-			menu.removeItem(R.id.menu_add_to_calendar);
+		if (AlarmUtils.isAlarmAdded(getActivity(), race)) {
+			menu.removeItem(R.id.menu_add_notification);
+		}
+		else {
+			menu.removeItem(R.id.menu_remove_notification);
 		}
 	}
 
@@ -158,9 +154,11 @@ public class RacesFragment extends BaseExpandableListFragment {
 		else if (id == R.id.menu_forum_post) {
 			mCallback.showUrl(race.getUrl());
 		}
-		else if (id == R.id.menu_add_to_calendar) {
-			Intent intent = buildCalendarIntent(race);
-			startActivityForResult(intent, 0);
+		else if (id == R.id.menu_add_notification) {
+			AlarmUtils.addAlarm(getActivity(), race);
+		}
+		else if (id == R.id.menu_remove_notification) {
+			AlarmUtils.cancelAlarm(getActivity(), race);
 		}
 		else {
 			return super.onContextItemSelected(item);
@@ -206,36 +204,10 @@ public class RacesFragment extends BaseExpandableListFragment {
 		}
 	}
 
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-	private Intent buildCalendarIntent(Race race) {
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-		long startTime = race.getStartAt().getTime();
-		long endTime = race.getEndAt().getTime();
-
-		Intent intent;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-			intent = new Intent(Intent.ACTION_INSERT);
-			intent.setData(Events.CONTENT_URI);
-			intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startTime);
-			intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime);
-			intent.putExtra(Events.TITLE, race.getRaceId());
-			intent.putExtra(Events.DESCRIPTION, race.getDescription());
-			intent.putExtra(Events.AVAILABILITY, Events.AVAILABILITY_BUSY);
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-				intent.putExtra(CalendarContract.Events.CUSTOM_APP_PACKAGE, getActivity().getPackageName());
-			}
-		}
-		else {
-			intent = new Intent(Intent.ACTION_EDIT);
-			intent.setType("vnd.android.cursor.item/event");
-			intent.putExtra("beginTime", startTime);
-			intent.putExtra("endTime", endTime);
-			intent.putExtra("rrule", "FREQ=YEARLY");
-			intent.putExtra("title", race.getRaceId());
-		}
-
-		return intent;
+		super.onActivityResult(requestCode, resultCode, data);
 	}
 
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
