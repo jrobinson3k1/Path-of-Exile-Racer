@@ -155,10 +155,12 @@ public class RacesFragment extends BaseExpandableListFragment {
 			mCallback.showUrl(race.getUrl());
 		}
 		else if (id == R.id.menu_add_notification) {
-			AlarmUtils.addAlarm(getActivity(), race);
+			AlarmUtils.addAlarm(getActivity(), race, 1000 * 60 * 15);
+			mAdapter.notifyDataSetChanged();
 		}
 		else if (id == R.id.menu_remove_notification) {
 			AlarmUtils.cancelAlarm(getActivity(), race);
+			mAdapter.notifyDataSetChanged();
 		}
 		else {
 			return super.onContextItemSelected(item);

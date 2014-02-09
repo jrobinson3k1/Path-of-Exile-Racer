@@ -17,11 +17,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.model.Race.Rule;
+import com.jasonrobinson.racer.util.AlarmUtils;
 import com.jasonrobinson.racer.util.CalendarUtils;
 import com.jasonrobinson.racer.util.RacerTimeUtils;
 import com.jasonrobinson.racer.util.RawTypeface;
@@ -185,7 +187,7 @@ public class RaceAdapter extends BaseExpandableListAdapter {
 		}
 
 		holder.descriptionTextView.setText(formatRules(race.getRules()));
-
+		holder.notificationImageView.setVisibility(AlarmUtils.isAlarmAdded(context, race) ? View.VISIBLE : View.GONE);
 		return view;
 	}
 
@@ -317,6 +319,7 @@ public class RaceAdapter extends BaseExpandableListAdapter {
 		public TextView timeTextView;
 		public TextView registerTextView;
 		public TextView descriptionTextView;
+		public ImageView notificationImageView;
 
 		public RaceCountDownTimer timer;
 
@@ -326,6 +329,7 @@ public class RaceAdapter extends BaseExpandableListAdapter {
 			timeTextView = (TextView) v.findViewById(R.id.startTime);
 			registerTextView = (TextView) v.findViewById(R.id.register);
 			descriptionTextView = (TextView) v.findViewById(R.id.description);
+			notificationImageView = (ImageView) v.findViewById(R.id.notification);
 		}
 	}
 }

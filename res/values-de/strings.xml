@@ -32,6 +32,7 @@
     <string name="auto_refresh">Auto-Aktualisierung</string>
     <string name="all">Alle</string>
     <string name="watcher_input_error">Charakternamen dürfen nur Buchstabentasten und Unterstriche.</string>
+    <string name="notification">Benachrichtigung</string>
     <string name="add_notification">Benachrichtigung Hinzufügen</string>
     <string name="remove_notification">Benachrichtigung Entfernen</string>
     <string name="error_parse">Beim Versuch, die Daten zu analysieren ist ein Fehler aufgetreten.</string>
@@ -40,5 +41,6 @@
     <string name="expand_all">Alles erweitern</string>
     <string name="collapse_all">Alles schließen</string>
     <string name="starts_at">Startet um</string>
+    <string name="notification_scheduled">Benachrichtigung für %1$s %2$s geplant</string>
 
 </resources>

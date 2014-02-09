@@ -1,11 +1,16 @@
 package com.jasonrobinson.racer.util;
 
+import java.sql.Date;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.text.format.DateFormat;
+import android.widget.Toast;
 
+import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.receiver.AlarmReceiver;
 
@@ -15,11 +20,15 @@ public class AlarmUtils {
 
 	}
 
-	public static void addAlarm(Context context, Race race) {
+	public static void addAlarm(Context context, Race race, long delay) {
 
 		AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		PendingIntent operation = getPendingIntentForRace(context, race, PendingIntent.FLAG_UPDATE_CURRENT);
-		am.set(AlarmManager.RTC_WAKEUP, race.getStartAt().getTime(), operation);
+		long time = race.getStartAt().getTime() - delay;
+		am.set(AlarmManager.RTC_WAKEUP, time, operation);
+
+		Date date = new Date(time);
+		Toast.makeText(context, context.getString(R.string.notification_scheduled, DateFormat.getTimeFormat(context).format(date), DateFormat.getDateFormat(context).format(date)), Toast.LENGTH_SHORT).show();
 	}
 
 	public static void cancelAlarm(Context context, Race race) {
