@@ -42,5 +42,8 @@
     <string name="collapse_all">Alles schließen</string>
     <string name="starts_at">Startet um</string>
     <string name="notification_scheduled">Benachrichtigung für %1$s %2$s geplant</string>
+    <string name="notification_dialog_message1">Benachrichtigen Sie mich</string>
+    <string name="notification_dialog_message2">Minuten vor dem Start des Rennens.</string>
+    <string name="add">Hinzufügen</string>
 
 </resources>

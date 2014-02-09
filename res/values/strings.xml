@@ -43,6 +43,9 @@
     <string name="collapse_all">Collapse All</string>
     <string name="starts_at">Starts at %1$s</string>
     <string name="notification_scheduled">Notification scheduled for %1$s %2$s</string>
+    <string name="notification_dialog_message1">Notify me</string>
+    <string name="notification_dialog_message2">minutes before the race starts.</string>
+    <string name="add">Add</string>
 
     <!-- Preference Keys -->
     <string name="prefs_keepscreenon_key">keepscreenon</string>

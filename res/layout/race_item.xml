@@ -30,6 +30,7 @@
                 android:id="@+id/notification"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
                 android:contentDescription="@string/notification"
                 android:src="@drawable/alarm_bell"
                 android:visibility="invisible" />

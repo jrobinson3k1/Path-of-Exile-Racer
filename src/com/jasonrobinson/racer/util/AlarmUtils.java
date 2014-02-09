@@ -28,7 +28,7 @@ public class AlarmUtils {
 		am.set(AlarmManager.RTC_WAKEUP, time, operation);
 
 		Date date = new Date(time);
-		Toast.makeText(context, context.getString(R.string.notification_scheduled, DateFormat.getTimeFormat(context).format(date), DateFormat.getDateFormat(context).format(date)), Toast.LENGTH_SHORT).show();
+		Toast.makeText(context, context.getString(R.string.notification_scheduled, DateFormat.getTimeFormat(context).format(date), DateFormat.getDateFormat(context).format(date)), Toast.LENGTH_LONG).show();
 	}
 
 	public static void cancelAlarm(Context context, Race race) {

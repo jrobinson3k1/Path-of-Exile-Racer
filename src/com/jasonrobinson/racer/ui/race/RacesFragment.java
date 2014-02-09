@@ -23,11 +23,10 @@ import com.jasonrobinson.racer.adapter.RaceAdapter;
 import com.jasonrobinson.racer.enumeration.RaceOptions;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.ui.base.BaseExpandableListFragment;
+import com.jasonrobinson.racer.ui.race.NotificationPickerDialogFragment.OnTimeSelectedListener;
 import com.jasonrobinson.racer.util.AlarmUtils;
 
 public class RacesFragment extends BaseExpandableListFragment {
-
-	private static final String TAG = RacesFragment.class.getSimpleName();
 
 	public static final String ARG_OPTION = "option";
 
@@ -155,8 +154,7 @@ public class RacesFragment extends BaseExpandableListFragment {
 			mCallback.showUrl(race.getUrl());
 		}
 		else if (id == R.id.menu_add_notification) {
-			AlarmUtils.addAlarm(getActivity(), race, 1000 * 60 * 15);
-			mAdapter.notifyDataSetChanged();
+			showNotificationDialog(race);
 		}
 		else if (id == R.id.menu_remove_notification) {
 			AlarmUtils.cancelAlarm(getActivity(), race);
@@ -188,6 +186,27 @@ public class RacesFragment extends BaseExpandableListFragment {
 		}
 
 		return true;
+	}
+
+	private void showNotificationDialog(final Race race) {
+
+		NotificationPickerDialogFragment fragment = NotificationPickerDialogFragment.newInstance();
+		fragment.setOnTimeSelectedListener(new OnTimeSelectedListener() {
+
+			@Override
+			public void onTimeSelected(long millis) {
+
+				AlarmUtils.addAlarm(getActivity(), race, millis);
+				mAdapter.notifyDataSetChanged();
+			}
+
+			@Override
+			public void onCancel() {
+
+				// no-op
+			}
+		});
+		fragment.show(getFragmentManager(), null);
 	}
 
 	private void expandAllGroups() {
