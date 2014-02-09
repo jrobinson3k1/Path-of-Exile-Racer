@@ -77,6 +77,12 @@ public class RacesFragment extends BaseExpandableListFragment {
 
 		super.onActivityCreated(savedInstanceState);
 		registerForContextMenu(getExpandableListView());
+	}
+
+	@Override
+	public void onResume() {
+
+		super.onResume();
 		refresh();
 	}
 

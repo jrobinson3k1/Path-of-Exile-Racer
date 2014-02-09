@@ -64,6 +64,7 @@ public class DatabaseManager {
 		try {
 			QueryBuilder<Race, String> queryBuilder = mHelper.getRaceDao().queryBuilder();
 			queryBuilder.where().le("endAt", new Date(System.currentTimeMillis()));
+			queryBuilder.orderBy("startAt", false);
 			return queryBuilder.query();
 		}
 		catch (SQLException e) {
@@ -77,6 +78,7 @@ public class DatabaseManager {
 		try {
 			QueryBuilder<Race, String> queryBuilder = mHelper.getRaceDao().queryBuilder();
 			queryBuilder.where().gt("endAt", new Date(System.currentTimeMillis()));
+			queryBuilder.orderBy("startAt", true);
 			return queryBuilder.query();
 		}
 		catch (SQLException e) {

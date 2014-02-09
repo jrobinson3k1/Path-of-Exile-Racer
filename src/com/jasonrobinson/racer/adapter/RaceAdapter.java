@@ -1,6 +1,7 @@
 package com.jasonrobinson.racer.adapter;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -21,13 +22,15 @@ import android.widget.TextView;
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.model.Race.Rule;
+import com.jasonrobinson.racer.util.CalendarUtils;
 import com.jasonrobinson.racer.util.RacerTimeUtils;
 import com.jasonrobinson.racer.util.RawTypeface;
 
 public class RaceAdapter extends BaseExpandableListAdapter {
 
-	private DateFormat mDateFormat;
-	private DateFormat mTimeFormat;
+	private final DateFormat mDayOfWeekFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
+	private final DateFormat mDateFormat;
+	private final DateFormat mTimeFormat;
 
 	private List<List<Race>> mDateRaces = new ArrayList<List<Race>>();
 	private List<Race> mRaces;
@@ -55,7 +58,7 @@ public class RaceAdapter extends BaseExpandableListAdapter {
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(startAt);
 
-			if (lastDate == null || cal.get(Calendar.YEAR) != lastCal.get(Calendar.YEAR) || cal.get(Calendar.MONTH) != lastCal.get(Calendar.MONTH) || cal.get(Calendar.DAY_OF_MONTH) != lastCal.get(Calendar.DAY_OF_MONTH)) {
+			if (lastDate == null || cal.get(Calendar.YEAR) != lastCal.get(Calendar.YEAR) || cal.get(Calendar.DAY_OF_YEAR) != lastCal.get(Calendar.DAY_OF_YEAR)) {
 				mDateRaces.add(new ArrayList<Race>());
 				lastDate = startAt;
 			}
@@ -117,21 +120,27 @@ public class RaceAdapter extends BaseExpandableListAdapter {
 
 		Context context = parent.getContext();
 		View view = convertView;
-		TextView textView;
+		TextView textView1;
+		TextView textView2;
 		if (view == null) {
-			view = LayoutInflater.from(context).inflate(android.R.layout.simple_expandable_list_item_1, parent, false);
+			view = LayoutInflater.from(context).inflate(android.R.layout.simple_expandable_list_item_2, parent, false);
 
-			textView = (TextView) view.findViewById(android.R.id.text1);
-			textView.setTypeface(RawTypeface.obtain(context, R.raw.fontin_regular));
+			textView1 = (TextView) view.findViewById(android.R.id.text1);
+			textView1.setTypeface(RawTypeface.obtain(context, R.raw.fontin_regular));
+
+			textView2 = (TextView) view.findViewById(android.R.id.text2);
+			textView2.setTypeface(RawTypeface.obtain(context, R.raw.fontin_regular));
 		}
 		else {
-			textView = (TextView) view.findViewById(android.R.id.text1);
+			textView1 = (TextView) view.findViewById(android.R.id.text1);
+			textView2 = (TextView) view.findViewById(android.R.id.text2);
 		}
 
 		List<Race> races = getGroup(groupPosition);
 		Date date = races.get(0).getStartAt();
 
-		textView.setText(formatDate(context, date) + " (" + races.size() + ")");
+		textView1.setText(formatDayOfWeek(context, date) + " (" + races.size() + ")");
+		textView2.setText(formatDate(date));
 
 		return view;
 	}
@@ -227,7 +236,11 @@ public class RaceAdapter extends BaseExpandableListAdapter {
 
 		holder.timeTextView.setText(startAtTime);
 
-		if (race.isRegistrationOpen()) {
+		if (race.isInProgress()) {
+			holder.registerTextView.setTextColor(Color.GREEN);
+			holder.registerTextView.setText(R.string.started);
+		}
+		else if (race.isRegistrationOpen()) {
 			holder.registerTextView.setTextColor(Color.GREEN);
 			holder.registerTextView.setText(R.string.open);
 		}
@@ -240,25 +253,30 @@ public class RaceAdapter extends BaseExpandableListAdapter {
 			holder.registerTextView.setText(R.string.closed);
 		}
 
+		holder.registerTextView.setText(holder.registerTextView.getText().toString().toUpperCase(Locale.getDefault()));
 	}
 
-	private CharSequence formatDate(Context context, Date date) {
+	private CharSequence formatDate(Date date) {
 
-		Calendar now = Calendar.getInstance(Locale.getDefault());
+		return mDateFormat.format(date);
+	}
+
+	private CharSequence formatDayOfWeek(Context context, Date date) {
 
 		Calendar time = Calendar.getInstance(Locale.getDefault());
 		time.setTime(date);
 
-		int nowDoY = now.get(Calendar.DAY_OF_YEAR);
-		int timeDoY = time.get(Calendar.DAY_OF_YEAR);
-		if (nowDoY == timeDoY) {
+		if (CalendarUtils.isToday(time)) {
 			return context.getString(R.string.today);
 		}
-		else if (timeDoY - nowDoY == 1 || (timeDoY == 1 && (nowDoY == 365 || nowDoY == 366))) {
+		else if (CalendarUtils.isTomorrow(time)) {
 			return context.getString(R.string.tomorrow);
 		}
+		else if (CalendarUtils.isYesterday(time)) {
+			return context.getString(R.string.yesterday);
+		}
 
-		return mDateFormat.format(date);
+		return mDayOfWeekFormat.format(date);
 	}
 
 	private CharSequence formatTime(Date date) {

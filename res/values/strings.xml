@@ -4,6 +4,7 @@
     <string name="app_name">Path of Exile Racer</string>
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
+    <string name="yesterday">Yesterday</string>
     <string name="unknown">Unknown</string>
     <string name="starting_in">Starting in</string>
     <string name="in_progress">In Progress</string>
@@ -13,6 +14,7 @@
     <string name="watch_character">Watch Character</string>
     <string name="open">OPEN</string>
     <string name="closed">CLOSED</string>
+    <string name="started">STARTED</string>
     <string name="races">Races</string>
     <string name="error_unavailable">Unable to connect to the Path of Exile server.</string>
     <string name="start_time">Start Time</string>
@@ -28,11 +30,9 @@
     <string name="forum_post">Forum Post</string>
     <string name="no_rankings">No rankings yet</string>
     <string name="no_forum_post">A forum post has not been created for this race yet</string>
-    
-    <!-- Need translation -->
     <string name="auto_refresh">Auto Refresh</string>
     <string name="all">All</string>
-    <string name="watcher_input_error">Character names may only contain alphabet keys and underscores.</string>
+    <string name="watcher_input_error">Character names may only contain alphabetic keys and underscores.</string>
     <string name="add_to_calendar">Add to Calendar</string>
     <string name="error_parse">An error occurred while attempting to parse the dates.</string>
     <string name="races_unavailable">No races yet.</string>

@@ -35,6 +35,11 @@ public class RaceAsyncTask extends AsyncTask<Void, Void, List<Race>> {
 
 		Log.d(TAG, "Downloading races");
 		List<Race> races = fetchFromWeb();
+		if (races == null) {
+			Log.d(TAG, "Failed to download races");
+			return null;
+		}
+
 		Log.d(TAG, "Finished downloading (" + races.size() + " entries)");
 
 		Log.d(TAG, "Cacheing races (" + races.size() + " entries)");
