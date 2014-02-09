@@ -4,7 +4,6 @@ import java.util.List;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -227,24 +226,26 @@ public class RacesFragment extends BaseExpandableListFragment {
 		}
 	}
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-		super.onActivityResult(requestCode, resultCode, data);
-	}
-
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	private void setData(List<Race> races) {
 
-		mAdapter = new RaceAdapter(getActivity(), races);
+		if (races.isEmpty()) {
+			mAdapter = null;
+		}
+		else {
+			mAdapter = new RaceAdapter(getActivity(), races);
+		}
+
 		setListAdapter(mAdapter);
 		setListShown(true);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-			getExpandableListView().expandGroup(0, false);
-		}
-		else {
-			getExpandableListView().expandGroup(0);
+		if (mAdapter != null) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+				getExpandableListView().expandGroup(0, false);
+			}
+			else {
+				getExpandableListView().expandGroup(0);
+			}
 		}
 	}
 
