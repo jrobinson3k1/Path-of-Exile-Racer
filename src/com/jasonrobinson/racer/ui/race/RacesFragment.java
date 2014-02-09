@@ -126,10 +126,12 @@ public class RacesFragment extends BaseExpandableListFragment {
 			menu.removeItem(R.id.menu_forum_post);
 		}
 
-		if (AlarmUtils.isAlarmAdded(getActivity(), race)) {
+		boolean alarmAdded = AlarmUtils.isAlarmAdded(getActivity(), race);
+		if (alarmAdded || race.isInProgress() || race.isFinished()) {
 			menu.removeItem(R.id.menu_add_notification);
 		}
-		else {
+
+		if (!alarmAdded || race.isInProgress() || race.isFinished()) {
 			menu.removeItem(R.id.menu_remove_notification);
 		}
 	}
