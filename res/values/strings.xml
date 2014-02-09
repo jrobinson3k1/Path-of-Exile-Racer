@@ -4,16 +4,17 @@
     <string name="app_name">Path of Exile Racer</string>
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
+    <string name="yesterday">Yesterday</string>
     <string name="unknown">Unknown</string>
     <string name="starting_in">Starting in</string>
     <string name="in_progress">In Progress</string>
     <string name="finished">Finished</string>
     <string name="refresh">Refresh</string>
     <string name="keep_screen_on">Keep Screen On</string>
-    <string name="auto_refresh">Auto Refresh</string>
     <string name="watch_character">Watch Character</string>
     <string name="open">OPEN</string>
     <string name="closed">CLOSED</string>
+    <string name="started">STARTED</string>
     <string name="races">Races</string>
     <string name="error_unavailable">Unable to connect to the Path of Exile server.</string>
     <string name="start_time">Start Time</string>
@@ -29,11 +30,26 @@
     <string name="forum_post">Forum Post</string>
     <string name="no_rankings">No rankings yet</string>
     <string name="no_forum_post">A forum post has not been created for this race yet</string>
+    <string name="auto_refresh">Auto Refresh</string>
     <string name="all">All</string>
-    <string name="watcher_input_error">Character names may only contain alphabet keys and underscores.</string>
+    <string name="watcher_input_error">Character names may only contain alphabetic keys and underscores.</string>
+    <string name="notification">Notification</string>
+    <string name="add_notification">Add Notification</string>
+    <string name="remove_notification">Remove Notification</string>
+    <string name="error_parse">An error occurred while attempting to parse the dates.</string>
+    <string name="races_unavailable">No races yet.</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="expand_all">Expand All</string>
+    <string name="collapse_all">Collapse All</string>
+    <string name="starts_at">Starts at %1$s</string>
+    <string name="notification_scheduled">Notification scheduled for %1$s %2$s</string>
+    <string name="notification_dialog_message1">Notify me</string>
+    <string name="notification_dialog_message2">minutes before the race starts.</string>
+    <string name="add">Add</string>
 
     <!-- Preference Keys -->
     <string name="prefs_keepscreenon_key">keepscreenon</string>
     <string name="prefs_autorefresh_key">autorefresh</string>
+    <string name="prefs_lastracefetch_key">lastracefetch</string>
 
 </resources>

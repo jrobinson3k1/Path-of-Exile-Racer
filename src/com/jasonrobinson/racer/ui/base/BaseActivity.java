@@ -6,6 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.jasonrobinson.racer.analytics.AnalyticsManager;
+import com.jasonrobinson.racer.db.DatabaseManager;
 import com.jasonrobinson.racer.util.SettingsManager;
 
 public class BaseActivity extends RoboActionBarActivity {
@@ -69,6 +70,11 @@ public class BaseActivity extends RoboActionBarActivity {
 	public AnalyticsManager getAnalyticsManager() {
 
 		return mImpl.getAnalyticsManager();
+	}
+
+	public DatabaseManager getDatabaseManager() {
+
+		return mImpl.getdDatabaseManager();
 	}
 
 	@Override

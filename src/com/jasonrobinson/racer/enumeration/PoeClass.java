@@ -1,4 +1,4 @@
-package com.jasonrobinson.racer.model;
+package com.jasonrobinson.racer.enumeration;
 
 public enum PoeClass {
 

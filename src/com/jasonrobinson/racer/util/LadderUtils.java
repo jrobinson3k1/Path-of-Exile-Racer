@@ -2,8 +2,8 @@ package com.jasonrobinson.racer.util;
 
 import java.util.List;
 
+import com.jasonrobinson.racer.enumeration.PoeClass;
 import com.jasonrobinson.racer.model.Ladder.Entry;
-import com.jasonrobinson.racer.model.PoeClass;
 
 public class LadderUtils {
 

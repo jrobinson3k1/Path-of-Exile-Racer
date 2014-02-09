@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.ui.base.BaseFragment;
 import com.jasonrobinson.racer.util.RacerTimeUtils;
 import com.jasonrobinson.racer.util.RawTypeface;
@@ -25,6 +26,8 @@ public class RaceTimeFragment extends BaseFragment {
 	private DateFormat mTimeFormat;
 
 	private RemainingCountdownTimer mRemainingTimer;
+
+	private RaceTimeCallback mRaceTimeCallback;
 
 	@InjectView(R.id.raceName)
 	private TextView mNameTextView;
@@ -41,6 +44,7 @@ public class RaceTimeFragment extends BaseFragment {
 	public void onAttach(Activity activity) {
 
 		super.onAttach(activity);
+		mRaceTimeCallback = castActivity(RaceTimeCallback.class);
 		mDateFormat = android.text.format.DateFormat.getDateFormat(getActivity());
 		mTimeFormat = android.text.format.DateFormat.getTimeFormat(getActivity());
 	}
@@ -58,7 +62,20 @@ public class RaceTimeFragment extends BaseFragment {
 		mNameTextView.setTypeface(RawTypeface.obtain(getActivity(), R.raw.fontin_bold));
 	}
 
-	public void setData(CharSequence name, Date startAt, Date endAt) {
+	@Override
+	public void onDestroyView() {
+
+		super.onDestroyView();
+		if (mRemainingTimer != null) {
+			mRemainingTimer.cancel();
+		}
+	}
+
+	public void setData(Race race) {
+
+		String name = race.getRaceId();
+		Date startAt = race.getStartAt();
+		Date endAt = race.getEndAt();
 
 		mNameTextView.setText(name);
 
@@ -98,6 +115,11 @@ public class RaceTimeFragment extends BaseFragment {
 		return sb;
 	}
 
+	public interface RaceTimeCallback {
+
+		public void onRaceFinished();
+	}
+
 	private class RemainingCountdownTimer extends CountDownTimer {
 
 		private long mStartTime;
@@ -111,7 +133,15 @@ public class RaceTimeFragment extends BaseFragment {
 		@Override
 		public void onFinish() {
 
-			mCountdownTimeTextView.setText(R.string.finished);
+			getActivity().runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+
+					mCountdownTimeTextView.setText(R.string.finished);
+					mRaceTimeCallback.onRaceFinished();
+				}
+			});
 		}
 
 		@Override

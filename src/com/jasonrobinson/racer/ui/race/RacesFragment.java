@@ -1,13 +1,11 @@
 package com.jasonrobinson.racer.ui.race;
 
-import java.net.SocketTimeoutException;
-import java.text.ParseException;
 import java.util.List;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
-import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -15,26 +13,36 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.ListView;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.Toast;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.adapter.RaceAdapter;
+import com.jasonrobinson.racer.enumeration.RaceOptions;
 import com.jasonrobinson.racer.model.Race;
-import com.jasonrobinson.racer.network.RaceClient;
-import com.jasonrobinson.racer.ui.base.BaseListFragment;
+import com.jasonrobinson.racer.ui.base.BaseExpandableListFragment;
+import com.jasonrobinson.racer.ui.race.NotificationPickerDialogFragment.OnTimeSelectedListener;
+import com.jasonrobinson.racer.util.AlarmUtils;
 
-public class RacesFragment extends BaseListFragment {
+public class RacesFragment extends BaseExpandableListFragment {
 
-	private RacesTask mRacesTask;
-	private boolean mRefreshing;
+	public static final String ARG_OPTION = "option";
 
+	private RaceAdapter mAdapter;
+
+	private RaceOptions mRaceOption;
 	private RacesCallback mCallback;
 
-	public static RacesFragment newInstance() {
+	public static RacesFragment newInstance(RaceOptions option) {
 
-		return new RacesFragment();
+		RacesFragment fragment = new RacesFragment();
+
+		Bundle args = new Bundle();
+		args.putSerializable(ARG_OPTION, option);
+		fragment.setArguments(args);
+
+		return fragment;
 	}
 
 	@Override
@@ -42,6 +50,7 @@ public class RacesFragment extends BaseListFragment {
 
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
+		mRaceOption = (RaceOptions) getArguments().getSerializable(ARG_OPTION);
 	}
 
 	@Override
@@ -52,43 +61,45 @@ public class RacesFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
+	public void onViewCreated(View view, Bundle savedInstanceState) {
 
-		super.onActivityCreated(savedInstanceState);
-		registerForContextMenu(getListView());
-		fetchRaces();
+		super.onViewCreated(view, savedInstanceState);
+		setEmptyText(getString(R.string.races_unavailable));
 	}
 
 	@Override
-	public void onDestroyView() {
+	public void onActivityCreated(Bundle savedInstanceState) {
 
-		super.onDestroyView();
-		if (mRacesTask != null) {
-			mRacesTask.cancel(true);
-		}
+		super.onActivityCreated(savedInstanceState);
+		registerForContextMenu(getExpandableListView());
+	}
+
+	@Override
+	public void onResume() {
+
+		super.onResume();
+		refresh();
 	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
 		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.refresh_menu, menu);
-
-		if (!mRefreshing) {
-			MenuItem refreshItem = menu.findItem(R.id.menu_refresh);
-			MenuItemCompat.setActionView(refreshItem, null);
-		}
+		inflater.inflate(R.menu.races_menu, menu);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		int id = item.getItemId();
-		if (id == R.id.menu_refresh) {
-			fetchRaces();
+		if (id == R.id.menu_expand_all) {
+			expandAllGroups();
+		}
+		else if (id == R.id.menu_collapse_all) {
+			collapseAllGroups();
 		}
 		else {
-			super.onOptionsItemSelected(item);
+			return super.onOptionsItemSelected(item);
 		}
 
 		return true;
@@ -98,14 +109,43 @@ public class RacesFragment extends BaseListFragment {
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 
 		super.onCreateContextMenu(menu, v, menuInfo);
+		ExpandableListContextMenuInfo adapterInfo = (ExpandableListContextMenuInfo) menuInfo;
+		if (ExpandableListView.getPackedPositionType(adapterInfo.packedPosition) != ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+			return;
+		}
+
+		int groupPosition = ExpandableListView.getPackedPositionGroup(adapterInfo.packedPosition);
+		int childPosition = ExpandableListView.getPackedPositionChild(adapterInfo.packedPosition);
+
 		getActivity().getMenuInflater().inflate(R.menu.races_context_menu, menu);
+
+		Race race = mAdapter.getChild(groupPosition, childPosition);
+
+		if (TextUtils.isEmpty(race.getUrl())) {
+			menu.removeItem(R.id.menu_forum_post);
+		}
+
+		boolean alarmAdded = AlarmUtils.isAlarmAdded(getActivity(), race);
+		if (alarmAdded || race.isInProgress() || race.isFinished()) {
+			menu.removeItem(R.id.menu_add_notification);
+		}
+
+		if (!alarmAdded || race.isInProgress() || race.isFinished()) {
+			menu.removeItem(R.id.menu_remove_notification);
+		}
 	}
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 
-		AdapterContextMenuInfo menuInfo = (AdapterContextMenuInfo) item.getMenuInfo();
-		Race race = (Race) getListView().getItemAtPosition(menuInfo.position);
+		ExpandableListContextMenuInfo menuInfo = (ExpandableListContextMenuInfo) item.getMenuInfo();
+		if (ExpandableListView.getPackedPositionType(menuInfo.packedPosition) != ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+			return false;
+		}
+
+		int groupPosition = ExpandableListView.getPackedPositionGroup(menuInfo.packedPosition);
+		int childPosition = ExpandableListView.getPackedPositionChild(menuInfo.packedPosition);
+		Race race = mAdapter.getChild(groupPosition, childPosition);
 
 		int id = item.getItemId();
 		if (id == R.id.menu_ladder) {
@@ -113,6 +153,13 @@ public class RacesFragment extends BaseListFragment {
 		}
 		else if (id == R.id.menu_forum_post) {
 			mCallback.showUrl(race.getUrl());
+		}
+		else if (id == R.id.menu_add_notification) {
+			showNotificationDialog(race);
+		}
+		else if (id == R.id.menu_remove_notification) {
+			AlarmUtils.cancelAlarm(getActivity(), race);
+			mAdapter.notifyDataSetChanged();
 		}
 		else {
 			return super.onContextItemSelected(item);
@@ -122,24 +169,11 @@ public class RacesFragment extends BaseListFragment {
 	}
 
 	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
+	public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
-		super.onListItemClick(l, v, position, id);
-		Race race = (Race) l.getItemAtPosition(position);
+		Race race = mAdapter.getChild(groupPosition, childPosition);
 
-		boolean registrationOpen;
-		boolean finished;
-		try {
-			registrationOpen = race.isRegistrationOpen();
-			finished = race.isFinished();
-		}
-		catch (ParseException e) {
-			e.printStackTrace();
-			registrationOpen = false;
-			finished = false;
-		}
-
-		if (registrationOpen || finished) {
+		if (race.isRegistrationOpen() || race.isFinished()) {
 			mCallback.showLadder(race);
 		}
 		else {
@@ -151,22 +185,74 @@ public class RacesFragment extends BaseListFragment {
 				Toast.makeText(getActivity(), R.string.no_forum_post, Toast.LENGTH_SHORT).show();
 			}
 		}
+
+		return true;
 	}
 
-	private void fetchRaces() {
+	private void showNotificationDialog(final Race race) {
 
-		if (mRacesTask != null) {
-			mRacesTask.cancel(true);
+		NotificationPickerDialogFragment fragment = NotificationPickerDialogFragment.newInstance();
+		fragment.setOnTimeSelectedListener(new OnTimeSelectedListener() {
+
+			@Override
+			public void onTimeSelected(long millis) {
+
+				AlarmUtils.addAlarm(getActivity(), race, millis);
+				mAdapter.notifyDataSetChanged();
+			}
+
+			@Override
+			public void onCancel() {
+
+				// no-op
+			}
+		});
+		fragment.show(getFragmentManager(), null);
+	}
+
+	private void expandAllGroups() {
+
+		int groupCount = getExpandableListAdapter().getGroupCount();
+		for (int i = 0; i < groupCount; i++) {
+			getExpandableListView().expandGroup(i);
+		}
+	}
+
+	private void collapseAllGroups() {
+
+		int groupCount = getExpandableListAdapter().getGroupCount();
+		for (int i = 0; i < groupCount; i++) {
+			getExpandableListView().collapseGroup(i);
+		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+	private void setData(List<Race> races) {
+
+		if (races.isEmpty()) {
+			mAdapter = null;
+		}
+		else {
+			mAdapter = new RaceAdapter(getActivity(), races);
 		}
 
-		mRacesTask = new RacesTask();
-		mRacesTask.execute();
+		setListAdapter(mAdapter);
+		setListShown(true);
+
+		if (mAdapter != null) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+				getExpandableListView().expandGroup(0, false);
+			}
+			else {
+				getExpandableListView().expandGroup(0);
+			}
+		}
 	}
 
-	private void setRefreshing(boolean refreshing) {
+	public void refresh() {
 
-		mRefreshing = refreshing;
-		getActivity().supportInvalidateOptionsMenu();
+		List<Race> races = getDatabaseManager().getRaces(mRaceOption);
+		setData(races);
 	}
 
 	public interface RacesCallback {
@@ -174,39 +260,5 @@ public class RacesFragment extends BaseListFragment {
 		public void showUrl(String url);
 
 		public void showLadder(Race race);
-	}
-
-	private class RacesTask extends AsyncTask<Void, Void, List<Race>> {
-
-		@Override
-		protected void onPreExecute() {
-
-			super.onPreExecute();
-			setRefreshing(true);
-		}
-
-		@Override
-		protected List<Race> doInBackground(Void... params) {
-
-			try {
-				return new RaceClient().fetchRaces();
-			}
-			catch (SocketTimeoutException e) {
-				return null;
-			}
-		}
-
-		@Override
-		protected void onPostExecute(List<Race> result) {
-
-			super.onPostExecute(result);
-			setRefreshing(false);
-			if (result != null) {
-				setListAdapter(new RaceAdapter(getActivity(), result));
-			}
-			else {
-				Toast.makeText(getActivity(), R.string.error_unavailable, Toast.LENGTH_SHORT).show();
-			}
-		}
 	}
 }
