@@ -86,6 +86,12 @@ public class RacesFragment extends BaseExpandableListFragment {
 
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.races_menu, menu);
+
+		MenuItem expandItem = menu.findItem(R.id.menu_expand_all);
+		MenuItem collapseItem = menu.findItem(R.id.menu_collapse_all);
+
+		expandItem.setEnabled(mAdapter != null);
+		collapseItem.setEnabled(mAdapter != null);
 	}
 
 	@Override
@@ -212,17 +218,21 @@ public class RacesFragment extends BaseExpandableListFragment {
 
 	private void expandAllGroups() {
 
-		int groupCount = getExpandableListAdapter().getGroupCount();
-		for (int i = 0; i < groupCount; i++) {
-			getExpandableListView().expandGroup(i);
+		if (mAdapter != null) {
+			int groupCount = mAdapter.getGroupCount();
+			for (int i = 0; i < groupCount; i++) {
+				getExpandableListView().expandGroup(i);
+			}
 		}
 	}
 
 	private void collapseAllGroups() {
 
-		int groupCount = getExpandableListAdapter().getGroupCount();
-		for (int i = 0; i < groupCount; i++) {
-			getExpandableListView().collapseGroup(i);
+		if (mAdapter != null) {
+			int groupCount = mAdapter.getGroupCount();
+			for (int i = 0; i < groupCount; i++) {
+				getExpandableListView().collapseGroup(i);
+			}
 		}
 	}
 
@@ -247,6 +257,8 @@ public class RacesFragment extends BaseExpandableListFragment {
 				getExpandableListView().expandGroup(0);
 			}
 		}
+
+		getActivity().supportInvalidateOptionsMenu();
 	}
 
 	public void refresh() {
