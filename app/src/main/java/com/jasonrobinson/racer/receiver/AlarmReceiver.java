@@ -1,7 +1,5 @@
 package com.jasonrobinson.racer.receiver;
 
-import java.text.DateFormat;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,38 +14,40 @@ import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.ui.ladder.LadderActivity;
 import com.jasonrobinson.racer.util.AlarmUtils;
 
+import java.text.DateFormat;
+
 public class AlarmReceiver extends BroadcastReceiver {
 
-	public static final String EXTRA_RACE = "race";
+    public static final String EXTRA_RACE = "race";
 
-	@Override
-	public void onReceive(Context context, Intent intent) {
+    @Override
+    public void onReceive(Context context, Intent intent) {
 
-		Race race = intent.getParcelableExtra(EXTRA_RACE);
-		AlarmUtils.cleanUpFinishedAlarm(context, race);
+        Race race = intent.getParcelableExtra(EXTRA_RACE);
+        AlarmUtils.cleanUpFinishedAlarm(context, race);
 
-		DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(context);
+        DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(context);
 
-		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-		builder.setSmallIcon(R.drawable.ic_launcher);
-		builder.setContentTitle(race.getRaceId());
-		builder.setContentInfo(context.getString(R.string.starts_at, timeFormat.format(race.getStartAt())));
-		builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
-		builder.setLights(context.getResources().getColor(R.color.main_color), 1000, 10000);
-		builder.setAutoCancel(true);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+        builder.setSmallIcon(R.drawable.ic_launcher);
+        builder.setContentTitle(race.getRaceId());
+        builder.setContentInfo(context.getString(R.string.starts_at, timeFormat.format(race.getStartAt())));
+        builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
+        builder.setLights(context.getResources().getColor(R.color.main_color), 1000, 10000);
+        builder.setAutoCancel(true);
 
-		Intent ladderIntent = new Intent(context, LadderActivity.class);
-		ladderIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		ladderIntent.putExtra(LadderActivity.EXTRA_ID, race.getRaceId());
+        Intent ladderIntent = new Intent(context, LadderActivity.class);
+        ladderIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        ladderIntent.putExtra(LadderActivity.EXTRA_ID, race.getRaceId());
 
-		TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-		stackBuilder.addParentStack(LadderActivity.class);
-		stackBuilder.addNextIntent(ladderIntent);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addParentStack(LadderActivity.class);
+        stackBuilder.addNextIntent(ladderIntent);
 
-		PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-		builder.setContentIntent(pendingIntent);
+        PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(pendingIntent);
 
-		NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		nm.notify(race.getRaceId(), 0, builder.build());
-	}
+        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.notify(race.getRaceId(), 0, builder.build());
+    }
 }

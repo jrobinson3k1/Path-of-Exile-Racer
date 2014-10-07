@@ -1,39 +1,52 @@
 package com.jasonrobinson.racer.analytics;
 
-import javax.inject.Inject;
-
-import roboguice.inject.ContextSingleton;
 import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.Fields;
-import com.google.analytics.tracking.android.MapBuilder;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.jasonrobinson.racer.R;
+
+import javax.inject.Inject;
+
+import roboguice.inject.ContextSingleton;
 
 @ContextSingleton
 public class AnalyticsManager {
 
-	@Inject
-	Context mContext;
+    @Inject
+    Context mContext;
 
-	public void onStart(Activity activity) {
+    Tracker mTracker;
 
-		EasyTracker.getInstance(mContext).activityStart(activity);
-	}
+    public void onStart(Activity activity) {
+        GoogleAnalytics.getInstance(mContext).reportActivityStart(activity);
+    }
 
-	public void onStop(Activity activity) {
+    public void onStop(Activity activity) {
+        GoogleAnalytics.getInstance(mContext).reportActivityStop(activity);
+    }
 
-		EasyTracker.getInstance(mContext).activityStop(activity);
-	}
+    public void trackFragment(Fragment fragment) {
+        getTracker().setScreenName(fragment.getClass().getName());
+        getTracker().send(new HitBuilders.AppViewBuilder().build());
+    }
 
-	public void trackFragment(Fragment fragment) {
+    public void trackEvent(String category, String action, String label) {
+        getTracker().send(new HitBuilders.EventBuilder()
+                .setCategory(category)
+                .setAction(action)
+                .setLabel(label)
+                .build());
+    }
 
-		EasyTracker.getInstance(mContext).send(MapBuilder.createAppView().set(Fields.SCREEN_NAME, fragment.getClass().getName()).build());
-	}
+    private Tracker getTracker() {
+        if (mTracker == null) {
+            mTracker = GoogleAnalytics.getInstance(mContext).newTracker(R.xml.analytics);
+        }
 
-	public void trackEvent(String category, String action, String label) {
-
-		EasyTracker.getInstance(mContext).send(MapBuilder.createEvent(category, action, label, 0L).build());
-	}
+        return mTracker;
+    }
 }

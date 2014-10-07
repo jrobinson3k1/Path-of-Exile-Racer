@@ -1,6 +1,5 @@
 package com.jasonrobinson.racer.ui.race;
 
-import net.simonvt.numberpicker.NumberPicker;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -13,61 +12,63 @@ import android.view.View;
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.ui.base.BaseDialogFragment;
 
+import net.simonvt.numberpicker.NumberPicker;
+
 public class NotificationPickerDialogFragment extends BaseDialogFragment {
 
-	private OnTimeSelectedListener mOnTimeSelectedListener;
+    private OnTimeSelectedListener mOnTimeSelectedListener;
 
-	public static NotificationPickerDialogFragment newInstance() {
+    public static NotificationPickerDialogFragment newInstance() {
 
-		return new NotificationPickerDialogFragment();
-	}
+        return new NotificationPickerDialogFragment();
+    }
 
-	@Override
-	public Dialog onCreateDialog(Bundle savedInstanceState) {
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-		Context ctxWrapper = new ContextThemeWrapper(getActivity(), R.style.Theme_AppCompat);
-		AlertDialog.Builder builder = new AlertDialog.Builder(ctxWrapper);
-		builder.setTitle(R.string.add_notification);
+        Context ctxWrapper = new ContextThemeWrapper(getActivity(), R.style.Theme_AppCompat);
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctxWrapper);
+        builder.setTitle(R.string.add_notification);
 
-		View customView = LayoutInflater.from(ctxWrapper).inflate(R.layout.notification_dialog_view, null);
-		final NumberPicker numberPicker = (NumberPicker) customView.findViewById(R.id.numberPicker);
-		numberPicker.setMinValue(0);
-		numberPicker.setMaxValue(60);
-		numberPicker.setValue(10);
-		numberPicker.setFocusable(true);
-		numberPicker.setFocusableInTouchMode(true);
+        View customView = LayoutInflater.from(ctxWrapper).inflate(R.layout.notification_dialog_view, null);
+        final NumberPicker numberPicker = (NumberPicker) customView.findViewById(R.id.numberPicker);
+        numberPicker.setMinValue(0);
+        numberPicker.setMaxValue(60);
+        numberPicker.setValue(10);
+        numberPicker.setFocusable(true);
+        numberPicker.setFocusableInTouchMode(true);
 
-		builder.setView(customView);
+        builder.setView(customView);
 
-		builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
 
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
 
-				mOnTimeSelectedListener.onTimeSelected(numberPicker.getValue() * 1000 * 60);
-			}
-		});
-		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                mOnTimeSelectedListener.onTimeSelected(numberPicker.getValue() * 1000 * 60);
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
 
-				mOnTimeSelectedListener.onCancel();
-			}
-		});
+                mOnTimeSelectedListener.onCancel();
+            }
+        });
 
-		return builder.create();
-	}
+        return builder.create();
+    }
 
-	public void setOnTimeSelectedListener(OnTimeSelectedListener l) {
+    public void setOnTimeSelectedListener(OnTimeSelectedListener l) {
 
-		mOnTimeSelectedListener = l;
-	}
+        mOnTimeSelectedListener = l;
+    }
 
-	public interface OnTimeSelectedListener {
+    public interface OnTimeSelectedListener {
 
-		public void onTimeSelected(long millis);
+        public void onTimeSelected(long millis);
 
-		public void onCancel();
-	}
+        public void onCancel();
+    }
 }

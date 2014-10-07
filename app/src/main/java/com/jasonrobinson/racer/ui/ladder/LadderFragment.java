@@ -1,9 +1,5 @@
 package com.jasonrobinson.racer.ui.ladder;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-import retrofit.RetrofitError;
 import android.os.AsyncTask.Status;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -30,370 +26,366 @@ import com.jasonrobinson.racer.ui.base.BaseListFragment;
 import com.jasonrobinson.racer.ui.ladder.WatchCharacterDialogFragment.WatchCharacterDialogListener;
 import com.jasonrobinson.racer.util.LadderUtils;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import retrofit.RetrofitError;
+
 public class LadderFragment extends BaseListFragment {
 
-	private static final String TAG = LadderFragment.class.getSimpleName();
+    private static final String TAG = LadderFragment.class.getSimpleName();
 
-	private static final String ARG_ID = "id";
+    private static final String ARG_ID = "id";
 
-	private static final String TAG_WATCH_CHARACTER = "watchCharacter";
+    private static final String TAG_WATCH_CHARACTER = "watchCharacter";
 
-	private Race mRace;
+    private Race mRace;
 
-	private String mWatchedCharacter;
-	private PoeClass mWatchedCharacterClass;
-	private PoeClass mWatchedClass;
+    private String mWatchedCharacter;
+    private PoeClass mWatchedCharacterClass;
+    private PoeClass mWatchedClass;
 
-	private Timer mAutoRefreshTimer;
-	private boolean mRefreshing;
+    private Timer mAutoRefreshTimer;
+    private boolean mRefreshing;
 
-	private LadderAdapter mAdapter;
-	private LadderTask mTask;
+    private LadderAdapter mAdapter;
+    private LadderTask mTask;
 
-	private boolean mTracked;
-	private boolean mRefreshEnabled = true;
-	private boolean mAutoRefreshEnabled;
+    private boolean mTracked;
+    private boolean mRefreshEnabled = true;
+    private boolean mAutoRefreshEnabled;
 
-	public static final LadderFragment newInstance(String id) {
+    public static final LadderFragment newInstance(String id) {
 
-		LadderFragment fragment = new LadderFragment();
+        LadderFragment fragment = new LadderFragment();
 
-		Bundle args = new Bundle();
-		args.putString(ARG_ID, id);
-		fragment.setArguments(args);
+        Bundle args = new Bundle();
+        args.putString(ARG_ID, id);
+        fragment.setArguments(args);
 
-		return fragment;
-	}
+        return fragment;
+    }
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
 
-		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
-	}
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
 
-		super.onViewCreated(view, savedInstanceState);
-		setEmptyText(getString(R.string.no_rankings));
-	}
+        super.onViewCreated(view, savedInstanceState);
+        setEmptyText(getString(R.string.no_rankings));
+    }
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
 
-		super.onActivityCreated(savedInstanceState);
-		if (getArguments() != null) {
-			String id = getArguments().getString(ARG_ID);
-			if (id != null) {
-				mRace = getDatabaseManager().getRace(id);
-				fetchLadder();
-			}
-		}
-	}
+        super.onActivityCreated(savedInstanceState);
+        if (getArguments() != null) {
+            String id = getArguments().getString(ARG_ID);
+            if (id != null) {
+                mRace = getDatabaseManager().getRace(id);
+                fetchLadder();
+            }
+        }
+    }
 
-	@Override
-	public void onResume() {
+    @Override
+    public void onResume() {
 
-		super.onResume();
-		if (mTask != null && mTask.getStatus() != Status.RUNNING && mRace != null) {
-			fetchLadder();
-		}
-	}
+        super.onResume();
+        if (mTask != null && mTask.getStatus() != Status.RUNNING && mRace != null) {
+            fetchLadder();
+        }
+    }
 
-	@Override
-	public void onPause() {
+    @Override
+    public void onPause() {
 
-		super.onPause();
-		cancelAutoRefresh();
-	}
+        super.onPause();
+        cancelAutoRefresh();
+    }
 
-	@Override
-	public void onDestroyView() {
+    @Override
+    public void onDestroyView() {
 
-		super.onDestroyView();
-		if (mTask != null) {
-			mTask.cancel(true);
-		}
+        super.onDestroyView();
+        if (mTask != null) {
+            mTask.cancel(true);
+        }
 
-		cancelAutoRefresh();
-	}
+        cancelAutoRefresh();
+    }
 
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
-		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.refresh_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.refresh_menu, menu);
 
-		MenuItem refreshItem = menu.findItem(R.id.menu_refresh);
-		refreshItem.setEnabled(mRefreshEnabled);
-		if (!mRefreshing) {
-			MenuItemCompat.setActionView(refreshItem, null);
-		}
-	}
+        MenuItem refreshItem = menu.findItem(R.id.menu_refresh);
+        refreshItem.setEnabled(mRefreshEnabled);
+        if (!mRefreshing) {
+            MenuItemCompat.setActionView(refreshItem, null);
+        }
+    }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
 
-		int id = item.getItemId();
-		if (id == R.id.menu_refresh) {
-			fetchLadder();
+        int id = item.getItemId();
+        if (id == R.id.menu_refresh) {
+            fetchLadder();
 
-			getAnalyticsManager().trackEvent("Ladder", "Refresh", "Manual");
-		}
-		else if (id == R.id.menu_watch_character) {
-			showCharacterDialog();
-		}
-		else {
-			super.onOptionsItemSelected(item);
-		}
+            getAnalyticsManager().trackEvent("Ladder", "Refresh", "Manual");
+        } else if (id == R.id.menu_watch_character) {
+            showCharacterDialog();
+        } else {
+            super.onOptionsItemSelected(item);
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	private void showCharacterDialog() {
+    private void showCharacterDialog() {
 
-		FragmentTransaction ft = getFragmentManager().beginTransaction();
-		Fragment prev = getFragmentManager().findFragmentByTag(TAG_WATCH_CHARACTER);
-		if (prev != null) {
-			ft.remove(prev);
-		}
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag(TAG_WATCH_CHARACTER);
+        if (prev != null) {
+            ft.remove(prev);
+        }
 
-		WatchCharacterDialogFragment fragment = WatchCharacterDialogFragment.newInstance(mWatchedCharacter);
-		fragment.setWatchCharacterDialogListener(new WatchCharacterDialogListener() {
+        WatchCharacterDialogFragment fragment = WatchCharacterDialogFragment.newInstance(mWatchedCharacter);
+        fragment.setWatchCharacterDialogListener(new WatchCharacterDialogListener() {
 
-			@Override
-			public void onRemove() {
+            @Override
+            public void onRemove() {
 
-				getAnalyticsManager().trackEvent("Ladder", "Remove", "Character Watcher");
-				mWatchedCharacter = null;
-				mWatchedCharacterClass = null;
-				fetchLadder();
-			}
+                getAnalyticsManager().trackEvent("Ladder", "Remove", "Character Watcher");
+                mWatchedCharacter = null;
+                mWatchedCharacterClass = null;
+                fetchLadder();
+            }
 
-			@Override
-			public void onCharacterSelected(String character) {
+            @Override
+            public void onCharacterSelected(String character) {
 
-				getAnalyticsManager().trackEvent("Ladder", "Use", "Character Watcher");
-				mWatchedCharacter = character;
+                getAnalyticsManager().trackEvent("Ladder", "Use", "Character Watcher");
+                mWatchedCharacter = character;
 
-				getListView().smoothScrollToPosition(0);
+                getListView().smoothScrollToPosition(0);
 
-				fetchLadder();
-			}
+                fetchLadder();
+            }
 
-			@Override
-			public void onCancel() {
+            @Override
+            public void onCancel() {
 
-				// no-op
-			}
-		});
+                // no-op
+            }
+        });
 
-		fragment.show(ft, TAG_WATCH_CHARACTER);
-	}
+        fragment.show(ft, TAG_WATCH_CHARACTER);
+    }
 
-	private void fetchLadder() {
+    private void fetchLadder() {
 
-		fetchLadder(mRace.getRaceId(), mWatchedClass);
-	}
+        fetchLadder(mRace.getRaceId(), mWatchedClass);
+    }
 
-	public void fetchLadder(String id, PoeClass poeClass) {
+    public void fetchLadder(String id, PoeClass poeClass) {
 
-		if (mRace == null || !mRace.getRaceId().equals(id)) {
-			mRace = getDatabaseManager().getRace(id);
-		}
+        if (mRace == null || !mRace.getRaceId().equals(id)) {
+            mRace = getDatabaseManager().getRace(id);
+        }
 
-		boolean resetAdapter = mWatchedClass != poeClass;
-		mWatchedClass = poeClass;
+        boolean resetAdapter = mWatchedClass != poeClass;
+        mWatchedClass = poeClass;
 
-		if (mTask != null) {
-			mTask.cancel(true);
-		}
+        if (mTask != null) {
+            mTask.cancel(true);
+        }
 
-		LadderParams params = new LadderParams(id, 0, poeClass == null ? 200 : 50, mWatchedClass, mWatchedCharacter, mWatchedCharacterClass);
+        LadderParams params = new LadderParams(id, 0, poeClass == null ? 200 : 50, mWatchedClass, mWatchedCharacter, mWatchedCharacterClass);
 
-		mTask = new LadderTask(resetAdapter);
-		mTask.execute(params);
+        mTask = new LadderTask(resetAdapter);
+        mTask.execute(params);
 
-		if (!mTracked) {
-			mTracked = true;
-			getAnalyticsManager().trackEvent("Ladder", "View", id);
-		}
-	}
+        if (!mTracked) {
+            mTracked = true;
+            getAnalyticsManager().trackEvent("Ladder", "View", id);
+        }
+    }
 
-	private void cancelAutoRefresh() {
+    private void cancelAutoRefresh() {
 
-		if (mAutoRefreshTimer != null) {
-			mAutoRefreshTimer.cancel();
-			mAutoRefreshTimer.purge();
-		}
-	}
+        if (mAutoRefreshTimer != null) {
+            mAutoRefreshTimer.cancel();
+            mAutoRefreshTimer.purge();
+        }
+    }
 
-	private void startAutoRefresh() {
+    private void startAutoRefresh() {
 
-		cancelAutoRefresh();
-		mAutoRefreshTimer = new Timer();
-		mAutoRefreshTimer.schedule(new RefreshTimerTask(), 30000);
-	}
+        cancelAutoRefresh();
+        mAutoRefreshTimer = new Timer();
+        mAutoRefreshTimer.schedule(new RefreshTimerTask(), 30000);
+    }
 
-	private void setRefreshing(boolean refreshing) {
+    private void setRefreshing(boolean refreshing) {
 
-		mRefreshing = refreshing;
-		getActivity().supportInvalidateOptionsMenu();
+        mRefreshing = refreshing;
+        getActivity().supportInvalidateOptionsMenu();
 
-		if (refreshing) {
-			cancelAutoRefresh();
-		}
-		else {
-			if (mAutoRefreshEnabled) {
-				startAutoRefresh();
-			}
-		}
-	}
+        if (refreshing) {
+            cancelAutoRefresh();
+        } else {
+            if (mAutoRefreshEnabled) {
+                startAutoRefresh();
+            }
+        }
+    }
 
-	public void setAutoRefreshEnabled(boolean enabled) {
+    public void setAutoRefreshEnabled(boolean enabled) {
 
-		if (mAutoRefreshEnabled == enabled) {
-			return;
-		}
-
-		mAutoRefreshEnabled = enabled;
-
-		if (mAutoRefreshEnabled) {
-			startAutoRefresh();
-		}
-		else {
-			cancelAutoRefresh();
-		}
-	}
-
-	public void onRaceFinished() {
-
-	}
-
-	public void setRefreshEnabled(boolean enabled) {
-
-		if (mRefreshEnabled = enabled) {
-			return;
-		}
-
-		mRefreshEnabled = enabled;
-		getActivity().supportInvalidateOptionsMenu();
-	}
-
-	private class LadderTask extends LadderAsyncTask {
-
-		private boolean mReset;
-
-		public LadderTask(boolean resetAdapter) {
-
-			mReset = resetAdapter;
-		}
-
-		@Override
-		protected void onPreExecute() {
-
-			super.onPreExecute();
-			getActivity().runOnUiThread(new Runnable() {
-
-				@Override
-				public void run() {
-
-					setRefreshing(true);
-
-					if (mReset) {
-						setListShown(false);
-					}
-				}
-			});
-		}
-
-		// TODO: This method is a mess and needs to be cleaned up
-		@Override
-		protected void onPostExecute(LadderResult result) {
-
-			super.onPostExecute(result);
-			setRefreshing(false);
-			String toastMessage = null;
-
-			if (result != null) {
-				Ladder ladder = result.ladder;
-				if (ladder != null) {
-					Entry[] entries = ladder.getEntries().toArray(new Entry[0]);
-
-					Entry watchedEntry = null;
-					if (!TextUtils.isEmpty(mWatchedCharacter)) {
-						watchedEntry = LadderUtils.findEntry(ladder.getEntries(), mWatchedCharacter);
-						if (watchedEntry == null && mWatchedCharacterClass == null) {
-							Toast.makeText(getActivity(), getString(R.string.character_not_found, mWatchedCharacter), Toast.LENGTH_LONG).show();
-							mWatchedCharacter = null;
-						}
-						else {
-							if (watchedEntry != null) {
-								mWatchedCharacterClass = PoeClass.getClassForName(watchedEntry.getCharacter().getPoeClass());
-							}
-						}
-					}
-
-					boolean borderFirstItem = !TextUtils.isEmpty(mWatchedCharacter) && watchedEntry != null;
-					if (mAdapter == null || mReset) {
-						mAdapter = new LadderAdapter(entries, mWatchedClass != null, borderFirstItem);
-						setListAdapter(mAdapter);
-					}
-					else {
-						mAdapter.setBorderFirstItem(borderFirstItem);
-						mAdapter.setEntries(entries, mWatchedClass != null);
-					}
-				}
-				else if (result.retrofitError != null) {
-					RetrofitError error = result.retrofitError;
-					if (error.getResponse() != null) {
-						ServerError body = (ServerError) error.getBodyAs(ServerError.class);
-
-						if (body.getError() != null) {
-							Log.e(TAG, "Error code: " + body.getError().getCode() + ", Message: " + body.getError().getMessage());
-							toastMessage = body.getError().getMessage();
-						}
-						else {
-							toastMessage = getString(R.string.error_unavailable);
-						}
-					}
-					else {
-						toastMessage = getString(R.string.error_unavailable);
-					}
-				}
-				else {
-					toastMessage = getString(R.string.error_unavailable);
-				}
-			}
-			else {
-				toastMessage = getString(R.string.error_unavailable);
-			}
-
-			if (toastMessage != null) {
-				Toast.makeText(getActivity(), toastMessage, Toast.LENGTH_LONG).show();
-			}
-
-			setListShown(true);
-		}
-	}
-
-	private class RefreshTimerTask extends TimerTask {
-
-		@Override
-		public void run() {
-
-			if (mRace != null) {
-				getActivity().runOnUiThread(new Runnable() {
-
-					@Override
-					public void run() {
-
-						fetchLadder();
-						getAnalyticsManager().trackEvent("Ladder", "Refresh", "Automatic");
-					}
-				});
-			}
-		}
-	};
+        if (mAutoRefreshEnabled == enabled) {
+            return;
+        }
+
+        mAutoRefreshEnabled = enabled;
+
+        if (mAutoRefreshEnabled) {
+            startAutoRefresh();
+        } else {
+            cancelAutoRefresh();
+        }
+    }
+
+    public void onRaceFinished() {
+
+    }
+
+    public void setRefreshEnabled(boolean enabled) {
+
+        if (mRefreshEnabled = enabled) {
+            return;
+        }
+
+        mRefreshEnabled = enabled;
+        getActivity().supportInvalidateOptionsMenu();
+    }
+
+    private class LadderTask extends LadderAsyncTask {
+
+        private boolean mReset;
+
+        public LadderTask(boolean resetAdapter) {
+
+            mReset = resetAdapter;
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+            super.onPreExecute();
+            getActivity().runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    setRefreshing(true);
+
+                    if (mReset) {
+                        setListShown(false);
+                    }
+                }
+            });
+        }
+
+        // TODO: This method is a mess and needs to be cleaned up
+        @Override
+        protected void onPostExecute(LadderResult result) {
+
+            super.onPostExecute(result);
+            setRefreshing(false);
+            String toastMessage = null;
+
+            if (result != null) {
+                Ladder ladder = result.ladder;
+                if (ladder != null) {
+                    Entry[] entries = ladder.getEntries().toArray(new Entry[0]);
+
+                    Entry watchedEntry = null;
+                    if (!TextUtils.isEmpty(mWatchedCharacter)) {
+                        watchedEntry = LadderUtils.findEntry(ladder.getEntries(), mWatchedCharacter);
+                        if (watchedEntry == null && mWatchedCharacterClass == null) {
+                            Toast.makeText(getActivity(), getString(R.string.character_not_found, mWatchedCharacter), Toast.LENGTH_LONG).show();
+                            mWatchedCharacter = null;
+                        } else {
+                            if (watchedEntry != null) {
+                                mWatchedCharacterClass = PoeClass.getClassForName(watchedEntry.getCharacter().getPoeClass());
+                            }
+                        }
+                    }
+
+                    boolean borderFirstItem = !TextUtils.isEmpty(mWatchedCharacter) && watchedEntry != null;
+                    if (mAdapter == null || mReset) {
+                        mAdapter = new LadderAdapter(entries, mWatchedClass != null, borderFirstItem);
+                        setListAdapter(mAdapter);
+                    } else {
+                        mAdapter.setBorderFirstItem(borderFirstItem);
+                        mAdapter.setEntries(entries, mWatchedClass != null);
+                    }
+                } else if (result.retrofitError != null) {
+                    RetrofitError error = result.retrofitError;
+                    if (error.getResponse() != null) {
+                        ServerError body = (ServerError) error.getBodyAs(ServerError.class);
+
+                        if (body.getError() != null) {
+                            Log.e(TAG, "Error code: " + body.getError().getCode() + ", Message: " + body.getError().getMessage());
+                            toastMessage = body.getError().getMessage();
+                        } else {
+                            toastMessage = getString(R.string.error_unavailable);
+                        }
+                    } else {
+                        toastMessage = getString(R.string.error_unavailable);
+                    }
+                } else {
+                    toastMessage = getString(R.string.error_unavailable);
+                }
+            } else {
+                toastMessage = getString(R.string.error_unavailable);
+            }
+
+            if (toastMessage != null) {
+                Toast.makeText(getActivity(), toastMessage, Toast.LENGTH_LONG).show();
+            }
+
+            setListShown(true);
+        }
+    }
+
+    private class RefreshTimerTask extends TimerTask {
+
+        @Override
+        public void run() {
+
+            if (mRace != null) {
+                getActivity().runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+
+                        fetchLadder();
+                        getAnalyticsManager().trackEvent("Ladder", "Refresh", "Automatic");
+                    }
+                });
+            }
+        }
+    }
+
+    ;
 }

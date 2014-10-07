@@ -1,142 +1,142 @@
 package com.jasonrobinson.racer.model;
 
-import java.util.List;
-
 import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
 
 public class Ladder {
 
-	private int total;
-	private List<Entry> entries;
+    private int total;
+    private List<Entry> entries;
 
-	private Ladder() {
+    private Ladder() {
 
-	}
+    }
 
-	public static class Entry {
+    public int getTotal() {
 
-		private boolean online;
-		private int rank;
-		private boolean dead;
-		private Character character;
-		private Account account;
+        return total;
+    }
 
-		private int classRank;
+    public List<Entry> getEntries() {
 
-		public static class Character {
+        return entries;
+    }
 
-			private String name;
-			private int level;
-			@SerializedName("class")
-			private String poeClass;
-			private long experience;
+    public static class Entry {
 
-			public String getName() {
+        private boolean online;
+        private int rank;
+        private boolean dead;
+        private Character character;
+        private Account account;
 
-				return name;
-			}
+        private int classRank;
 
-			public int getLevel() {
+        public boolean isOnline() {
 
-				return level;
-			}
+            return online;
+        }
 
-			public String getPoeClass() {
+        public int getRank() {
 
-				return poeClass;
-			}
+            return rank;
+        }
 
-			public long getExperience() {
+        public boolean isDead() {
 
-				return experience;
-			}
-		}
+            return dead;
+        }
 
-		public static class Account {
+        public Character getCharacter() {
 
-			private String name;
-			private Challenges challenges;
-			private Twitch twitch;
+            return character;
+        }
 
-			public static class Challenges {
+        public Account getAccount() {
 
-				private int total;
+            return account;
+        }
 
-				public int getTotal() {
+        public int getClassRank() {
 
-					return total;
-				}
-			}
+            return classRank;
+        }
 
-			public static class Twitch {
+        public void setClassRank(int classRank) {
 
-				private String name;
+            this.classRank = classRank;
+        }
 
-				public String getName() {
+        public static class Character {
 
-					return name;
-				}
-			}
+            private String name;
+            private int level;
+            @SerializedName("class")
+            private String poeClass;
+            private long experience;
 
-			public String getName() {
+            public String getName() {
 
-				return name;
-			}
+                return name;
+            }
 
-			public Challenges getChallenges() {
+            public int getLevel() {
 
-				return challenges;
-			}
+                return level;
+            }
 
-			public Twitch getTwitch() {
+            public String getPoeClass() {
 
-				return twitch;
-			}
-		}
+                return poeClass;
+            }
 
-		public boolean isOnline() {
+            public long getExperience() {
 
-			return online;
-		}
+                return experience;
+            }
+        }
 
-		public int getRank() {
+        public static class Account {
 
-			return rank;
-		}
+            private String name;
+            private Challenges challenges;
+            private Twitch twitch;
 
-		public boolean isDead() {
+            public String getName() {
 
-			return dead;
-		}
+                return name;
+            }
 
-		public Character getCharacter() {
+            public Challenges getChallenges() {
 
-			return character;
-		}
+                return challenges;
+            }
 
-		public Account getAccount() {
+            public Twitch getTwitch() {
 
-			return account;
-		}
+                return twitch;
+            }
 
-		public int getClassRank() {
+            public static class Challenges {
 
-			return classRank;
-		}
+                private int total;
 
-		public void setClassRank(int classRank) {
+                public int getTotal() {
 
-			this.classRank = classRank;
-		}
-	}
+                    return total;
+                }
+            }
 
-	public int getTotal() {
+            public static class Twitch {
 
-		return total;
-	}
+                private String name;
 
-	public List<Entry> getEntries() {
+                public String getName() {
 
-		return entries;
-	}
+                    return name;
+                }
+            }
+        }
+    }
 }

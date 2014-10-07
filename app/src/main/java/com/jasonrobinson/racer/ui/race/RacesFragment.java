@@ -1,7 +1,5 @@
 package com.jasonrobinson.racer.ui.race;
 
-import java.util.List;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
@@ -25,252 +23,244 @@ import com.jasonrobinson.racer.ui.base.BaseExpandableListFragment;
 import com.jasonrobinson.racer.ui.race.NotificationPickerDialogFragment.OnTimeSelectedListener;
 import com.jasonrobinson.racer.util.AlarmUtils;
 
+import java.util.List;
+
 public class RacesFragment extends BaseExpandableListFragment {
 
-	public static final String ARG_OPTION = "option";
+    public static final String ARG_OPTION = "option";
 
-	private RaceAdapter mAdapter;
+    private RaceAdapter mAdapter;
 
-	private RaceOptions mRaceOption;
-	private RacesCallback mCallback;
+    private RaceOptions mRaceOption;
+    private RacesCallback mCallback;
 
-	public static RacesFragment newInstance(RaceOptions option) {
+    public static RacesFragment newInstance(RaceOptions option) {
 
-		RacesFragment fragment = new RacesFragment();
+        RacesFragment fragment = new RacesFragment();
 
-		Bundle args = new Bundle();
-		args.putSerializable(ARG_OPTION, option);
-		fragment.setArguments(args);
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_OPTION, option);
+        fragment.setArguments(args);
 
-		return fragment;
-	}
+        return fragment;
+    }
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
 
-		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
-		mRaceOption = (RaceOptions) getArguments().getSerializable(ARG_OPTION);
-	}
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        mRaceOption = (RaceOptions) getArguments().getSerializable(ARG_OPTION);
+    }
 
-	@Override
-	public void onAttach(Activity activity) {
+    @Override
+    public void onAttach(Activity activity) {
 
-		super.onAttach(activity);
-		mCallback = castActivity(RacesCallback.class);
-	}
+        super.onAttach(activity);
+        mCallback = castActivity(RacesCallback.class);
+    }
 
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
 
-		super.onViewCreated(view, savedInstanceState);
-		setEmptyText(getString(R.string.races_unavailable));
-	}
+        super.onViewCreated(view, savedInstanceState);
+        setEmptyText(getString(R.string.races_unavailable));
+    }
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
 
-		super.onActivityCreated(savedInstanceState);
-		registerForContextMenu(getExpandableListView());
-	}
+        super.onActivityCreated(savedInstanceState);
+        registerForContextMenu(getExpandableListView());
+    }
 
-	@Override
-	public void onResume() {
+    @Override
+    public void onResume() {
 
-		super.onResume();
-		refresh();
-	}
+        super.onResume();
+        refresh();
+    }
 
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
-		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.races_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.races_menu, menu);
 
-		MenuItem expandItem = menu.findItem(R.id.menu_expand_all);
-		MenuItem collapseItem = menu.findItem(R.id.menu_collapse_all);
+        MenuItem expandItem = menu.findItem(R.id.menu_expand_all);
+        MenuItem collapseItem = menu.findItem(R.id.menu_collapse_all);
 
-		expandItem.setEnabled(mAdapter != null);
-		collapseItem.setEnabled(mAdapter != null);
-	}
+        expandItem.setEnabled(mAdapter != null);
+        collapseItem.setEnabled(mAdapter != null);
+    }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
 
-		int id = item.getItemId();
-		if (id == R.id.menu_expand_all) {
-			expandAllGroups();
-		}
-		else if (id == R.id.menu_collapse_all) {
-			collapseAllGroups();
-		}
-		else {
-			return super.onOptionsItemSelected(item);
-		}
+        int id = item.getItemId();
+        if (id == R.id.menu_expand_all) {
+            expandAllGroups();
+        } else if (id == R.id.menu_collapse_all) {
+            collapseAllGroups();
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 
-		super.onCreateContextMenu(menu, v, menuInfo);
-		ExpandableListContextMenuInfo adapterInfo = (ExpandableListContextMenuInfo) menuInfo;
-		if (ExpandableListView.getPackedPositionType(adapterInfo.packedPosition) != ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-			return;
-		}
+        super.onCreateContextMenu(menu, v, menuInfo);
+        ExpandableListContextMenuInfo adapterInfo = (ExpandableListContextMenuInfo) menuInfo;
+        if (ExpandableListView.getPackedPositionType(adapterInfo.packedPosition) != ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+            return;
+        }
 
-		int groupPosition = ExpandableListView.getPackedPositionGroup(adapterInfo.packedPosition);
-		int childPosition = ExpandableListView.getPackedPositionChild(adapterInfo.packedPosition);
+        int groupPosition = ExpandableListView.getPackedPositionGroup(adapterInfo.packedPosition);
+        int childPosition = ExpandableListView.getPackedPositionChild(adapterInfo.packedPosition);
 
-		getActivity().getMenuInflater().inflate(R.menu.races_context_menu, menu);
+        getActivity().getMenuInflater().inflate(R.menu.races_context_menu, menu);
 
-		Race race = mAdapter.getChild(groupPosition, childPosition);
+        Race race = mAdapter.getChild(groupPosition, childPosition);
 
-		if (TextUtils.isEmpty(race.getUrl())) {
-			menu.removeItem(R.id.menu_forum_post);
-		}
+        if (TextUtils.isEmpty(race.getUrl())) {
+            menu.removeItem(R.id.menu_forum_post);
+        }
 
-		boolean alarmAdded = AlarmUtils.isAlarmAdded(getActivity(), race);
-		if (alarmAdded || race.isInProgress() || race.isFinished()) {
-			menu.removeItem(R.id.menu_add_notification);
-		}
+        boolean alarmAdded = AlarmUtils.isAlarmAdded(getActivity(), race);
+        if (alarmAdded || race.isInProgress() || race.isFinished()) {
+            menu.removeItem(R.id.menu_add_notification);
+        }
 
-		if (!alarmAdded || race.isInProgress() || race.isFinished()) {
-			menu.removeItem(R.id.menu_remove_notification);
-		}
-	}
+        if (!alarmAdded || race.isInProgress() || race.isFinished()) {
+            menu.removeItem(R.id.menu_remove_notification);
+        }
+    }
 
-	@Override
-	public boolean onContextItemSelected(MenuItem item) {
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
 
-		ExpandableListContextMenuInfo menuInfo = (ExpandableListContextMenuInfo) item.getMenuInfo();
-		if (ExpandableListView.getPackedPositionType(menuInfo.packedPosition) != ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-			return false;
-		}
+        ExpandableListContextMenuInfo menuInfo = (ExpandableListContextMenuInfo) item.getMenuInfo();
+        if (ExpandableListView.getPackedPositionType(menuInfo.packedPosition) != ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+            return false;
+        }
 
-		int groupPosition = ExpandableListView.getPackedPositionGroup(menuInfo.packedPosition);
-		int childPosition = ExpandableListView.getPackedPositionChild(menuInfo.packedPosition);
-		Race race = mAdapter.getChild(groupPosition, childPosition);
+        int groupPosition = ExpandableListView.getPackedPositionGroup(menuInfo.packedPosition);
+        int childPosition = ExpandableListView.getPackedPositionChild(menuInfo.packedPosition);
+        Race race = mAdapter.getChild(groupPosition, childPosition);
 
-		int id = item.getItemId();
-		if (id == R.id.menu_ladder) {
-			mCallback.showLadder(race);
-		}
-		else if (id == R.id.menu_forum_post) {
-			mCallback.showUrl(race.getUrl());
-		}
-		else if (id == R.id.menu_add_notification) {
-			showNotificationDialog(race);
-		}
-		else if (id == R.id.menu_remove_notification) {
-			AlarmUtils.cancelAlarm(getActivity(), race);
-			mAdapter.notifyDataSetChanged();
-		}
-		else {
-			return super.onContextItemSelected(item);
-		}
+        int id = item.getItemId();
+        if (id == R.id.menu_ladder) {
+            mCallback.showLadder(race);
+        } else if (id == R.id.menu_forum_post) {
+            mCallback.showUrl(race.getUrl());
+        } else if (id == R.id.menu_add_notification) {
+            showNotificationDialog(race);
+        } else if (id == R.id.menu_remove_notification) {
+            AlarmUtils.cancelAlarm(getActivity(), race);
+            mAdapter.notifyDataSetChanged();
+        } else {
+            return super.onContextItemSelected(item);
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+    @Override
+    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
-		Race race = mAdapter.getChild(groupPosition, childPosition);
+        Race race = mAdapter.getChild(groupPosition, childPosition);
 
-		if (race.isRegistrationOpen() || race.isFinished()) {
-			mCallback.showLadder(race);
-		}
-		else {
-			String url = race.getUrl();
-			if (!TextUtils.isEmpty(url)) {
-				mCallback.showUrl(url);
-			}
-			else {
-				Toast.makeText(getActivity(), R.string.no_forum_post, Toast.LENGTH_SHORT).show();
-			}
-		}
+        if (race.isRegistrationOpen() || race.isFinished()) {
+            mCallback.showLadder(race);
+        } else {
+            String url = race.getUrl();
+            if (!TextUtils.isEmpty(url)) {
+                mCallback.showUrl(url);
+            } else {
+                Toast.makeText(getActivity(), R.string.no_forum_post, Toast.LENGTH_SHORT).show();
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	private void showNotificationDialog(final Race race) {
+    private void showNotificationDialog(final Race race) {
 
-		NotificationPickerDialogFragment fragment = NotificationPickerDialogFragment.newInstance();
-		fragment.setOnTimeSelectedListener(new OnTimeSelectedListener() {
+        NotificationPickerDialogFragment fragment = NotificationPickerDialogFragment.newInstance();
+        fragment.setOnTimeSelectedListener(new OnTimeSelectedListener() {
 
-			@Override
-			public void onTimeSelected(long millis) {
+            @Override
+            public void onTimeSelected(long millis) {
 
-				AlarmUtils.addAlarm(getActivity(), race, millis);
-				mAdapter.notifyDataSetChanged();
-			}
+                AlarmUtils.addAlarm(getActivity(), race, millis);
+                mAdapter.notifyDataSetChanged();
+            }
 
-			@Override
-			public void onCancel() {
+            @Override
+            public void onCancel() {
 
-				// no-op
-			}
-		});
-		fragment.show(getFragmentManager(), null);
-	}
+                // no-op
+            }
+        });
+        fragment.show(getFragmentManager(), null);
+    }
 
-	private void expandAllGroups() {
+    private void expandAllGroups() {
 
-		if (mAdapter != null) {
-			int groupCount = mAdapter.getGroupCount();
-			for (int i = 0; i < groupCount; i++) {
-				getExpandableListView().expandGroup(i);
-			}
-		}
-	}
+        if (mAdapter != null) {
+            int groupCount = mAdapter.getGroupCount();
+            for (int i = 0; i < groupCount; i++) {
+                getExpandableListView().expandGroup(i);
+            }
+        }
+    }
 
-	private void collapseAllGroups() {
+    private void collapseAllGroups() {
 
-		if (mAdapter != null) {
-			int groupCount = mAdapter.getGroupCount();
-			for (int i = 0; i < groupCount; i++) {
-				getExpandableListView().collapseGroup(i);
-			}
-		}
-	}
+        if (mAdapter != null) {
+            int groupCount = mAdapter.getGroupCount();
+            for (int i = 0; i < groupCount; i++) {
+                getExpandableListView().collapseGroup(i);
+            }
+        }
+    }
 
-	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-	private void setData(List<Race> races) {
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    private void setData(List<Race> races) {
 
-		if (races.isEmpty()) {
-			mAdapter = null;
-		}
-		else {
-			mAdapter = new RaceAdapter(getActivity(), races);
-		}
+        if (races.isEmpty()) {
+            mAdapter = null;
+        } else {
+            mAdapter = new RaceAdapter(getActivity(), races);
+        }
 
-		setListAdapter(mAdapter);
-		setListShown(true);
+        setListAdapter(mAdapter);
+        setListShown(true);
 
-		if (mAdapter != null) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-				getExpandableListView().expandGroup(0, false);
-			}
-			else {
-				getExpandableListView().expandGroup(0);
-			}
-		}
+        if (mAdapter != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                getExpandableListView().expandGroup(0, false);
+            } else {
+                getExpandableListView().expandGroup(0);
+            }
+        }
 
-		getActivity().supportInvalidateOptionsMenu();
-	}
+        getActivity().supportInvalidateOptionsMenu();
+    }
 
-	public void refresh() {
+    public void refresh() {
 
-		List<Race> races = getDatabaseManager().getRaces(mRaceOption);
-		setData(races);
-	}
+        List<Race> races = getDatabaseManager().getRaces(mRaceOption);
+        setData(races);
+    }
 
-	public interface RacesCallback {
+    public interface RacesCallback {
 
-		public void showUrl(String url);
+        public void showUrl(String url);
 
-		public void showLadder(Race race);
-	}
+        public void showLadder(Race race);
+    }
 }

@@ -2,34 +2,34 @@ package com.jasonrobinson.racer.model;
 
 public class ServerError {
 
-	private GGGError error;
+    private GGGError error;
 
-	private ServerError() {
+    private ServerError() {
 
-	}
+    }
 
-	public static class GGGError {
+    public GGGError getError() {
 
-		private int code;
-		private String message;
+        return error;
+    }
 
-		private GGGError() {
+    public static class GGGError {
 
-		}
+        private int code;
+        private String message;
 
-		public int getCode() {
+        private GGGError() {
 
-			return code;
-		}
+        }
 
-		public String getMessage() {
+        public int getCode() {
 
-			return message;
-		}
-	}
+            return code;
+        }
 
-	public GGGError getError() {
+        public String getMessage() {
 
-		return error;
-	}
+            return message;
+        }
+    }
 }

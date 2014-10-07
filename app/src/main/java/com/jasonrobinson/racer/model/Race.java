@@ -1,9 +1,5 @@
 package com.jasonrobinson.racer.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -12,212 +8,213 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+
 @DatabaseTable
 public class Race implements Parcelable {
 
-	@DatabaseField(id = true)
-	@SerializedName("id")
-	private String raceId;
-	@DatabaseField
-	private String description;
-	@DatabaseField
-	private String url;
-	@DatabaseField
-	private boolean event;
-	@DatabaseField
-	private Date registerAt;
-	@DatabaseField
-	private Date startAt;
-	@DatabaseField
-	private Date endAt;
-	@ForeignCollectionField
-	private Collection<Rule> rules;
+    public static final Parcelable.Creator<Race> CREATOR = new Parcelable.Creator<Race>() {
 
-	public static final Parcelable.Creator<Race> CREATOR = new Parcelable.Creator<Race>() {
+        public Race createFromParcel(Parcel in) {
 
-		public Race createFromParcel(Parcel in) {
+            return new Race(in);
+        }
 
-			return new Race(in);
-		}
+        public Race[] newArray(int size) {
 
-		public Race[] newArray(int size) {
+            return new Race[size];
+        }
+    };
+    @DatabaseField(id = true)
+    @SerializedName("id")
+    private String raceId;
+    @DatabaseField
+    private String description;
+    @DatabaseField
+    private String url;
+    @DatabaseField
+    private boolean event;
+    @DatabaseField
+    private Date registerAt;
+    @DatabaseField
+    private Date startAt;
+    @DatabaseField
+    private Date endAt;
+    @ForeignCollectionField
+    private Collection<Rule> rules;
 
-			return new Race[size];
-		}
-	};
+    private Race() {
 
-	private Race() {
+    }
 
-	}
+    private Race(Parcel in) {
 
-	private Race(Parcel in) {
+        raceId = in.readString();
+        description = in.readString();
+        url = in.readString();
+        event = in.readInt() == 1 ? true : false;
+        registerAt = new Date(in.readLong());
+        startAt = new Date(in.readLong());
+        endAt = new Date(in.readLong());
 
-		raceId = in.readString();
-		description = in.readString();
-		url = in.readString();
-		event = in.readInt() == 1 ? true : false;
-		registerAt = new Date(in.readLong());
-		startAt = new Date(in.readLong());
-		endAt = new Date(in.readLong());
+        Parcelable[] ruleParcels = in.readParcelableArray(Rule.class.getClassLoader());
+        rules = new ArrayList<Rule>();
+        for (Parcelable ruleParcel : ruleParcels) {
+            rules.add((Rule) ruleParcel);
+        }
+    }
 
-		Parcelable[] ruleParcels = in.readParcelableArray(Rule.class.getClassLoader());
-		rules = new ArrayList<Rule>();
-		for (Parcelable ruleParcel : ruleParcels) {
-			rules.add((Rule) ruleParcel);
-		}
-	}
+    @Override
+    public int describeContents() {
 
-	@Override
-	public int describeContents() {
+        return 0;
+    }
 
-		return 0;
-	}
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
 
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(raceId);
+        dest.writeString(description);
+        dest.writeString(url);
+        dest.writeInt(event ? 1 : 0);
+        dest.writeLong(registerAt.getTime());
+        dest.writeLong(startAt.getTime());
+        dest.writeLong(endAt.getTime());
+        dest.writeParcelableArray(rules.toArray(new Rule[0]), flags);
+    }
 
-		dest.writeString(raceId);
-		dest.writeString(description);
-		dest.writeString(url);
-		dest.writeInt(event ? 1 : 0);
-		dest.writeLong(registerAt.getTime());
-		dest.writeLong(startAt.getTime());
-		dest.writeLong(endAt.getTime());
-		dest.writeParcelableArray(rules.toArray(new Rule[0]), flags);
-	}
+    public String getRaceId() {
 
-	@DatabaseTable
-	public static class Rule implements Parcelable {
+        return raceId;
+    }
 
-		@DatabaseField
-		@SerializedName("id")
-		private long ruleId;
-		@DatabaseField
-		private String name;
-		@DatabaseField
-		private String description;
+    public String getDescription() {
 
-		@SuppressWarnings("unused")
-		@DatabaseField(generatedId = true)
-		private transient long id;
-		@SuppressWarnings("unused")
-		@DatabaseField(foreign = true)
-		private transient Race race;
+        return description;
+    }
 
-		public static final Parcelable.Creator<Rule> CREATOR = new Parcelable.Creator<Rule>() {
+    public String getUrl() {
 
-			public Rule createFromParcel(Parcel in) {
+        return url;
+    }
 
-				return new Rule(in);
-			}
+    public boolean isEvent() {
 
-			public Rule[] newArray(int size) {
+        return event;
+    }
 
-				return new Rule[size];
-			}
-		};
+    public Date getRegisterAt() {
 
-		private Rule() {
+        return registerAt;
+    }
 
-		}
+    public Date getStartAt() {
 
-		private Rule(Parcel in) {
+        return startAt;
+    }
 
-			ruleId = in.readLong();
-			name = in.readString();
-			description = in.readString();
-		}
+    public Date getEndAt() {
 
-		@Override
-		public int describeContents() {
+        return endAt;
+    }
 
-			return 0;
-		}
+    public Collection<Rule> getRules() {
 
-		@Override
-		public void writeToParcel(Parcel dest, int flags) {
+        return rules;
+    }
 
-			dest.writeLong(ruleId);
-			dest.writeString(name);
-			dest.writeString(description);
-		}
+    public boolean isInProgress() {
 
-		public long getRuleId() {
+        Date now = new Date(System.currentTimeMillis());
+        return now.after(getStartAt()) && now.before(getEndAt());
+    }
 
-			return ruleId;
-		}
+    public boolean isFinished() {
 
-		public String getName() {
+        Date now = new Date(System.currentTimeMillis());
+        return now.after(getEndAt());
+    }
 
-			return name;
-		}
+    public boolean isRegistrationOpen() {
 
-		public String getDescription() {
+        Date now = new Date(System.currentTimeMillis());
+        return now.after(getRegisterAt()) && now.before(getEndAt());
+    }
 
-			return description;
-		}
+    @DatabaseTable
+    public static class Rule implements Parcelable {
 
-		public void setRace(Race race) {
+        public static final Parcelable.Creator<Rule> CREATOR = new Parcelable.Creator<Rule>() {
 
-			this.race = race;
-		}
-	}
+            public Rule createFromParcel(Parcel in) {
 
-	public String getRaceId() {
+                return new Rule(in);
+            }
 
-		return raceId;
-	}
+            public Rule[] newArray(int size) {
 
-	public String getDescription() {
+                return new Rule[size];
+            }
+        };
+        @DatabaseField
+        @SerializedName("id")
+        private long ruleId;
+        @DatabaseField
+        private String name;
+        @DatabaseField
+        private String description;
+        @SuppressWarnings("unused")
+        @DatabaseField(generatedId = true)
+        private transient long id;
+        @SuppressWarnings("unused")
+        @DatabaseField(foreign = true)
+        private transient Race race;
 
-		return description;
-	}
+        private Rule() {
 
-	public String getUrl() {
+        }
 
-		return url;
-	}
+        private Rule(Parcel in) {
 
-	public boolean isEvent() {
+            ruleId = in.readLong();
+            name = in.readString();
+            description = in.readString();
+        }
 
-		return event;
-	}
+        @Override
+        public int describeContents() {
 
-	public Date getRegisterAt() {
+            return 0;
+        }
 
-		return registerAt;
-	}
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
 
-	public Date getStartAt() {
+            dest.writeLong(ruleId);
+            dest.writeString(name);
+            dest.writeString(description);
+        }
 
-		return startAt;
-	}
+        public long getRuleId() {
 
-	public Date getEndAt() {
+            return ruleId;
+        }
 
-		return endAt;
-	}
+        public String getName() {
 
-	public Collection<Rule> getRules() {
+            return name;
+        }
 
-		return rules;
-	}
+        public String getDescription() {
 
-	public boolean isInProgress() {
+            return description;
+        }
 
-		Date now = new Date(System.currentTimeMillis());
-		return now.after(getStartAt()) && now.before(getEndAt());
-	}
+        public void setRace(Race race) {
 
-	public boolean isFinished() {
-
-		Date now = new Date(System.currentTimeMillis());
-		return now.after(getEndAt());
-	}
-
-	public boolean isRegistrationOpen() {
-
-		Date now = new Date(System.currentTimeMillis());
-		return now.after(getRegisterAt()) && now.before(getEndAt());
-	}
+            this.race = race;
+        }
+    }
 }

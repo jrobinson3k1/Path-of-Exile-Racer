@@ -9,19 +9,19 @@ import com.jasonrobinson.racer.ui.base.BasePreferenceActivity;
 
 public class SettingsActivity extends BasePreferenceActivity {
 
-	@SuppressWarnings("deprecation")
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+    @SuppressWarnings("deprecation")
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
 
-		super.onCreate(savedInstanceState);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			getActionBar().setDisplayHomeAsUpEnabled(true);
-		}
+        super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
-		setTitle(R.string.settings);
+        setTitle(R.string.settings);
 
-		// TODO: Add fragment implementation side-by-side
-		addPreferencesFromResource(R.xml.preferences);
-	}
+        // TODO: Add fragment implementation side-by-side
+        addPreferencesFromResource(R.xml.preferences);
+    }
 }

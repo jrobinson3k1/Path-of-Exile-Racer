@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:support="http://schemas.android.com/apk/res-auto" >
+    xmlns:support="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/menu_refresh"
@@ -10,6 +10,6 @@
         android:showAsAction="always"
         android:title="@string/refresh"
         support:actionLayout="@layout/progress_bar"
-        support:showAsAction="always"/>
+        support:showAsAction="always" />
 
 </menu>

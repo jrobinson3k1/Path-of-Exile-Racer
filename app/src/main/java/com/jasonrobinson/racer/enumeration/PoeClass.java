@@ -2,41 +2,41 @@ package com.jasonrobinson.racer.enumeration;
 
 public enum PoeClass {
 
-	DUELIST("Duelist"),
-	MARAUDER("Marauder"),
-	RANGER("Ranger"),
-	SCION("Scion"),
-	SHADOW("Shadow"),
-	TEMPLAR("Templar"),
-	WITCH("Witch");
+    DUELIST("Duelist"),
+    MARAUDER("Marauder"),
+    RANGER("Ranger"),
+    SCION("Scion"),
+    SHADOW("Shadow"),
+    TEMPLAR("Templar"),
+    WITCH("Witch");
 
-	private String mName;
+    private String mName;
 
-	PoeClass(String name) {
+    PoeClass(String name) {
 
-		mName = name;
-	}
+        mName = name;
+    }
 
-	public static PoeClass getClassForName(String name) {
+    public static PoeClass getClassForName(String name) {
 
-		PoeClass[] poeClasses = values();
-		for (PoeClass poeClass : poeClasses) {
-			if (poeClass.getName().equalsIgnoreCase(name)) {
-				return poeClass;
-			}
-		}
+        PoeClass[] poeClasses = values();
+        for (PoeClass poeClass : poeClasses) {
+            if (poeClass.getName().equalsIgnoreCase(name)) {
+                return poeClass;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public String getName() {
+    public String getName() {
 
-		return mName;
-	}
+        return mName;
+    }
 
-	@Override
-	public String toString() {
+    @Override
+    public String toString() {
 
-		return mName;
-	}
+        return mName;
+    }
 }

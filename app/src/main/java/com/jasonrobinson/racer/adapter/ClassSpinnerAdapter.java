@@ -13,67 +13,66 @@ import com.jasonrobinson.racer.util.RawTypeface;
 
 public class ClassSpinnerAdapter extends BaseAdapter {
 
-	PoeClass[] mPoeClasses;
-	boolean mShowAll;
+    PoeClass[] mPoeClasses;
+    boolean mShowAll;
 
-	public ClassSpinnerAdapter(PoeClass[] poeClasses, boolean showAll) {
+    public ClassSpinnerAdapter(PoeClass[] poeClasses, boolean showAll) {
 
-		mPoeClasses = poeClasses;
-		mShowAll = showAll;
-	}
+        mPoeClasses = poeClasses;
+        mShowAll = showAll;
+    }
 
-	@Override
-	public int getCount() {
+    @Override
+    public int getCount() {
 
-		return mPoeClasses.length + (mShowAll ? 1 : 0);
-	}
+        return mPoeClasses.length + (mShowAll ? 1 : 0);
+    }
 
-	@Override
-	public PoeClass getItem(int position) {
+    @Override
+    public PoeClass getItem(int position) {
 
-		if (mShowAll && position == 0) {
-			return null;
-		}
+        if (mShowAll && position == 0) {
+            return null;
+        }
 
-		return mPoeClasses[mShowAll ? position - 1 : position];
-	}
+        return mPoeClasses[mShowAll ? position - 1 : position];
+    }
 
-	@Override
-	public long getItemId(int position) {
+    @Override
+    public long getItemId(int position) {
 
-		return position;
-	}
+        return position;
+    }
 
-	@Override
-	public View getDropDownView(int position, View convertView, ViewGroup parent) {
+    @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
 
-		return getView(position, convertView, parent, android.R.layout.simple_spinner_dropdown_item);
-	}
+        return getView(position, convertView, parent, android.R.layout.simple_spinner_dropdown_item);
+    }
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
 
-		return getView(position, convertView, parent, android.R.layout.simple_spinner_item);
-	}
+        return getView(position, convertView, parent, android.R.layout.simple_spinner_item);
+    }
 
-	private View getView(int position, View convertView, ViewGroup parent, int layoutResId) {
+    private View getView(int position, View convertView, ViewGroup parent, int layoutResId) {
 
-		View v = convertView;
-		TextView textView;
-		if (v == null) {
-			v = LayoutInflater.from(parent.getContext()).inflate(layoutResId, parent, false);
-			textView = (TextView) v.findViewById(android.R.id.text1);
-			textView.setTextColor(Color.WHITE);
-			textView.setTypeface(RawTypeface.obtain(parent.getContext(), R.raw.fontin_regular));
-		}
-		else {
-			textView = (TextView) v.findViewById(android.R.id.text1);
-		}
+        View v = convertView;
+        TextView textView;
+        if (v == null) {
+            v = LayoutInflater.from(parent.getContext()).inflate(layoutResId, parent, false);
+            textView = (TextView) v.findViewById(android.R.id.text1);
+            textView.setTextColor(Color.WHITE);
+            textView.setTypeface(RawTypeface.obtain(parent.getContext(), R.raw.fontin_regular));
+        } else {
+            textView = (TextView) v.findViewById(android.R.id.text1);
+        }
 
-		PoeClass poeClass = getItem(position);
+        PoeClass poeClass = getItem(position);
 
-		textView.setText(poeClass == null ? parent.getContext().getString(R.string.all) : poeClass.toString());
+        textView.setText(poeClass == null ? parent.getContext().getString(R.string.all) : poeClass.toString());
 
-		return v;
-	}
+        return v;
+    }
 }

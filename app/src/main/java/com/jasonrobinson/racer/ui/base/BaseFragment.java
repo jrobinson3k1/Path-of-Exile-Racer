@@ -1,40 +1,41 @@
 package com.jasonrobinson.racer.ui.base;
 
-import roboguice.fragment.RoboFragment;
 import android.app.Activity;
 
 import com.jasonrobinson.racer.analytics.AnalyticsManager;
 import com.jasonrobinson.racer.db.DatabaseManager;
 import com.jasonrobinson.racer.util.SettingsManager;
 
+import roboguice.fragment.RoboFragment;
+
 public abstract class BaseFragment extends RoboFragment {
 
-	BaseFragmentImpl mImpl = new BaseFragmentImpl(this);
+    BaseFragmentImpl mImpl = new BaseFragmentImpl(this);
 
-	@Override
-	public void onAttach(Activity activity) {
+    @Override
+    public void onAttach(Activity activity) {
 
-		super.onAttach(activity);
-		mImpl.onAttach(activity);
-	}
+        super.onAttach(activity);
+        mImpl.onAttach(activity);
+    }
 
-	public <T> T castActivity(Class<T> clz) {
+    public <T> T castActivity(Class<T> clz) {
 
-		return mImpl.castActivity(clz);
-	}
+        return mImpl.castActivity(clz);
+    }
 
-	public AnalyticsManager getAnalyticsManager() {
+    public AnalyticsManager getAnalyticsManager() {
 
-		return mImpl.getAnalyticsManager();
-	}
+        return mImpl.getAnalyticsManager();
+    }
 
-	public SettingsManager getSettingsManager() {
+    public SettingsManager getSettingsManager() {
 
-		return mImpl.getSettingsManager();
-	}
+        return mImpl.getSettingsManager();
+    }
 
-	public DatabaseManager getDatabaseManager() {
+    public DatabaseManager getDatabaseManager() {
 
-		return mImpl.getdDatabaseManager();
-	}
+        return mImpl.getdDatabaseManager();
+    }
 }

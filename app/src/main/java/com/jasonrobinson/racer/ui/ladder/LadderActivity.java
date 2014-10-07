@@ -1,10 +1,5 @@
 package com.jasonrobinson.racer.ui.ladder;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-import roboguice.inject.InjectExtra;
-import roboguice.inject.InjectFragment;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.OnNavigationListener;
@@ -19,206 +14,205 @@ import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.ui.base.BaseActivity;
 import com.jasonrobinson.racer.ui.ladder.RaceTimeFragment.RaceTimeCallback;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import roboguice.inject.InjectExtra;
+import roboguice.inject.InjectFragment;
+
 public class LadderActivity extends BaseActivity implements RaceTimeCallback {
 
-	private static final long DISABLE_REFRESH_EXTENSION = 1000 * 60 * 5; // 5
-																			// minutes
+    public static final String EXTRA_ID = "id";
+    // minutes
+    private static final long DISABLE_REFRESH_EXTENSION = 1000 * 60 * 5; // 5
+    @InjectFragment(tag = "raceTime_fragment")
+    RaceTimeFragment mRaceTimeFragment;
+    @InjectFragment(tag = "ladder_fragment")
+    LadderFragment mLadderFragment;
 
-	public static final String EXTRA_ID = "id";
+    private Timer mDisableRefreshTimer;
 
-	@InjectFragment(tag = "raceTime_fragment")
-	RaceTimeFragment mRaceTimeFragment;
-	@InjectFragment(tag = "ladder_fragment")
-	LadderFragment mLadderFragment;
+    private ClassSpinnerAdapter mNavAdapter;
 
-	private Timer mDisableRefreshTimer;
+    @InjectExtra(value = EXTRA_ID)
+    private String mId;
+    private Race mRace;
 
-	private ClassSpinnerAdapter mNavAdapter;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
 
-	@InjectExtra(value = EXTRA_ID)
-	private String mId;
-	private Race mRace;
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.ladder_activity);
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+        mRace = getDatabaseManager().getRace(mId);
+        mNavAdapter = new ClassSpinnerAdapter(PoeClass.values(), true);
 
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.ladder_activity);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        actionBar.setListNavigationCallbacks(mNavAdapter, new OnNavigationListener() {
 
-		mRace = getDatabaseManager().getRace(mId);
-		mNavAdapter = new ClassSpinnerAdapter(PoeClass.values(), true);
+            @Override
+            public boolean onNavigationItemSelected(int position, long id) {
 
-		ActionBar actionBar = getSupportActionBar();
-		actionBar.setDisplayHomeAsUpEnabled(true);
-		actionBar.setDisplayShowTitleEnabled(false);
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		actionBar.setListNavigationCallbacks(mNavAdapter, new OnNavigationListener() {
+                PoeClass poeClass = mNavAdapter.getItem(position);
+                mLadderFragment.fetchLadder(mId, poeClass);
 
-			@Override
-			public boolean onNavigationItemSelected(int position, long id) {
+                getAnalyticsManager().trackEvent("Ladder", "Filter", poeClass == null ? "All" : poeClass.toString());
 
-				PoeClass poeClass = mNavAdapter.getItem(position);
-				mLadderFragment.fetchLadder(mId, poeClass);
+                return true;
+            }
+        });
 
-				getAnalyticsManager().trackEvent("Ladder", "Filter", poeClass == null ? "All" : poeClass.toString());
+        boolean enabled = getSettingsManager().isAutoRefreshEnabled();
+        setAutoRefreshEnabled(enabled, false);
 
-				return true;
-			}
-		});
+        mRaceTimeFragment.setData(mRace);
+    }
 
-		boolean enabled = getSettingsManager().isAutoRefreshEnabled();
-		setAutoRefreshEnabled(enabled, false);
+    @Override
+    protected void onDestroy() {
 
-		mRaceTimeFragment.setData(mRace);
-	}
+        super.onDestroy();
+        cancelDisableRefreshTimer();
+    }
 
-	@Override
-	protected void onDestroy() {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 
-		super.onDestroy();
-		cancelDisableRefreshTimer();
-	}
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.ladder_menu, menu);
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+        boolean checked = getSettingsManager().isKeepScreenOn();
+        menu.findItem(R.id.menu_keep_screen_on).setChecked(checked);
+        keepScreenOn(checked);
 
-		super.onCreateOptionsMenu(menu);
-		getMenuInflater().inflate(R.menu.ladder_menu, menu);
+        checked = getSettingsManager().isAutoRefreshEnabled();
+        menu.findItem(R.id.menu_auto_refresh).setChecked(checked);
+        setAutoRefreshEnabled(checked, false);
 
-		boolean checked = getSettingsManager().isKeepScreenOn();
-		menu.findItem(R.id.menu_keep_screen_on).setChecked(checked);
-		keepScreenOn(checked);
+        return true;
+    }
 
-		checked = getSettingsManager().isAutoRefreshEnabled();
-		menu.findItem(R.id.menu_auto_refresh).setChecked(checked);
-		setAutoRefreshEnabled(checked, false);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
 
-		return true;
-	}
+        int id = item.getItemId();
+        if (id == R.id.menu_keep_screen_on) {
+            item.setChecked(!item.isChecked());
+            keepScreenOn(item.isChecked());
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+            getAnalyticsManager().trackEvent("Ladder", item.isChecked() ? "Enable" : "Disable", "Keep Screen On");
+        } else if (id == R.id.menu_auto_refresh) {
+            item.setChecked(!item.isChecked());
+            setAutoRefreshEnabled(item.isChecked(), true);
 
-		int id = item.getItemId();
-		if (id == R.id.menu_keep_screen_on) {
-			item.setChecked(!item.isChecked());
-			keepScreenOn(item.isChecked());
+            getAnalyticsManager().trackEvent("Ladder", item.isChecked() ? "Enable" : "Disable", "Auto Refresh");
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
 
-			getAnalyticsManager().trackEvent("Ladder", item.isChecked() ? "Enable" : "Disable", "Keep Screen On");
-		}
-		else if (id == R.id.menu_auto_refresh) {
-			item.setChecked(!item.isChecked());
-			setAutoRefreshEnabled(item.isChecked(), true);
+        return true;
+    }
 
-			getAnalyticsManager().trackEvent("Ladder", item.isChecked() ? "Enable" : "Disable", "Auto Refresh");
-		}
-		else {
-			return super.onOptionsItemSelected(item);
-		}
+    @Override
+    public void onRaceFinished() {
 
-		return true;
-	}
+        cancelDisableRefreshTimer();
+        if (isDelayedRaceFinished()) {
+            onDelayedRaceFinished();
+        } else {
+            mDisableRefreshTimer = new Timer();
+            mDisableRefreshTimer.schedule(new DisableRefreshTimerTask(), getTimeUntilDelayedFinish());
+        }
+    }
 
-	@Override
-	public void onRaceFinished() {
+    private void onDelayedRaceFinished() {
 
-		cancelDisableRefreshTimer();
-		if (isDelayedRaceFinished()) {
-			onDelayedRaceFinished();
-		}
-		else {
-			mDisableRefreshTimer = new Timer();
-			mDisableRefreshTimer.schedule(new DisableRefreshTimerTask(), getTimeUntilDelayedFinish());
-		}
-	}
+        setAutoRefreshEnabled(false, false);
+        setRefreshEnabled(false);
+    }
 
-	private void onDelayedRaceFinished() {
+    private void cancelDisableRefreshTimer() {
 
-		setAutoRefreshEnabled(false, false);
-		setRefreshEnabled(false);
-	}
+        if (mDisableRefreshTimer != null) {
+            mDisableRefreshTimer.cancel();
+            mDisableRefreshTimer.purge();
+        }
+    }
 
-	private void cancelDisableRefreshTimer() {
+    private long getTimeUntilDelayedFinish() {
 
-		if (mDisableRefreshTimer != null) {
-			mDisableRefreshTimer.cancel();
-			mDisableRefreshTimer.purge();
-		}
-	}
+        return (mRace.getEndAt().getTime() + DISABLE_REFRESH_EXTENSION) - System.currentTimeMillis();
+    }
 
-	private long getTimeUntilDelayedFinish() {
+    private boolean isDelayedRaceFinished() {
 
-		return (mRace.getEndAt().getTime() + DISABLE_REFRESH_EXTENSION) - System.currentTimeMillis();
-	}
+        return getTimeUntilDelayedFinish() < 0;
+    }
 
-	private boolean isDelayedRaceFinished() {
+    private void setAutoRefreshEnabled(final boolean enabled, final boolean save) {
 
-		return getTimeUntilDelayedFinish() < 0;
-	}
+        runOnUiThread(new Runnable() {
 
-	private void setAutoRefreshEnabled(final boolean enabled, final boolean save) {
+            @Override
+            public void run() {
 
-		runOnUiThread(new Runnable() {
+                if (mLadderFragment != null) {
+                    if (isDelayedRaceFinished()) {
+                        mLadderFragment.setAutoRefreshEnabled(false);
+                    } else {
+                        mLadderFragment.setAutoRefreshEnabled(enabled);
+                    }
+                }
 
-			@Override
-			public void run() {
+                if (save) {
+                    getSettingsManager().setAutoRefresh(enabled);
+                }
+            }
+        });
+    }
 
-				if (mLadderFragment != null) {
-					if (isDelayedRaceFinished()) {
-						mLadderFragment.setAutoRefreshEnabled(false);
-					}
-					else {
-						mLadderFragment.setAutoRefreshEnabled(enabled);
-					}
-				}
+    private void setRefreshEnabled(final boolean enabled) {
 
-				if (save) {
-					getSettingsManager().setAutoRefresh(enabled);
-				}
-			}
-		});
-	}
+        runOnUiThread(new Runnable() {
 
-	private void setRefreshEnabled(final boolean enabled) {
+            @Override
+            public void run() {
 
-		runOnUiThread(new Runnable() {
+                if (mLadderFragment != null) {
+                    mLadderFragment.setRefreshEnabled(enabled);
+                }
+            }
+        });
+    }
 
-			@Override
-			public void run() {
+    private void keepScreenOn(final boolean keepScreenOn) {
 
-				if (mLadderFragment != null) {
-					mLadderFragment.setRefreshEnabled(enabled);
-				}
-			}
-		});
-	}
+        runOnUiThread(new Runnable() {
 
-	private void keepScreenOn(final boolean keepScreenOn) {
+            @Override
+            public void run() {
 
-		runOnUiThread(new Runnable() {
+                int flag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                if (keepScreenOn) {
+                    getWindow().addFlags(flag);
+                } else {
+                    getWindow().clearFlags(flag);
+                }
 
-			@Override
-			public void run() {
+                getSettingsManager().setKeepScreenOn(keepScreenOn);
+            }
+        });
+    }
 
-				int flag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
-				if (keepScreenOn) {
-					getWindow().addFlags(flag);
-				}
-				else {
-					getWindow().clearFlags(flag);
-				}
+    private class DisableRefreshTimerTask extends TimerTask {
 
-				getSettingsManager().setKeepScreenOn(keepScreenOn);
-			}
-		});
-	}
+        @Override
+        public void run() {
 
-	private class DisableRefreshTimerTask extends TimerTask {
-
-		@Override
-		public void run() {
-
-			onDelayedRaceFinished();
-		}
-	}
+            onDelayedRaceFinished();
+        }
+    }
 }

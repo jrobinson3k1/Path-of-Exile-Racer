@@ -1,86 +1,87 @@
 package com.jasonrobinson.racer.util;
 
-import javax.inject.Inject;
-
-import roboguice.inject.ContextSingleton;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.jasonrobinson.racer.R;
 
+import javax.inject.Inject;
+
+import roboguice.inject.ContextSingleton;
+
 @ContextSingleton
 public class SettingsManager {
 
-	private static final int KEY_KEEP_SCREEN_ON = R.string.prefs_keepscreenon_key;
-	private static final int KEY_AUTO_REFRESH = R.string.prefs_autorefresh_key;
-	private static final int KEY_LAST_RACE_FETCH = R.string.prefs_lastracefetch_key;
+    private static final int KEY_KEEP_SCREEN_ON = R.string.prefs_keepscreenon_key;
+    private static final int KEY_AUTO_REFRESH = R.string.prefs_autorefresh_key;
+    private static final int KEY_LAST_RACE_FETCH = R.string.prefs_lastracefetch_key;
 
-	@Inject
-	private Context mContext;
+    @Inject
+    private Context mContext;
 
-	@Inject
-	private SettingsManager() {
+    @Inject
+    private SettingsManager() {
 
-	}
+    }
 
-	public void setKeepScreenOn(boolean enable) {
+    public boolean isKeepScreenOn() {
 
-		putBoolean(KEY_KEEP_SCREEN_ON, enable);
-	}
+        return getBoolean(KEY_KEEP_SCREEN_ON, false);
+    }
 
-	public boolean isKeepScreenOn() {
+    public void setKeepScreenOn(boolean enable) {
 
-		return getBoolean(KEY_KEEP_SCREEN_ON, false);
-	}
+        putBoolean(KEY_KEEP_SCREEN_ON, enable);
+    }
 
-	public void setAutoRefresh(boolean enable) {
+    public void setAutoRefresh(boolean enable) {
 
-		putBoolean(KEY_AUTO_REFRESH, enable);
-	}
+        putBoolean(KEY_AUTO_REFRESH, enable);
+    }
 
-	public boolean isAutoRefreshEnabled() {
+    public boolean isAutoRefreshEnabled() {
 
-		return getBoolean(KEY_AUTO_REFRESH, true);
-	}
+        return getBoolean(KEY_AUTO_REFRESH, true);
+    }
 
-	public void updateLastRaceFetch() {
+    public void updateLastRaceFetch() {
 
-		putLong(KEY_LAST_RACE_FETCH, System.currentTimeMillis());
-	}
+        putLong(KEY_LAST_RACE_FETCH, System.currentTimeMillis());
+    }
 
-	public long getLastRaceFetch() {
+    public long getLastRaceFetch() {
 
-		return getLong(KEY_LAST_RACE_FETCH, 0L);
-	}
+        return getLong(KEY_LAST_RACE_FETCH, 0L);
+    }
 
-	private String getKey(int resId) {
+    private String getKey(int resId) {
 
-		return mContext.getString(resId);
-	}
+        return mContext.getString(resId);
+    }
 
-	private void putBoolean(int keyResId, boolean value) {
+    private void putBoolean(int keyResId, boolean value) {
 
-		getPrefs().edit().putBoolean(getKey(keyResId), value).commit();
-	}
+        getPrefs().edit().putBoolean(getKey(keyResId), value).commit();
+    }
 
-	private boolean getBoolean(int keyResId, boolean defValue) {
+    private boolean getBoolean(int keyResId, boolean defValue) {
 
-		return getPrefs().getBoolean(getKey(keyResId), defValue);
-	}
+        return getPrefs().getBoolean(getKey(keyResId), defValue);
+    }
 
-	private void putLong(int keyResId, long value) {
+    private void putLong(int keyResId, long value) {
 
-		getPrefs().edit().putLong(getKey(keyResId), value).commit();
-	}
+        getPrefs().edit().putLong(getKey(keyResId), value).commit();
+    }
 
-	private long getLong(int keyResId, long defValue) {
+    private long getLong(int keyResId, long defValue) {
 
-		return getPrefs().getLong(getKey(keyResId), defValue);
-	}
+        return getPrefs().getLong(getKey(keyResId), defValue);
+    }
 
-	private SharedPreferences getPrefs() {
+    private SharedPreferences getPrefs() {
 
-		return PreferenceManager.getDefaultSharedPreferences(mContext);
-	}
+        return PreferenceManager.getDefaultSharedPreferences(mContext);
+    }
 }
