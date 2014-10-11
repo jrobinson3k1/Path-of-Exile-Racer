@@ -1,13 +1,12 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" tools:ignore="NewApi">
 
-    <style name="AppTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <item name="pstsIndicatorColor">@color/main_color</item>
         <item name="numberPickerStyle">@style/NPWidget.Holo.NumberPicker</item>
         <item name="android:actionBarStyle">@style/AppActionBar</item>
-        <item name="actionBarStyle">@style/AppActionBar</item>
     </style>
 
-    <style name="AppActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+    <style name="AppActionBar" parent="android:Widget.Holo.Light.ActionBar.Solid.Inverse">
         <item name="android:background">@color/main_color</item>
     </style>
 

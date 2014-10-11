@@ -1,34 +1,30 @@
 package com.jasonrobinson.racer.async;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.jasonrobinson.racer.db.DatabaseManager;
 import com.jasonrobinson.racer.enumeration.RaceOptions;
 import com.jasonrobinson.racer.model.Race;
+import com.jasonrobinson.racer.module.GraphHolder;
 import com.jasonrobinson.racer.network.RaceClient;
 
 import java.net.SocketTimeoutException;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import retrofit.RetrofitError;
-import roboguice.RoboGuice;
 
 public class RaceAsyncTask extends AsyncTask<Void, Void, List<Race>> {
 
     private static final String TAG = RaceAsyncTask.class.getSimpleName();
 
-    @Inject
-    private DatabaseManager mDatabaseManager;
-    private boolean mReturnData;
+    DatabaseManager mDatabaseManager;
 
-    public RaceAsyncTask(Context context, boolean returnData) {
+    boolean mReturnData;
 
-        RoboGuice.injectMembers(context, this);
+    public RaceAsyncTask(boolean returnData) {
         mReturnData = returnData;
+        mDatabaseManager = GraphHolder.getInstance().get(DatabaseManager.class);
     }
 
     @Override

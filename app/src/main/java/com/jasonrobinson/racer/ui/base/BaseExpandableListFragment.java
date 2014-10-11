@@ -1,25 +1,21 @@
 package com.jasonrobinson.racer.ui.base;
 
-import android.app.Activity;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.view.View;
 
 import com.jasonrobinson.racer.analytics.AnalyticsManager;
 import com.jasonrobinson.racer.db.DatabaseManager;
 import com.jasonrobinson.racer.util.SettingsManager;
 
-public class BaseExpandableListFragment extends RoboExpandableListFragment {
+public class BaseExpandableListFragment extends ExpandableListFragment {
 
     BaseFragmentImpl mImpl = new BaseFragmentImpl(this);
 
     @Override
-    public void onAttach(Activity activity) {
-
-        super.onAttach(activity);
-        mImpl.onAttach(activity);
-    }
-
-    public <T> T castActivity(Class<T> clz) {
-
-        return mImpl.castActivity(clz);
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mImpl.onViewCreated(view, savedInstanceState);
     }
 
     public AnalyticsManager getAnalyticsManager() {

@@ -1,8 +1,7 @@
 package com.jasonrobinson.racer.ui.ladder;
 
+import android.app.ActionBar;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBar.OnNavigationListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
@@ -13,45 +12,43 @@ import com.jasonrobinson.racer.enumeration.PoeClass;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.ui.base.BaseActivity;
 import com.jasonrobinson.racer.ui.ladder.RaceTimeFragment.RaceTimeCallback;
+import com.metova.slim.annotation.Extra;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-import roboguice.inject.InjectExtra;
-import roboguice.inject.InjectFragment;
-
 public class LadderActivity extends BaseActivity implements RaceTimeCallback {
 
     public static final String EXTRA_ID = "id";
-    // minutes
-    private static final long DISABLE_REFRESH_EXTENSION = 1000 * 60 * 5; // 5
-    @InjectFragment(tag = "raceTime_fragment")
+    private static final long DISABLE_REFRESH_EXTENSION = 1000 * 60 * 5; // 5 minutes
+
     RaceTimeFragment mRaceTimeFragment;
-    @InjectFragment(tag = "ladder_fragment")
     LadderFragment mLadderFragment;
 
     private Timer mDisableRefreshTimer;
 
     private ClassSpinnerAdapter mNavAdapter;
 
-    @InjectExtra(value = EXTRA_ID)
+    @Extra(EXTRA_ID)
     private String mId;
     private Race mRace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ladder_activity);
+
+        mRaceTimeFragment = (RaceTimeFragment) getSupportFragmentManager().findFragmentById(R.id.raceTime_fragment);
+        mLadderFragment = (LadderFragment) getSupportFragmentManager().findFragmentById(R.id.ladder_fragment);
 
         mRace = getDatabaseManager().getRace(mId);
         mNavAdapter = new ClassSpinnerAdapter(PoeClass.values(), true);
 
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        actionBar.setListNavigationCallbacks(mNavAdapter, new OnNavigationListener() {
+        actionBar.setListNavigationCallbacks(mNavAdapter, new ActionBar.OnNavigationListener() {
 
             @Override
             public boolean onNavigationItemSelected(int position, long id) {
@@ -73,14 +70,12 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
 
     @Override
     protected void onDestroy() {
-
         super.onDestroy();
         cancelDisableRefreshTimer();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.ladder_menu, menu);
 
@@ -97,7 +92,6 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         int id = item.getItemId();
         if (id == R.id.menu_keep_screen_on) {
             item.setChecked(!item.isChecked());
@@ -118,7 +112,6 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
 
     @Override
     public void onRaceFinished() {
-
         cancelDisableRefreshTimer();
         if (isDelayedRaceFinished()) {
             onDelayedRaceFinished();
@@ -129,13 +122,11 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
     }
 
     private void onDelayedRaceFinished() {
-
         setAutoRefreshEnabled(false, false);
         setRefreshEnabled(false);
     }
 
     private void cancelDisableRefreshTimer() {
-
         if (mDisableRefreshTimer != null) {
             mDisableRefreshTimer.cancel();
             mDisableRefreshTimer.purge();
@@ -143,17 +134,14 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
     }
 
     private long getTimeUntilDelayedFinish() {
-
         return (mRace.getEndAt().getTime() + DISABLE_REFRESH_EXTENSION) - System.currentTimeMillis();
     }
 
     private boolean isDelayedRaceFinished() {
-
         return getTimeUntilDelayedFinish() < 0;
     }
 
     private void setAutoRefreshEnabled(final boolean enabled, final boolean save) {
-
         runOnUiThread(new Runnable() {
 
             @Override
@@ -175,7 +163,6 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
     }
 
     private void setRefreshEnabled(final boolean enabled) {
-
         runOnUiThread(new Runnable() {
 
             @Override
@@ -189,7 +176,6 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
     }
 
     private void keepScreenOn(final boolean keepScreenOn) {
-
         runOnUiThread(new Runnable() {
 
             @Override
@@ -211,7 +197,6 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
 
         @Override
         public void run() {
-
             onDelayedRaceFinished();
         }
     }

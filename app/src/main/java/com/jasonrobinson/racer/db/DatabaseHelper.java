@@ -14,10 +14,9 @@ import com.jasonrobinson.racer.model.Race.Rule;
 import java.sql.SQLException;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import roboguice.inject.ContextSingleton;
-
-@ContextSingleton
+@Singleton
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
@@ -28,8 +27,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private Dao<Race, String> mRaceDao;
     private Dao<Rule, Long> mRuleDao;
 
-    @Inject
-    private DatabaseHelper(Context context) {
+    public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
     }
 

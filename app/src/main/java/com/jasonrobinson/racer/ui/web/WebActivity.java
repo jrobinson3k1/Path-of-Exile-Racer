@@ -10,40 +10,38 @@ import android.widget.ProgressBar;
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.ui.base.BaseActivity;
 import com.jasonrobinson.racer.ui.web.WebFragment.WebCallback;
+import com.metova.slim.annotation.Extra;
 
-import roboguice.inject.InjectFragment;
-import roboguice.inject.InjectView;
+import butterknife.InjectView;
 
 public class WebActivity extends BaseActivity implements WebCallback {
 
     public static final String EXTRA_URL = "url";
 
-    @InjectFragment(tag = "web_fragment")
+    @Extra(EXTRA_URL)
+    String mUrl;
+
     WebFragment mWebFragment;
-    @InjectView(tag = "progress")
+
+    @InjectView(R.id.progress)
     ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.web_activity);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mWebFragment = (WebFragment) getSupportFragmentManager().findFragmentById(R.id.web_fragment);
+
+        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         setTitle(R.string.forum_post);
 
-        String url = getIntent().getStringExtra(EXTRA_URL);
-        if (url == null) {
-            throw new IllegalArgumentException("url not found in intent");
-        }
-
-        mWebFragment.loadUrl(url);
+        mWebFragment.loadUrl(mUrl);
     }
 
     @Override
     public void onBackPressed() {
-
         if (!mWebFragment.onBackPressed()) {
             super.onBackPressed();
         }
@@ -51,7 +49,6 @@ public class WebActivity extends BaseActivity implements WebCallback {
 
     @Override
     public void onProgressChanged(int progress) {
-
         mProgressBar.setAnimation(null);
         mProgressBar.setVisibility(View.VISIBLE);
         mProgressBar.setProgress(progress);
@@ -63,19 +60,16 @@ public class WebActivity extends BaseActivity implements WebCallback {
 
                 @Override
                 public void onAnimationStart(Animation animation) {
-
                     // no-op
                 }
 
                 @Override
                 public void onAnimationRepeat(Animation animation) {
-
                     // no-op
                 }
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-
                     mProgressBar.setVisibility(View.GONE);
                 }
             });

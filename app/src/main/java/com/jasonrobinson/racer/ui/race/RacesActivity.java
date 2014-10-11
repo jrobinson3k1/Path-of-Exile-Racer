@@ -1,6 +1,5 @@
 package com.jasonrobinson.racer.ui.race;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,8 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.astuetz.PagerSlidingTabStrip;
-import com.crashlytics.android.Crashlytics;
-import com.jasonrobinson.racer.BuildConfig;
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.async.RaceAsyncTask;
 import com.jasonrobinson.racer.enumeration.RaceOptions;
@@ -29,19 +26,19 @@ import com.jasonrobinson.racer.util.DepthPageTransformer;
 import java.util.ArrayList;
 import java.util.List;
 
-import roboguice.inject.InjectView;
+import butterknife.InjectView;
 
 public class RacesActivity extends BaseActivity implements RacesCallback {
 
     private static final long FETCH_INTERVAL = 1000 * 60 * 60 * 24; // 24 hours
 
-    @InjectView(tag = "tabs")
-    private PagerSlidingTabStrip mTabs;
-    @InjectView(tag = "pager")
-    private ViewPager mPager;
+    @InjectView(R.id.tabs)
+    PagerSlidingTabStrip mTabs;
+    @InjectView(R.id.pager)
+    ViewPager mPager;
 
-    private RacesTask mRacesTask;
-    private boolean mRefreshing;
+    RacesTask mRacesTask;
+    boolean mRefreshing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +116,7 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
             mRacesTask.cancel(true);
         }
 
-        mRacesTask = new RacesTask(this);
+        mRacesTask = new RacesTask();
         mRacesTask.execute();
     }
 
@@ -167,8 +164,8 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 
     private class RacesTask extends RaceAsyncTask {
 
-        public RacesTask(Context context) {
-            super(context, false);
+        public RacesTask() {
+            super(false);
         }
 
         @Override

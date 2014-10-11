@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
@@ -17,13 +18,13 @@ import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import roboguice.fragment.RoboFragment;
+import com.metova.slim.SlimFragment;
 
-public class RoboExpandableListFragment extends RoboFragment implements OnCreateContextMenuListener, ExpandableListView.OnChildClickListener, ExpandableListView.OnGroupCollapseListener, ExpandableListView.OnGroupExpandListener, OnGroupClickListener {
+@SuppressWarnings("ResourceType")
+public class ExpandableListFragment extends SlimFragment implements OnCreateContextMenuListener, ExpandableListView.OnChildClickListener, ExpandableListView.OnGroupCollapseListener, ExpandableListView.OnGroupExpandListener, OnGroupClickListener {
 
     static final int INTERNAL_EMPTY_ID = 0x00ff0001;
     static final int INTERNAL_PROGRESS_CONTAINER_ID = 0x00ff0002;
@@ -196,7 +197,7 @@ public class RoboExpandableListFragment extends RoboFragment implements OnCreate
      * Applications do not normally need to use this themselves. The default
      * behavior of ListFragment is to start with the list not being shown, only
      * showing it once an adapter is given with
-     * {@link #setListAdapter(ListAdapter)}. If the list at that point had not
+     * {@link #setListAdapter(android.widget.ExpandableListAdapter)} (ListAdapter)}. If the list at that point had not
      * been shown, when it does get shown it will be do without the user ever
      * seeing the hidden state.
      *

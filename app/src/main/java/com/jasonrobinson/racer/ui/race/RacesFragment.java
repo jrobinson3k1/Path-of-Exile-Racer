@@ -1,7 +1,6 @@
 package com.jasonrobinson.racer.ui.race;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -22,24 +21,28 @@ import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.ui.base.BaseExpandableListFragment;
 import com.jasonrobinson.racer.ui.race.NotificationPickerDialogFragment.OnTimeSelectedListener;
 import com.jasonrobinson.racer.util.AlarmUtils;
+import com.metova.slim.annotation.Callback;
+import com.metova.slim.annotation.Extra;
 
 import java.util.List;
 
 public class RacesFragment extends BaseExpandableListFragment {
 
-    public static final String ARG_OPTION = "option";
+    public static final String EXTRA_OPTION = "option";
 
-    private RaceAdapter mAdapter;
+    RaceAdapter mAdapter;
 
-    private RaceOptions mRaceOption;
-    private RacesCallback mCallback;
+    @Extra(EXTRA_OPTION)
+    RaceOptions mRaceOption;
+
+    @Callback
+    RacesCallback mCallback;
 
     public static RacesFragment newInstance(RaceOptions option) {
-
         RacesFragment fragment = new RacesFragment();
 
         Bundle args = new Bundle();
-        args.putSerializable(ARG_OPTION, option);
+        args.putSerializable(EXTRA_OPTION, option);
         fragment.setArguments(args);
 
         return fragment;
@@ -47,43 +50,30 @@ public class RacesFragment extends BaseExpandableListFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mRaceOption = (RaceOptions) getArguments().getSerializable(ARG_OPTION);
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-
-        super.onAttach(activity);
-        mCallback = castActivity(RacesCallback.class);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-
         super.onViewCreated(view, savedInstanceState);
         setEmptyText(getString(R.string.races_unavailable));
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-
         super.onActivityCreated(savedInstanceState);
         registerForContextMenu(getExpandableListView());
     }
 
     @Override
     public void onResume() {
-
         super.onResume();
         refresh();
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.races_menu, menu);
 
@@ -96,7 +86,6 @@ public class RacesFragment extends BaseExpandableListFragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         int id = item.getItemId();
         if (id == R.id.menu_expand_all) {
             expandAllGroups();
@@ -111,7 +100,6 @@ public class RacesFragment extends BaseExpandableListFragment {
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-
         super.onCreateContextMenu(menu, v, menuInfo);
         ExpandableListContextMenuInfo adapterInfo = (ExpandableListContextMenuInfo) menuInfo;
         if (ExpandableListView.getPackedPositionType(adapterInfo.packedPosition) != ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
@@ -141,7 +129,6 @@ public class RacesFragment extends BaseExpandableListFragment {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-
         ExpandableListContextMenuInfo menuInfo = (ExpandableListContextMenuInfo) item.getMenuInfo();
         if (ExpandableListView.getPackedPositionType(menuInfo.packedPosition) != ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
             return false;
@@ -170,7 +157,6 @@ public class RacesFragment extends BaseExpandableListFragment {
 
     @Override
     public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-
         Race race = mAdapter.getChild(groupPosition, childPosition);
 
         if (race.isRegistrationOpen() || race.isFinished()) {
@@ -188,20 +174,17 @@ public class RacesFragment extends BaseExpandableListFragment {
     }
 
     private void showNotificationDialog(final Race race) {
-
         NotificationPickerDialogFragment fragment = NotificationPickerDialogFragment.newInstance();
         fragment.setOnTimeSelectedListener(new OnTimeSelectedListener() {
 
             @Override
             public void onTimeSelected(long millis) {
-
                 AlarmUtils.addAlarm(getActivity(), race, millis);
                 mAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onCancel() {
-
                 // no-op
             }
         });
@@ -209,7 +192,6 @@ public class RacesFragment extends BaseExpandableListFragment {
     }
 
     private void expandAllGroups() {
-
         if (mAdapter != null) {
             int groupCount = mAdapter.getGroupCount();
             for (int i = 0; i < groupCount; i++) {
@@ -219,7 +201,6 @@ public class RacesFragment extends BaseExpandableListFragment {
     }
 
     private void collapseAllGroups() {
-
         if (mAdapter != null) {
             int groupCount = mAdapter.getGroupCount();
             for (int i = 0; i < groupCount; i++) {
@@ -230,7 +211,6 @@ public class RacesFragment extends BaseExpandableListFragment {
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     private void setData(List<Race> races) {
-
         if (races.isEmpty()) {
             mAdapter = null;
         } else {
@@ -252,7 +232,6 @@ public class RacesFragment extends BaseExpandableListFragment {
     }
 
     public void refresh() {
-
         List<Race> races = getDatabaseManager().getRaces(mRaceOption);
         setData(races);
     }

@@ -52,7 +52,7 @@ public class WatchCharacterDialogFragment extends BaseDialogFragment {
 
         String name = getArguments().getString(ARG_NAME);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.Theme_AppCompat));
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), android.R.style.Theme));
         builder.setIcon(R.drawable.ic_action_search);
         builder.setTitle(R.string.watch_character);
 

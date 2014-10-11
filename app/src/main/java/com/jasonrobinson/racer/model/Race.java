@@ -46,15 +46,13 @@ public class Race implements Parcelable {
     private Collection<Rule> rules;
 
     private Race() {
-
     }
 
     private Race(Parcel in) {
-
         raceId = in.readString();
         description = in.readString();
         url = in.readString();
-        event = in.readInt() == 1 ? true : false;
+        event = in.readInt() == 1;
         registerAt = new Date(in.readLong());
         startAt = new Date(in.readLong());
         endAt = new Date(in.readLong());
@@ -68,13 +66,11 @@ public class Race implements Parcelable {
 
     @Override
     public int describeContents() {
-
         return 0;
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-
         dest.writeString(raceId);
         dest.writeString(description);
         dest.writeString(url);
@@ -86,59 +82,48 @@ public class Race implements Parcelable {
     }
 
     public String getRaceId() {
-
         return raceId;
     }
 
     public String getDescription() {
-
         return description;
     }
 
     public String getUrl() {
-
         return url;
     }
 
     public boolean isEvent() {
-
         return event;
     }
 
     public Date getRegisterAt() {
-
         return registerAt;
     }
 
     public Date getStartAt() {
-
         return startAt;
     }
 
     public Date getEndAt() {
-
         return endAt;
     }
 
     public Collection<Rule> getRules() {
-
         return rules;
     }
 
     public boolean isInProgress() {
-
         Date now = new Date(System.currentTimeMillis());
         return now.after(getStartAt()) && now.before(getEndAt());
     }
 
     public boolean isFinished() {
-
         Date now = new Date(System.currentTimeMillis());
         return now.after(getEndAt());
     }
 
     public boolean isRegistrationOpen() {
-
         Date now = new Date(System.currentTimeMillis());
         return now.after(getRegisterAt()) && now.before(getEndAt());
     }
@@ -149,12 +134,10 @@ public class Race implements Parcelable {
         public static final Parcelable.Creator<Rule> CREATOR = new Parcelable.Creator<Rule>() {
 
             public Rule createFromParcel(Parcel in) {
-
                 return new Rule(in);
             }
 
             public Rule[] newArray(int size) {
-
                 return new Rule[size];
             }
         };
@@ -173,11 +156,9 @@ public class Race implements Parcelable {
         private transient Race race;
 
         private Rule() {
-
         }
 
         private Rule(Parcel in) {
-
             ruleId = in.readLong();
             name = in.readString();
             description = in.readString();
@@ -185,35 +166,29 @@ public class Race implements Parcelable {
 
         @Override
         public int describeContents() {
-
             return 0;
         }
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
-
             dest.writeLong(ruleId);
             dest.writeString(name);
             dest.writeString(description);
         }
 
         public long getRuleId() {
-
             return ruleId;
         }
 
         public String getName() {
-
             return name;
         }
 
         public String getDescription() {
-
             return description;
         }
 
         public void setRace(Race race) {
-
             this.race = race;
         }
     }

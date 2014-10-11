@@ -9,7 +9,6 @@
         android:name="com.jasonrobinson.racer.ui.ladder.RaceTimeFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:tag="raceTime_fragment"
         tools:layout="@layout/racetime_fragment" />
 
     <fragment
@@ -17,7 +16,6 @@
         android:name="com.jasonrobinson.racer.ui.ladder.LadderFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:tag="ladder_fragment"
         tools:layout="@android:layout/list_content" />
 
 </LinearLayout>

@@ -13,59 +13,56 @@ import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.ui.base.BaseFragment;
 import com.jasonrobinson.racer.util.RacerTimeUtils;
 import com.jasonrobinson.racer.util.RawTypeface;
+import com.metova.slim.annotation.Callback;
 
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import roboguice.inject.InjectView;
+import butterknife.InjectView;
 
 public class RaceTimeFragment extends BaseFragment {
 
-    private DateFormat mDateFormat;
-    private DateFormat mTimeFormat;
+    DateFormat mDateFormat;
+    DateFormat mTimeFormat;
 
-    private RemainingCountdownTimer mRemainingTimer;
+    RemainingCountdownTimer mRemainingTimer;
 
-    private RaceTimeCallback mRaceTimeCallback;
+    @Callback
+    RaceTimeCallback mRaceTimeCallback;
 
     @InjectView(R.id.raceName)
-    private TextView mNameTextView;
+    TextView mNameTextView;
     @InjectView(R.id.startTime)
-    private TextView mStartTimeTextView;
+    TextView mStartTimeTextView;
     @InjectView(R.id.endTime)
-    private TextView mEndTimeTextView;
+    TextView mEndTimeTextView;
     @InjectView(R.id.countdownTime)
-    private TextView mCountdownTimeTextView;
+    TextView mCountdownTimeTextView;
     @InjectView(R.id.countdownText)
-    private TextView mCountdownTextView;
+    TextView mCountdownTextView;
 
     @Override
     public void onAttach(Activity activity) {
-
         super.onAttach(activity);
-        mRaceTimeCallback = castActivity(RaceTimeCallback.class);
         mDateFormat = android.text.format.DateFormat.getDateFormat(getActivity());
         mTimeFormat = android.text.format.DateFormat.getTimeFormat(getActivity());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         return inflater.inflate(R.layout.racetime_fragment, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-
         super.onViewCreated(view, savedInstanceState);
         mNameTextView.setTypeface(RawTypeface.obtain(getActivity(), R.raw.fontin_bold));
     }
 
     @Override
     public void onDestroyView() {
-
         super.onDestroyView();
         if (mRemainingTimer != null) {
             mRemainingTimer.cancel();
@@ -73,7 +70,6 @@ public class RaceTimeFragment extends BaseFragment {
     }
 
     public void setData(Race race) {
-
         String name = race.getRaceId();
         Date startAt = race.getStartAt();
         Date endAt = race.getEndAt();
@@ -94,7 +90,6 @@ public class RaceTimeFragment extends BaseFragment {
     }
 
     private boolean isToday(Date date) {
-
         Calendar now = Calendar.getInstance(Locale.getDefault());
 
         Calendar then = Calendar.getInstance(Locale.getDefault());
@@ -104,7 +99,6 @@ public class RaceTimeFragment extends BaseFragment {
     }
 
     private CharSequence getFormattedTime(Date date, boolean includeDate) {
-
         StringBuilder sb = new StringBuilder();
         if (includeDate) {
             sb.append(mDateFormat.format(date));
@@ -126,19 +120,16 @@ public class RaceTimeFragment extends BaseFragment {
         private long mStartTime;
 
         public RemainingCountdownTimer(long startTime, long millisInFuture) {
-
             super(millisInFuture, 1000);
             mStartTime = startTime;
         }
 
         @Override
         public void onFinish() {
-
             getActivity().runOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
-
                     mCountdownTimeTextView.setText(R.string.finished);
                     mRaceTimeCallback.onRaceFinished();
                 }
@@ -147,7 +138,6 @@ public class RaceTimeFragment extends BaseFragment {
 
         @Override
         public void onTick(long millisUntilFinished) {
-
             long timeToStart = mStartTime - System.currentTimeMillis();
             long seconds;
             if (timeToStart > 0) {

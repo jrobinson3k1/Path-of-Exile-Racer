@@ -1,6 +1,5 @@
 package com.jasonrobinson.racer.db;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.j256.ormlite.dao.Dao.CreateOrUpdateStatus;
@@ -16,22 +15,15 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import roboguice.RoboGuice;
-import roboguice.inject.ContextSingleton;
-
-@ContextSingleton
+@Singleton
 public class DatabaseManager {
 
     private static final String TAG = DatabaseManager.class.getSimpleName();
 
     @Inject
-    private DatabaseHelper mHelper;
-
-    @Inject
-    private DatabaseManager(Context context) {
-        RoboGuice.injectMembers(context, this);
-    }
+    DatabaseHelper mHelper;
 
     public List<Race> getRaces(RaceOptions option) {
         switch (option) {

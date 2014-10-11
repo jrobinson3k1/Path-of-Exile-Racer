@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         maven { url 'http://download.crashlytics.com/maven' }
     }
     dependencies {
@@ -13,6 +13,6 @@ buildscript {
 allprojects {
     repositories {
         mavenCentral()
-        jcenter()
+        maven { url "http://repo.metova.com/nexus/content/groups/public" }
     }
 }

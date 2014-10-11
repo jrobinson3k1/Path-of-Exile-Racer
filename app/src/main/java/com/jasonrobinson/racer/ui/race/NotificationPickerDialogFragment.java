@@ -26,7 +26,7 @@ public class NotificationPickerDialogFragment extends BaseDialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        Context ctxWrapper = new ContextThemeWrapper(getActivity(), R.style.Theme_AppCompat);
+        Context ctxWrapper = new ContextThemeWrapper(getActivity(), android.R.style.Theme);
         AlertDialog.Builder builder = new AlertDialog.Builder(ctxWrapper);
         builder.setTitle(R.string.add_notification);
 

@@ -2,24 +2,26 @@ package com.jasonrobinson.racer.analytics;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.v4.app.Fragment;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.jasonrobinson.racer.R;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import roboguice.inject.ContextSingleton;
-
-@ContextSingleton
+@Singleton
 public class AnalyticsManager {
 
-    @Inject
-    Context mContext;
+    private final Context mContext;
 
-    Tracker mTracker;
+    private final Tracker mTracker;
+
+    @Inject
+    AnalyticsManager(Context context, Tracker tracker) {
+        mContext = context;
+        mTracker = tracker;
+    }
 
     public void onStart(Activity activity) {
         GoogleAnalytics.getInstance(mContext).reportActivityStart(activity);
@@ -29,24 +31,11 @@ public class AnalyticsManager {
         GoogleAnalytics.getInstance(mContext).reportActivityStop(activity);
     }
 
-    public void trackFragment(Fragment fragment) {
-        getTracker().setScreenName(fragment.getClass().getName());
-        getTracker().send(new HitBuilders.AppViewBuilder().build());
-    }
-
     public void trackEvent(String category, String action, String label) {
-        getTracker().send(new HitBuilders.EventBuilder()
+        mTracker.send(new HitBuilders.EventBuilder()
                 .setCategory(category)
                 .setAction(action)
                 .setLabel(label)
                 .build());
-    }
-
-    private Tracker getTracker() {
-        if (mTracker == null) {
-            mTracker = GoogleAnalytics.getInstance(mContext).newTracker(R.xml.analytics);
-        }
-
-        return mTracker;
     }
 }
