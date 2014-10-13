@@ -45,5 +45,6 @@
     <string name="notification_dialog_message1">Benachrichtigen Sie mich</string>
     <string name="notification_dialog_message2">Minuten vor dem Start des Rennens.</string>
     <string name="add">Hinzufügen</string>
+    <string name="open_in_browser">in Browser öffnen</string>
 
 </resources>

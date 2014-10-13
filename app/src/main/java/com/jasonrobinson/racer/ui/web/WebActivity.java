@@ -1,6 +1,10 @@
 package com.jasonrobinson.racer.ui.web;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -11,9 +15,11 @@ import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.ui.base.BaseActivity;
 import com.jasonrobinson.racer.ui.web.WebFragment.WebCallback;
 import com.metova.slim.annotation.Extra;
+import com.metova.slim.annotation.Layout;
 
 import butterknife.InjectView;
 
+@Layout(R.layout.web_activity)
 public class WebActivity extends BaseActivity implements WebCallback {
 
     public static final String EXTRA_URL = "url";
@@ -29,8 +35,6 @@ public class WebActivity extends BaseActivity implements WebCallback {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.web_activity);
-
         mWebFragment = (WebFragment) getSupportFragmentManager().findFragmentById(R.id.web_fragment);
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -45,6 +49,25 @@ public class WebActivity extends BaseActivity implements WebCallback {
         if (!mWebFragment.onBackPressed()) {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.web_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_browser:
+                openInBrowser(mUrl);
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+        return true;
     }
 
     @Override
@@ -76,5 +99,15 @@ public class WebActivity extends BaseActivity implements WebCallback {
 
             mProgressBar.startAnimation(anim);
         }
+    }
+
+    private void openInBrowser(String url) {
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "http://" + url;
+        }
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        startActivity(intent);
     }
 }
