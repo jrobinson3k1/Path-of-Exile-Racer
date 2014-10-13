@@ -11,7 +11,7 @@ import com.metova.slim.SlimActivity;
 
 public class BaseActivity extends SlimActivity {
 
-    private final BaseActivityImpl mImpl = new BaseActivityImpl(this, true);
+    private final BaseActivityImpl mImpl = new BaseActivityImpl(this, showSettingsMenu());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +51,10 @@ public class BaseActivity extends SlimActivity {
     public void finish() {
         super.finish();
         mImpl.finish();
+    }
+
+    public boolean showSettingsMenu() {
+        return true;
     }
 
     @Override

@@ -1,27 +1,41 @@
 package com.jasonrobinson.racer.ui.settings;
 
-import android.annotation.TargetApi;
-import android.os.Build;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.preference.PreferenceFragment;
 
 import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.ui.base.BasePreferenceActivity;
+import com.jasonrobinson.racer.ui.base.BaseActivity;
 
-public class SettingsActivity extends BasePreferenceActivity {
+public class SettingsActivity extends BaseActivity {
 
-    @SuppressWarnings("deprecation")
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            getActionBar().setDisplayHomeAsUpEnabled(true);
+        if (savedInstanceState == null) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.add(android.R.id.content, SettingsFragment.newInstance());
+            ft.commit();
         }
 
         setTitle(R.string.settings);
+    }
 
-        // TODO: Add fragment implementation side-by-side
-        addPreferencesFromResource(R.xml.preferences);
+    @Override
+    public boolean showSettingsMenu() {
+        return false;
+    }
+
+    public static class SettingsFragment extends PreferenceFragment {
+
+        public static SettingsFragment newInstance() {
+            return new SettingsFragment();
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.settings);
+        }
     }
 }

@@ -10,7 +10,6 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.analytics.AnalyticsManager;
@@ -64,9 +63,8 @@ public class BaseActivityImpl {
 
     public boolean onCreateOptionsMenu(Menu menu) {
         if (mShowSettingsMenu) {
-            // TODO Uncomment when there's settings
-            // mActivity.getMenuInflater().inflate(R.menu.settings_menu, menu);
-            // return true;
+            mActivity.getMenuInflater().inflate(R.menu.settings_menu, menu);
+            return true;
         }
 
         return false;

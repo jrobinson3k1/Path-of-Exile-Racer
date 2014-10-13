@@ -1,12 +1,3 @@
-<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" tools:ignore="NewApi">
-
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <item name="pstsIndicatorColor">@color/main_color</item>
-        <item name="android:actionBarStyle">@style/AppActionBar</item>
-    </style>
-
-    <style name="AppActionBar" parent="android:Widget.Holo.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@color/main_color</item>
-    </style>
+<resources>
 
 </resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/ladder">
+        <CheckBoxPreference
+            android:key="@string/key_auto_refresh"
+            android:summary="@string/settings_autorefresh_summary"
+            android:title="@string/auto_refresh" />
+
+        <CheckBoxPreference
+            android:key="@string/key_keep_screen_on"
+            android:summary="@string/settings_keepscreenon_summary"
+            android:title="@string/keep_screen_on" />
+    </PreferenceCategory>
+</PreferenceScreen>

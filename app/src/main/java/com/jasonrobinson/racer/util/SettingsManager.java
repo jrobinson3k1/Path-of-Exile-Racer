@@ -1,6 +1,9 @@
 package com.jasonrobinson.racer.util;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.jasonrobinson.racer.R;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -8,14 +11,16 @@ import javax.inject.Singleton;
 @Singleton
 public class SettingsManager {
 
-    private static final String KEY_KEEP_SCREEN_ON = "keepscreenon";
-    private static final String KEY_AUTO_REFRESH = "autorefresh";
-    private static final String KEY_LAST_RACE_FETCH = "lastracefetch";
+    private static final int KEY_KEEP_SCREEN_ON = R.string.key_keep_screen_on;
+    private static final int KEY_AUTO_REFRESH = R.string.key_auto_refresh;
+    private static final int KEY_LAST_RACE_FETCH = R.string.key_last_race_fetch;
 
+    private final Context mContext;
     private final SharedPreferences mPrefs;
 
     @Inject
-    public SettingsManager(SharedPreferences prefs) {
+    public SettingsManager(Context context, SharedPreferences prefs) {
+        mContext = context;
         mPrefs = prefs;
     }
 
@@ -43,19 +48,19 @@ public class SettingsManager {
         return getLong(KEY_LAST_RACE_FETCH, 0L);
     }
 
-    private void putBoolean(String key, boolean value) {
-        mPrefs.edit().putBoolean(key, value).apply();
+    private void putBoolean(int key, boolean value) {
+        mPrefs.edit().putBoolean(mContext.getString(key), value).apply();
     }
 
-    private boolean getBoolean(String key, boolean defValue) {
-        return mPrefs.getBoolean(key, defValue);
+    private boolean getBoolean(int key, boolean defValue) {
+        return mPrefs.getBoolean(mContext.getString(key), defValue);
     }
 
-    private void putLong(String key, long value) {
-        mPrefs.edit().putLong(key, value).apply();
+    private void putLong(int key, long value) {
+        mPrefs.edit().putLong(mContext.getString(key), value).apply();
     }
 
-    private long getLong(String key, long defValue) {
-        return mPrefs.getLong(key, defValue);
+    private long getLong(int key, long defValue) {
+        return mPrefs.getLong(mContext.getString(key), defValue);
     }
 }

@@ -12,12 +12,11 @@ import com.metova.slim.Slim;
 
 public class BasePreferenceActivity extends PreferenceActivity {
 
-    BaseActivityImpl mImpl;
+    BaseActivityImpl mImpl = new BaseActivityImpl(this, false);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mImpl = new BaseActivityImpl(this, false);
         mImpl.onCreate(savedInstanceState);
 
         Slim.injectExtras(getIntent().getExtras(), this);

@@ -28,7 +28,7 @@ import java.util.List;
 
 import butterknife.InjectView;
 
-@Layout(R.layout.racer_activity)
+@Layout(R.layout.races_activity)
 public class RacesActivity extends BaseActivity implements RacesCallback {
 
     private static final long FETCH_INTERVAL = 1000 * 60 * 60 * 24; // 24 hours
@@ -71,6 +71,7 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.refresh_menu, menu);
 
         if (!mRefreshing) {

@@ -35,12 +35,9 @@ public class WebActivity extends BaseActivity implements WebCallback {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mWebFragment = (WebFragment) getSupportFragmentManager().findFragmentById(R.id.web_fragment);
-
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-
         setTitle(R.string.forum_post);
 
+        mWebFragment = (WebFragment) getSupportFragmentManager().findFragmentById(R.id.web_fragment);
         mWebFragment.loadUrl(mUrl);
     }
 
@@ -53,7 +50,9 @@ public class WebActivity extends BaseActivity implements WebCallback {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.web_menu, menu);
+
         return true;
     }
 

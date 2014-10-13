@@ -14,10 +14,12 @@ public class RawTypeface {
 
     private static LruCache<Integer, Typeface> sTypefaceCache = new LruCache<Integer, Typeface>(5);
 
+    private RawTypeface() {
+
+    }
+
     public static Typeface obtain(Context context, int resId) {
-
         Typeface typeface = sTypefaceCache.get(resId);
-
         if (typeface == null) {
             String outPath = context.getCacheDir() + File.separator + resId + ".raw";
 
@@ -40,7 +42,6 @@ public class RawTypeface {
     }
 
     private static void copyToFile(Context context, int resId, File outFile) throws IOException {
-
         InputStream is = context.getResources().openRawResource(resId);
 
         byte[] buffer = new byte[is.available()];

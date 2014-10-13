@@ -23,7 +23,8 @@
         <activity
             android:name=".ui.web.WebActivity"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName=".ui.race.RacesActivity">
+            android:parentActivityName=".ui.race.RacesActivity"
+            android:theme="@style/AppTheme.HomeAsUp">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.race.RacesActivity" />
@@ -31,14 +32,21 @@
         <activity
             android:name=".ui.ladder.LadderActivity"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName=".ui.race.RacesActivity">
+            android:parentActivityName=".ui.race.RacesActivity"
+            android:theme="@style/AppTheme.HomeAsUp">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.race.RacesActivity" />
         </activity>
         <activity
             android:name=".ui.settings.SettingsActivity"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:parentActivityName=".ui.race.RacesActivity"
+            android:theme="@style/AppTheme.HomeAsUp">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.race.RacesActivity" />
+        </activity>
 
         <receiver
             android:name=".receiver.AlarmReceiver"

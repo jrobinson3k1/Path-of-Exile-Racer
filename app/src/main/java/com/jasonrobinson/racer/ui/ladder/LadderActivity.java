@@ -46,7 +46,6 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
         mNavAdapter = new ClassSpinnerAdapter(PoeClass.values(), true);
 
         ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         actionBar.setListNavigationCallbacks(mNavAdapter, new ActionBar.OnNavigationListener() {
@@ -79,34 +78,6 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.ladder_menu, menu);
-
-        boolean checked = getSettingsManager().isKeepScreenOn();
-        menu.findItem(R.id.menu_keep_screen_on).setChecked(checked);
-        keepScreenOn(checked);
-
-        checked = getSettingsManager().isAutoRefreshEnabled();
-        menu.findItem(R.id.menu_auto_refresh).setChecked(checked);
-        setAutoRefreshEnabled(checked, false);
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.menu_keep_screen_on) {
-            item.setChecked(!item.isChecked());
-            keepScreenOn(item.isChecked());
-
-            getAnalyticsManager().trackEvent("Ladder", item.isChecked() ? "Enable" : "Disable", "Keep Screen On");
-        } else if (id == R.id.menu_auto_refresh) {
-            item.setChecked(!item.isChecked());
-            setAutoRefreshEnabled(item.isChecked(), true);
-
-            getAnalyticsManager().trackEvent("Ladder", item.isChecked() ? "Enable" : "Disable", "Auto Refresh");
-        } else {
-            return super.onOptionsItemSelected(item);
-        }
 
         return true;
     }
