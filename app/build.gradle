@@ -41,7 +41,6 @@ android {
 dependencies {
     compile 'com.android.support:support-v4:20.0.0'
     compile 'com.google.android.gms:play-services:5.0.89'
-    compile project(':androidnumberpicker')
     compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
     compile 'com.squareup.okhttp:okhttp:2.0.0'

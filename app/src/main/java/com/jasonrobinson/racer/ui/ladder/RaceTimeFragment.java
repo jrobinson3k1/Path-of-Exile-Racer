@@ -3,9 +3,7 @@ package com.jasonrobinson.racer.ui.ladder;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.jasonrobinson.racer.R;
@@ -14,6 +12,7 @@ import com.jasonrobinson.racer.ui.base.BaseFragment;
 import com.jasonrobinson.racer.util.RacerTimeUtils;
 import com.jasonrobinson.racer.util.RawTypeface;
 import com.metova.slim.annotation.Callback;
+import com.metova.slim.annotation.Layout;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -22,6 +21,7 @@ import java.util.Locale;
 
 import butterknife.InjectView;
 
+@Layout(R.layout.racetime_fragment)
 public class RaceTimeFragment extends BaseFragment {
 
     DateFormat mDateFormat;
@@ -48,11 +48,6 @@ public class RaceTimeFragment extends BaseFragment {
         super.onAttach(activity);
         mDateFormat = android.text.format.DateFormat.getDateFormat(getActivity());
         mTimeFormat = android.text.format.DateFormat.getTimeFormat(getActivity());
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.racetime_fragment, container, false);
     }
 
     @Override

@@ -13,10 +13,12 @@ import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.ui.base.BaseActivity;
 import com.jasonrobinson.racer.ui.ladder.RaceTimeFragment.RaceTimeCallback;
 import com.metova.slim.annotation.Extra;
+import com.metova.slim.annotation.Layout;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
+@Layout(R.layout.ladder_activity)
 public class LadderActivity extends BaseActivity implements RaceTimeCallback {
 
     public static final String EXTRA_ID = "id";
@@ -31,13 +33,12 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
 
     @Extra(EXTRA_ID)
     private String mId;
+
     private Race mRace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.ladder_activity);
-
         mRaceTimeFragment = (RaceTimeFragment) getSupportFragmentManager().findFragmentById(R.id.raceTime_fragment);
         mLadderFragment = (LadderFragment) getSupportFragmentManager().findFragmentById(R.id.ladder_fragment);
 

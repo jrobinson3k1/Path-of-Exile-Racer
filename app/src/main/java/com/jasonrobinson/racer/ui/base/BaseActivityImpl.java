@@ -10,6 +10,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.analytics.AnalyticsManager;
@@ -54,11 +55,11 @@ public class BaseActivityImpl {
         mAnalyticsManager.onStop(mActivity);
     }
 
-    public void finish() {
+    public void onContentChanged() {
+        ButterKnife.inject(mActivity);
     }
 
-    public void setContentView(int layoutResID) {
-        ButterKnife.inject(mActivity);
+    public void finish() {
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

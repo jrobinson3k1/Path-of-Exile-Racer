@@ -1,18 +1,22 @@
 package com.jasonrobinson.racer.adapter;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.CountDownTimer;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.model.Race;
-import com.jasonrobinson.racer.model.Race.Rule;
 import com.jasonrobinson.racer.util.AlarmUtils;
 import com.jasonrobinson.racer.util.CalendarUtils;
 import com.jasonrobinson.racer.util.RacerTimeUtils;
@@ -22,11 +26,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 
 public class RaceAdapter extends BaseExpandableListAdapter {
 
@@ -37,9 +42,12 @@ public class RaceAdapter extends BaseExpandableListAdapter {
     private List<List<Race>> mDateRaces = new ArrayList<List<Race>>();
     private List<Race> mRaces;
 
-    public RaceAdapter(Context context, List<Race> races) {
+    private OnRaceActionClickListener mOnActionClickListener;
 
+    public RaceAdapter(Context context, List<Race> races, OnRaceActionClickListener onActionClickListener) {
         mRaces = races;
+        mOnActionClickListener = onActionClickListener;
+
         mDateFormat = android.text.format.DateFormat.getDateFormat(context);
         mTimeFormat = android.text.format.DateFormat.getTimeFormat(context);
 
@@ -47,7 +55,6 @@ public class RaceAdapter extends BaseExpandableListAdapter {
     }
 
     private void init() {
-
         Date lastDate = null;
         for (Race race : mRaces) {
             Date startAt = race.getStartAt();
@@ -71,55 +78,46 @@ public class RaceAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getGroupCount() {
-
         return mDateRaces.size();
     }
 
     @Override
     public List<Race> getGroup(int groupPosition) {
-
         return mDateRaces.get(groupPosition);
     }
 
     @Override
     public long getGroupId(int groupPosition) {
-
         return groupPosition;
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
-
         return mDateRaces.get(groupPosition).size();
     }
 
     @Override
     public Race getChild(int groupPosition, int childPosition) {
-
         return mDateRaces.get(groupPosition).get(childPosition);
     }
 
     @Override
     public long getChildId(int groupPosition, int childPosition) {
-
         return groupPosition * 1000 + childPosition;
     }
 
     @Override
     public boolean hasStableIds() {
-
         return false;
     }
 
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
-
         return true;
     }
 
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-
         Context context = parent.getContext();
         View view = convertView;
         TextView textView1;
@@ -148,24 +146,34 @@ public class RaceAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-
         Context context = parent.getContext();
         View view = convertView;
         if (view == null) {
             view = LayoutInflater.from(context).inflate(R.layout.race_item, parent, false);
 
-            ViewHolder holder = new ViewHolder(view);
+            final ViewHolder holder = new ViewHolder(view);
             holder.titleTextView.setTypeface(RawTypeface.obtain(context, R.raw.fontin_bold));
+            holder.popupMenu = new PopupMenu(context, holder.actionImageView);
+
+            holder.actionImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    holder.popupMenu.show();
+                }
+            });
+
             view.setTag(holder);
         }
 
-        Race race = getChild(groupPosition, childPosition);
-        ViewHolder holder = (ViewHolder) view.getTag();
+        final Race race = getChild(groupPosition, childPosition);
+        final ViewHolder holder = (ViewHolder) view.getTag();
 
         if (holder.timer != null) {
             holder.timer.cancel();
             holder.timer = null;
         }
+
+        setupActionMenu(context, holder.popupMenu, race);
 
         holder.titleTextView.setText(race.getRaceId());
 
@@ -177,41 +185,67 @@ public class RaceAdapter extends BaseExpandableListAdapter {
             long millisTotal = (startDate.getTime() - millisNow) + (endDate.getTime() - startDate.getTime());
 
             if (millisTotal > 0) {
-                holder.timer = new RaceCountDownTimer(context, holder, race, millisTotal);
+                holder.timer = new RaceCountDownTimer(holder, race, millisTotal);
                 holder.timer.start();
             } else {
-                updateTimeViews(context, holder, race);
+                updateTimeViews(holder, race);
             }
         }
 
-        holder.descriptionTextView.setText(formatRules(race.getRules()));
-        holder.notificationImageView.setVisibility(AlarmUtils.isAlarmAdded(context, race) ? View.VISIBLE : View.GONE);
+        int backgroundId;
+        if (AlarmUtils.isAlarmAdded(context, race)) {
+            backgroundId = R.color.pastel_yellow;
+        } else {
+            TypedArray a = context.getTheme().obtainStyledAttributes(new int[]{android.R.attr.listChoiceBackgroundIndicator});
+            backgroundId = a.getResourceId(0, android.R.drawable.list_selector_background);
+            a.recycle();
+        }
+        holder.rootView.setBackgroundResource(backgroundId);
+
         return view;
     }
 
-    private CharSequence formatRules(Collection<Rule> rules) {
+    private void setupActionMenu(Context context, PopupMenu popupMenu, final Race race) {
+        Menu menu = popupMenu.getMenu();
+        menu.clear();
 
-        if (rules == null || rules.isEmpty()) {
-            return null;
+        popupMenu.getMenuInflater().inflate(R.menu.races_context_menu, menu);
+        if (TextUtils.isEmpty(race.getUrl())) {
+            menu.removeItem(R.id.menu_forum_post);
         }
 
-        StringBuilder sb = new StringBuilder();
-        Iterator<Rule> iterator = rules.iterator();
-        for (int i = 0; i < rules.size(); i++) {
-            Rule rule = iterator.next();
+        boolean alarmAdded = AlarmUtils.isAlarmAdded(context, race);
+        if (alarmAdded || race.isInProgress() || race.isFinished()) {
+            menu.removeItem(R.id.menu_add_notification);
+        }
 
-            if (i != 0) {
-                sb.append(", ");
+        if (!alarmAdded || race.isInProgress() || race.isFinished()) {
+            menu.removeItem(R.id.menu_remove_notification);
+        }
+
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.menu_forum_post:
+                        mOnActionClickListener.onForumPostClicked(race);
+                        break;
+                    case R.id.menu_add_notification:
+                        mOnActionClickListener.onAddNotificationClicked(race);
+                        break;
+                    case R.id.menu_remove_notification:
+                        mOnActionClickListener.onRemoveNotificationClicked(race);
+                        break;
+                    default:
+                        return false;
+                }
+
+                return true;
             }
-
-            sb.append(rule.getName());
-        }
-
-        return sb;
+        });
     }
 
-    private void updateTimeViews(Context context, ViewHolder holder, Race race) {
-
+    private void updateTimeViews(ViewHolder holder, Race race) {
         CharSequence startAtTime;
 
         long millisNow = System.currentTimeMillis();
@@ -252,12 +286,10 @@ public class RaceAdapter extends BaseExpandableListAdapter {
     }
 
     private CharSequence formatDate(Date date) {
-
         return mDateFormat.format(date);
     }
 
     private CharSequence formatDayOfWeek(Context context, Date date) {
-
         Calendar time = Calendar.getInstance(Locale.getDefault());
         time.setTime(date);
 
@@ -273,54 +305,61 @@ public class RaceAdapter extends BaseExpandableListAdapter {
     }
 
     private CharSequence formatTime(Date date) {
-
         return mTimeFormat.format(date);
     }
 
     private class RaceCountDownTimer extends CountDownTimer {
 
-        private Context mContext;
         private ViewHolder mViewHolder;
         private Race mRace;
 
-        public RaceCountDownTimer(Context context, ViewHolder viewHolder, Race race, long millisInFuture) {
-
+        public RaceCountDownTimer(ViewHolder viewHolder, Race race, long millisInFuture) {
             super(millisInFuture, 1000);
-            mContext = context;
             mViewHolder = viewHolder;
             mRace = race;
         }
 
         @Override
         public void onFinish() {
-
-            updateTimeViews(mContext, mViewHolder, mRace);
+            updateTimeViews(mViewHolder, mRace);
         }
 
         @Override
         public void onTick(long millisUntilFinished) {
-
-            updateTimeViews(mContext, mViewHolder, mRace);
+            updateTimeViews(mViewHolder, mRace);
         }
     }
 
-    private class ViewHolder {
+    public interface OnRaceActionClickListener {
 
-        public TextView titleTextView;
-        public TextView timeTextView;
-        public TextView registerTextView;
-        public TextView descriptionTextView;
-        public ImageView notificationImageView;
+        public void onLadderClicked(Race race);
+
+        public void onForumPostClicked(Race race);
+
+        public void onAddNotificationClicked(Race race);
+
+        public void onRemoveNotificationClicked(Race race);
+    }
+
+    class ViewHolder {
+
+        View rootView;
+        @InjectView(R.id.title)
+        TextView titleTextView;
+        @InjectView(R.id.startTime)
+        TextView timeTextView;
+        @InjectView(R.id.register)
+        TextView registerTextView;
+        @InjectView(R.id.action_ImageView)
+        ImageView actionImageView;
+
+        PopupMenu popupMenu;
 
         public RaceCountDownTimer timer;
 
         public ViewHolder(View v) {
-
-            titleTextView = (TextView) v.findViewById(R.id.title);
-            timeTextView = (TextView) v.findViewById(R.id.startTime);
-            registerTextView = (TextView) v.findViewById(R.id.register);
-            descriptionTextView = (TextView) v.findViewById(R.id.description);
-            notificationImageView = (ImageView) v.findViewById(R.id.notification);
+            this.rootView = v;
+            ButterKnife.inject(this, v);
         }
     }
 }

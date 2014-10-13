@@ -11,12 +11,11 @@ import com.metova.slim.SlimActivity;
 
 public class BaseActivity extends SlimActivity {
 
-    private BaseActivityImpl mImpl;
+    private final BaseActivityImpl mImpl = new BaseActivityImpl(this, true);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mImpl = new BaseActivityImpl(this, true);
         mImpl.onCreate(savedInstanceState);
     }
 
@@ -33,6 +32,12 @@ public class BaseActivity extends SlimActivity {
     }
 
     @Override
+    public void onContentChanged() {
+        super.onContentChanged();
+        mImpl.onContentChanged();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return mImpl.onCreateOptionsMenu(menu) || super.onCreateOptionsMenu(menu);
     }
@@ -40,12 +45,6 @@ public class BaseActivity extends SlimActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return mImpl.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void setContentView(int layoutResID) {
-        super.setContentView(layoutResID);
-        mImpl.setContentView(layoutResID);
     }
 
     @Override

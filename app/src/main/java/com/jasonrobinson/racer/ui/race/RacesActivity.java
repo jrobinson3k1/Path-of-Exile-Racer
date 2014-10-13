@@ -1,7 +1,6 @@
 package com.jasonrobinson.racer.ui.race;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -22,12 +21,14 @@ import com.jasonrobinson.racer.ui.race.RacesActivity.RacesPagerAdapter.RacesAdap
 import com.jasonrobinson.racer.ui.race.RacesFragment.RacesCallback;
 import com.jasonrobinson.racer.ui.web.WebActivity;
 import com.jasonrobinson.racer.util.DepthPageTransformer;
+import com.metova.slim.annotation.Layout;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.InjectView;
 
+@Layout(R.layout.racer_activity)
 public class RacesActivity extends BaseActivity implements RacesCallback {
 
     private static final long FETCH_INTERVAL = 1000 * 60 * 60 * 24; // 24 hours
@@ -43,17 +44,13 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.racer_activity);
         setTitle(R.string.races);
 
         List<RacesAdapterParams> params = new ArrayList<RacesAdapterParams>();
         params.add(new RacesAdapterParams(RaceOptions.UNFINISHED, getString(R.string.upcoming)));
         params.add(new RacesAdapterParams(RaceOptions.FINISHED, getString(R.string.finished)));
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            mPager.setPageTransformer(true, new DepthPageTransformer());
-        }
-
+        mPager.setPageTransformer(true, new DepthPageTransformer());
         mPager.setAdapter(new RacesPagerAdapter(getSupportFragmentManager(), params));
         mTabs.setViewPager(mPager);
 

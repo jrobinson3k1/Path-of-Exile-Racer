@@ -2,35 +2,29 @@ package com.jasonrobinson.racer.ui.race;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.NumberPicker;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.ui.base.BaseDialogFragment;
-
-import net.simonvt.numberpicker.NumberPicker;
 
 public class NotificationPickerDialogFragment extends BaseDialogFragment {
 
     private OnTimeSelectedListener mOnTimeSelectedListener;
 
     public static NotificationPickerDialogFragment newInstance() {
-
         return new NotificationPickerDialogFragment();
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-        Context ctxWrapper = new ContextThemeWrapper(getActivity(), android.R.style.Theme);
-        AlertDialog.Builder builder = new AlertDialog.Builder(ctxWrapper);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.add_notification);
 
-        View customView = LayoutInflater.from(ctxWrapper).inflate(R.layout.notification_dialog_view, null);
+        View customView = LayoutInflater.from(getActivity()).inflate(R.layout.notification_dialog_view, null);
         final NumberPicker numberPicker = (NumberPicker) customView.findViewById(R.id.numberPicker);
         numberPicker.setMinValue(0);
         numberPicker.setMaxValue(60);
@@ -44,7 +38,6 @@ public class NotificationPickerDialogFragment extends BaseDialogFragment {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
                 mOnTimeSelectedListener.onTimeSelected(numberPicker.getValue() * 1000 * 60);
             }
         });
@@ -52,7 +45,6 @@ public class NotificationPickerDialogFragment extends BaseDialogFragment {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
                 mOnTimeSelectedListener.onCancel();
             }
         });
@@ -61,7 +53,6 @@ public class NotificationPickerDialogFragment extends BaseDialogFragment {
     }
 
     public void setOnTimeSelectedListener(OnTimeSelectedListener l) {
-
         mOnTimeSelectedListener = l;
     }
 

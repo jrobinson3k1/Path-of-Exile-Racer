@@ -1,18 +1,11 @@
 package com.jasonrobinson.racer.ui.race;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
-import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
-import android.widget.Toast;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.adapter.RaceAdapter;
@@ -26,7 +19,7 @@ import com.metova.slim.annotation.Extra;
 
 import java.util.List;
 
-public class RacesFragment extends BaseExpandableListFragment {
+public class RacesFragment extends BaseExpandableListFragment implements RaceAdapter.OnRaceActionClickListener {
 
     public static final String EXTRA_OPTION = "option";
 
@@ -77,11 +70,10 @@ public class RacesFragment extends BaseExpandableListFragment {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.races_menu, menu);
 
-        MenuItem expandItem = menu.findItem(R.id.menu_expand_all);
-        MenuItem collapseItem = menu.findItem(R.id.menu_collapse_all);
-
-        expandItem.setEnabled(mAdapter != null);
-        collapseItem.setEnabled(mAdapter != null);
+        if (mAdapter == null) {
+            menu.removeItem(R.id.menu_expand_all);
+            menu.removeItem(R.id.menu_collapse_all);
+        }
     }
 
     @Override
@@ -99,78 +91,32 @@ public class RacesFragment extends BaseExpandableListFragment {
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        ExpandableListContextMenuInfo adapterInfo = (ExpandableListContextMenuInfo) menuInfo;
-        if (ExpandableListView.getPackedPositionType(adapterInfo.packedPosition) != ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-            return;
-        }
-
-        int groupPosition = ExpandableListView.getPackedPositionGroup(adapterInfo.packedPosition);
-        int childPosition = ExpandableListView.getPackedPositionChild(adapterInfo.packedPosition);
-
-        getActivity().getMenuInflater().inflate(R.menu.races_context_menu, menu);
-
-        Race race = mAdapter.getChild(groupPosition, childPosition);
-
-        if (TextUtils.isEmpty(race.getUrl())) {
-            menu.removeItem(R.id.menu_forum_post);
-        }
-
-        boolean alarmAdded = AlarmUtils.isAlarmAdded(getActivity(), race);
-        if (alarmAdded || race.isInProgress() || race.isFinished()) {
-            menu.removeItem(R.id.menu_add_notification);
-        }
-
-        if (!alarmAdded || race.isInProgress() || race.isFinished()) {
-            menu.removeItem(R.id.menu_remove_notification);
-        }
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        ExpandableListContextMenuInfo menuInfo = (ExpandableListContextMenuInfo) item.getMenuInfo();
-        if (ExpandableListView.getPackedPositionType(menuInfo.packedPosition) != ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-            return false;
-        }
-
-        int groupPosition = ExpandableListView.getPackedPositionGroup(menuInfo.packedPosition);
-        int childPosition = ExpandableListView.getPackedPositionChild(menuInfo.packedPosition);
-        Race race = mAdapter.getChild(groupPosition, childPosition);
-
-        int id = item.getItemId();
-        if (id == R.id.menu_ladder) {
-            mCallback.showLadder(race);
-        } else if (id == R.id.menu_forum_post) {
-            mCallback.showUrl(race.getUrl());
-        } else if (id == R.id.menu_add_notification) {
-            showNotificationDialog(race);
-        } else if (id == R.id.menu_remove_notification) {
-            AlarmUtils.cancelAlarm(getActivity(), race);
-            mAdapter.notifyDataSetChanged();
-        } else {
-            return super.onContextItemSelected(item);
-        }
-
-        return true;
-    }
-
-    @Override
     public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
         Race race = mAdapter.getChild(groupPosition, childPosition);
-
-        if (race.isRegistrationOpen() || race.isFinished()) {
-            mCallback.showLadder(race);
-        } else {
-            String url = race.getUrl();
-            if (!TextUtils.isEmpty(url)) {
-                mCallback.showUrl(url);
-            } else {
-                Toast.makeText(getActivity(), R.string.no_forum_post, Toast.LENGTH_SHORT).show();
-            }
-        }
+        mCallback.showLadder(race);
 
         return true;
+    }
+
+    @Override
+    public void onLadderClicked(Race race) {
+        mCallback.showLadder(race);
+    }
+
+    @Override
+    public void onForumPostClicked(Race race) {
+        mCallback.showUrl(race.getUrl());
+    }
+
+    @Override
+    public void onAddNotificationClicked(Race race) {
+        showNotificationDialog(race);
+    }
+
+    @Override
+    public void onRemoveNotificationClicked(Race race) {
+        AlarmUtils.cancelAlarm(getActivity(), race);
+        mAdapter.notifyDataSetChanged();
     }
 
     private void showNotificationDialog(final Race race) {
@@ -209,23 +155,18 @@ public class RacesFragment extends BaseExpandableListFragment {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     private void setData(List<Race> races) {
         if (races.isEmpty()) {
             mAdapter = null;
         } else {
-            mAdapter = new RaceAdapter(getActivity(), races);
+            mAdapter = new RaceAdapter(getActivity(), races, this);
         }
 
         setListAdapter(mAdapter);
         setListShown(true);
 
         if (mAdapter != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-                getExpandableListView().expandGroup(0, false);
-            } else {
-                getExpandableListView().expandGroup(0);
-            }
+            getExpandableListView().expandGroup(0, false);
         }
 
         getActivity().supportInvalidateOptionsMenu();

@@ -35,7 +35,7 @@ public class LadderFragment extends BaseListFragment {
 
     private static final String TAG = LadderFragment.class.getSimpleName();
 
-    private static final String ARG_ID = "id";
+    private static final String EXTRA_ID = "id";
 
     private static final String TAG_WATCH_CHARACTER = "watchCharacter";
 
@@ -55,12 +55,11 @@ public class LadderFragment extends BaseListFragment {
     private boolean mRefreshEnabled = true;
     private boolean mAutoRefreshEnabled;
 
-    public static final LadderFragment newInstance(String id) {
-
+    public static LadderFragment newInstance(String id) {
         LadderFragment fragment = new LadderFragment();
 
         Bundle args = new Bundle();
-        args.putString(ARG_ID, id);
+        args.putString(EXTRA_ID, id);
         fragment.setArguments(args);
 
         return fragment;
@@ -68,24 +67,21 @@ public class LadderFragment extends BaseListFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-
         super.onViewCreated(view, savedInstanceState);
         setEmptyText(getString(R.string.no_rankings));
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-
         super.onActivityCreated(savedInstanceState);
         if (getArguments() != null) {
-            String id = getArguments().getString(ARG_ID);
+            String id = getArguments().getString(EXTRA_ID);
             if (id != null) {
                 mRace = getDatabaseManager().getRace(id);
                 fetchLadder();
@@ -95,7 +91,6 @@ public class LadderFragment extends BaseListFragment {
 
     @Override
     public void onResume() {
-
         super.onResume();
         if (mTask != null && mTask.getStatus() != Status.RUNNING && mRace != null) {
             fetchLadder();
@@ -104,14 +99,12 @@ public class LadderFragment extends BaseListFragment {
 
     @Override
     public void onPause() {
-
         super.onPause();
         cancelAutoRefresh();
     }
 
     @Override
     public void onDestroyView() {
-
         super.onDestroyView();
         if (mTask != null) {
             mTask.cancel(true);
@@ -122,7 +115,6 @@ public class LadderFragment extends BaseListFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.refresh_menu, menu);
 
@@ -135,7 +127,6 @@ public class LadderFragment extends BaseListFragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         int id = item.getItemId();
         if (id == R.id.menu_refresh) {
             fetchLadder();
@@ -151,7 +142,6 @@ public class LadderFragment extends BaseListFragment {
     }
 
     private void showCharacterDialog() {
-
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         Fragment prev = getFragmentManager().findFragmentByTag(TAG_WATCH_CHARACTER);
         if (prev != null) {
@@ -163,7 +153,6 @@ public class LadderFragment extends BaseListFragment {
 
             @Override
             public void onRemove() {
-
                 getAnalyticsManager().trackEvent("Ladder", "Remove", "Character Watcher");
                 mWatchedCharacter = null;
                 mWatchedCharacterClass = null;
@@ -172,7 +161,6 @@ public class LadderFragment extends BaseListFragment {
 
             @Override
             public void onCharacterSelected(String character) {
-
                 getAnalyticsManager().trackEvent("Ladder", "Use", "Character Watcher");
                 mWatchedCharacter = character;
 
@@ -183,7 +171,6 @@ public class LadderFragment extends BaseListFragment {
 
             @Override
             public void onCancel() {
-
                 // no-op
             }
         });
@@ -192,12 +179,10 @@ public class LadderFragment extends BaseListFragment {
     }
 
     private void fetchLadder() {
-
         fetchLadder(mRace.getRaceId(), mWatchedClass);
     }
 
     public void fetchLadder(String id, PoeClass poeClass) {
-
         if (mRace == null || !mRace.getRaceId().equals(id)) {
             mRace = getDatabaseManager().getRace(id);
         }
@@ -221,7 +206,6 @@ public class LadderFragment extends BaseListFragment {
     }
 
     private void cancelAutoRefresh() {
-
         if (mAutoRefreshTimer != null) {
             mAutoRefreshTimer.cancel();
             mAutoRefreshTimer.purge();
@@ -229,14 +213,12 @@ public class LadderFragment extends BaseListFragment {
     }
 
     private void startAutoRefresh() {
-
         cancelAutoRefresh();
         mAutoRefreshTimer = new Timer();
         mAutoRefreshTimer.schedule(new RefreshTimerTask(), 30000);
     }
 
     private void setRefreshing(boolean refreshing) {
-
         mRefreshing = refreshing;
         getActivity().supportInvalidateOptionsMenu();
 
@@ -250,7 +232,6 @@ public class LadderFragment extends BaseListFragment {
     }
 
     public void setAutoRefreshEnabled(boolean enabled) {
-
         if (mAutoRefreshEnabled == enabled) {
             return;
         }
@@ -265,11 +246,9 @@ public class LadderFragment extends BaseListFragment {
     }
 
     public void onRaceFinished() {
-
     }
 
     public void setRefreshEnabled(boolean enabled) {
-
         if (mRefreshEnabled = enabled) {
             return;
         }
@@ -283,13 +262,11 @@ public class LadderFragment extends BaseListFragment {
         private boolean mReset;
 
         public LadderTask(boolean resetAdapter) {
-
             mReset = resetAdapter;
         }
 
         @Override
         protected void onPreExecute() {
-
             super.onPreExecute();
             getActivity().runOnUiThread(new Runnable() {
 
@@ -308,7 +285,6 @@ public class LadderFragment extends BaseListFragment {
         // TODO: This method is a mess and needs to be cleaned up
         @Override
         protected void onPostExecute(LadderResult result) {
-
             super.onPostExecute(result);
             setRefreshing(false);
             String toastMessage = null;
@@ -316,7 +292,7 @@ public class LadderFragment extends BaseListFragment {
             if (result != null) {
                 Ladder ladder = result.ladder;
                 if (ladder != null) {
-                    Entry[] entries = ladder.getEntries().toArray(new Entry[0]);
+                    Entry[] entries = ladder.getEntries().toArray(new Entry[ladder.getEntries().size()]);
 
                     Entry watchedEntry = null;
                     if (!TextUtils.isEmpty(mWatchedCharacter)) {
@@ -372,13 +348,11 @@ public class LadderFragment extends BaseListFragment {
 
         @Override
         public void run() {
-
             if (mRace != null) {
                 getActivity().runOnUiThread(new Runnable() {
 
                     @Override
                     public void run() {
-
                         fetchLadder();
                         getAnalyticsManager().trackEvent("Ladder", "Refresh", "Automatic");
                     }

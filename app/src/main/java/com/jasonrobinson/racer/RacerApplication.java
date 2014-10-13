@@ -20,6 +20,8 @@ public class RacerApplication extends Application {
         if (BuildConfig.DEBUG) {
             GoogleAnalytics.getInstance(this).setDryRun(true);
             GoogleAnalytics.getInstance(this).getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
+
+            Crashlytics.getInstance().setDebugMode(true);
         }
 
         Crashlytics.start(this);

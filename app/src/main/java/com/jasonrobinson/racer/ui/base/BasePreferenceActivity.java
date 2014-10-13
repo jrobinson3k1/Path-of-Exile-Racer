@@ -36,9 +36,9 @@ public class BasePreferenceActivity extends PreferenceActivity {
     }
 
     @Override
-    public void setContentView(int layoutResID) {
-        super.setContentView(layoutResID);
-        mImpl.setContentView(layoutResID);
+    public void onContentChanged() {
+        super.onContentChanged();
+        mImpl.onContentChanged();
     }
 
     @Override
