@@ -2,6 +2,7 @@ package com.jasonrobinson.racer.util;
 
 import com.jasonrobinson.racer.enumeration.PoeClass;
 import com.jasonrobinson.racer.model.Ladder.Entry;
+import com.jasonrobinson.racer.model.WatchType;
 
 import java.util.List;
 
@@ -11,11 +12,20 @@ public class LadderUtils {
 
     }
 
-    public static Entry findEntry(List<Entry> entries, String character) {
+    public static Entry findEntry(List<Entry> entries, String name, WatchType type) {
 
         for (Entry entry : entries) {
-            if (entry.getCharacter().getName().equalsIgnoreCase(character)) {
-                return entry;
+            switch (type) {
+                case ACCOUNT:
+                    if (entry.getAccount().getName().equalsIgnoreCase(name)) {
+                        return entry;
+                    }
+                    break;
+                case CHARACTER:
+                    if (entry.getCharacter().getName().equalsIgnoreCase(name)) {
+                        return entry;
+                    }
+                    break;
             }
         }
 

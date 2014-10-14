@@ -21,7 +21,7 @@
     <string name="end_time">End Time</string>
     <string name="remaining">Remaining</string>
     <string name="ladder">Ladder</string>
-    <string name="character_name">Character name</string>
+    <string name="name">Name</string>
     <string name="watch">Watch</string>
     <string name="cancel">Cancel</string>
     <string name="remove">Remove</string>
@@ -49,5 +49,7 @@
     <string name="open_in_browser">Open in browser</string>
     <string name="settings_keepscreenon_summary">Prevents your screen from turning off while viewing a ladder.</string>
     <string name="settings_autorefresh_summary">Automatically updates the ladder every 30 seconds.</string>
+    <string name="character">Character</string>
+    <string name="account">Account</string>
 
 </resources>

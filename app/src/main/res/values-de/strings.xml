@@ -20,7 +20,7 @@
     <string name="end_time">Endzeit</string>
     <string name="remaining">Verbleibend</string>
     <string name="ladder">Leiter</string>
-    <string name="character_name">Figurenname</string>
+    <string name="name">Name</string>
     <string name="watch">Beobachten</string>
     <string name="cancel">Abbrechen</string>
     <string name="remove">Entfernen</string>
@@ -46,5 +46,9 @@
     <string name="notification_dialog_message2">Minuten vor dem Start des Rennens.</string>
     <string name="add">Hinzufügen</string>
     <string name="open_in_browser">in Browser öffnen</string>
+    <string name="settings_keepscreenon_summary">Verhindert, dass Ihr Bildschirm ausschaltet, während Sie die Rangliste.</string>
+    <string name="settings_autorefresh_summary">Aktualisiert automatisch die Rangliste alle 30 Sekunden.</string>
+    <string name="character">Charakter</string>
+    <string name="account">Konto</string>
 
 </resources>
