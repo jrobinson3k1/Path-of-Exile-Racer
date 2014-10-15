@@ -51,5 +51,7 @@
     <string name="settings_autorefresh_summary">Automatically updates the ladder every 30 seconds.</string>
     <string name="character">Character</string>
     <string name="account">Account</string>
+    <string name="list">List</string>
+    <string name="calendar">Calendar</string>
 
 </resources>

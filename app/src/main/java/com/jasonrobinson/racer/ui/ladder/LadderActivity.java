@@ -52,7 +52,6 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
 
             @Override
             public boolean onNavigationItemSelected(int position, long id) {
-
                 PoeClass poeClass = mNavAdapter.getItem(position);
                 mLadderFragment.fetchLadder(mId, poeClass);
 
@@ -62,10 +61,14 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
             }
         });
 
-        boolean enabled = getSettingsManager().isAutoRefreshEnabled();
-        setAutoRefreshEnabled(enabled, false);
-
         mRaceTimeFragment.setData(mRace);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setAutoRefreshEnabled(getSettingsManager().isAutoRefreshEnabled());
+        keepScreenOn(getSettingsManager().isKeepScreenOn());
     }
 
     @Override
@@ -94,7 +97,7 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
     }
 
     private void onDelayedRaceFinished() {
-        setAutoRefreshEnabled(false, false);
+        setAutoRefreshEnabled(false);
         setRefreshEnabled(false);
     }
 
@@ -113,22 +116,17 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
         return getTimeUntilDelayedFinish() < 0;
     }
 
-    private void setAutoRefreshEnabled(final boolean enabled, final boolean save) {
+    private void setAutoRefreshEnabled(final boolean enabled) {
         runOnUiThread(new Runnable() {
 
             @Override
             public void run() {
-
                 if (mLadderFragment != null) {
                     if (isDelayedRaceFinished()) {
                         mLadderFragment.setAutoRefreshEnabled(false);
                     } else {
                         mLadderFragment.setAutoRefreshEnabled(enabled);
                     }
-                }
-
-                if (save) {
-                    getSettingsManager().setAutoRefresh(enabled);
                 }
             }
         });
@@ -139,7 +137,6 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
 
             @Override
             public void run() {
-
                 if (mLadderFragment != null) {
                     mLadderFragment.setRefreshEnabled(enabled);
                 }
@@ -152,15 +149,12 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
 
             @Override
             public void run() {
-
                 int flag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
                 if (keepScreenOn) {
                     getWindow().addFlags(flag);
                 } else {
                     getWindow().clearFlags(flag);
                 }
-
-                getSettingsManager().setKeepScreenOn(keepScreenOn);
             }
         });
     }
