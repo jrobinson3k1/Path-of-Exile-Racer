@@ -1,6 +1,7 @@
 package com.jasonrobinson.racer.ui.base;
 
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -9,7 +10,7 @@ import com.jasonrobinson.racer.db.DatabaseManager;
 import com.jasonrobinson.racer.util.SettingsManager;
 import com.metova.slim.SlimActivity;
 
-public class BaseActivity extends SlimActivity {
+public class BaseActivity extends ActionBarActivity {
 
     private final BaseActivityImpl mImpl = new BaseActivityImpl(this, showSettingsMenu());
 
@@ -32,8 +33,8 @@ public class BaseActivity extends SlimActivity {
     }
 
     @Override
-    public void onContentChanged() {
-        super.onContentChanged();
+    public void onSupportContentChanged() {
+        super.onSupportContentChanged();
         mImpl.onContentChanged();
     }
 

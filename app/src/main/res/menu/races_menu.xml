@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/menu_grid"
         android:icon="@drawable/ic_action_view_as_grid"
         android:showAsAction="ifRoom"
-        android:title="@string/calendar" />
+        android:title="@string/calendar"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_list"
         android:icon="@drawable/ic_action_view_as_list"
         android:showAsAction="ifRoom"
-        android:title="@string/list" />
+        android:title="@string/list"
+        app:showAsAction="ifRoom" />
 </menu>

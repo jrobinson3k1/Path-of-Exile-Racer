@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,7 +51,11 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTitle(R.string.races);
+
+//        Toolbar toolbar = new Toolbar(this);
+//        toolbar.setTitle(R.string.races);
+//
+//        setSupportActionBar(toolbar);
 
         List<RaceListPagerAdapter.RaceListParams> params = new ArrayList<RaceListPagerAdapter.RaceListParams>();
         params.add(new RaceListPagerAdapter.RaceListParams(RaceOptions.UNFINISHED, getString(R.string.upcoming)));
@@ -87,7 +92,8 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.refresh_menu, menu);
-        getMenuInflater().inflate(R.menu.races_menu, menu);
+        // TODO: Implement calendar view
+//        getMenuInflater().inflate(R.menu.races_menu, menu);
 
         if (!mRefreshing) {
             MenuItem refreshItem = menu.findItem(R.id.menu_refresh);

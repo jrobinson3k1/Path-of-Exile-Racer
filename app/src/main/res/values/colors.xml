@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="main_color">#071D70</color>
+    <color name="primary">#071D70</color>
+    <color name="primary_dark">#071D70</color>
+    <color name="accent">#071D70</color>
+
     <color name="pastel_yellow">#FDFD96</color>
 
     <!-- Ranks -->
