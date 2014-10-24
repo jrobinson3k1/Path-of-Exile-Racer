@@ -1,6 +1,0 @@
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <style name="AppActionBar" parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@color/main_color</item>
-    </style>
-</resources>

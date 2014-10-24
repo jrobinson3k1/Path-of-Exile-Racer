@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <string name="app_name">Path of Exile Racer</string>
+    <string name="today">Heute</string>
+    <string name="tomorrow">Morgen</string>
+    <string name="yesterday">Gestern</string>
+    <string name="unknown">Unbekannt</string>
+    <string name="starting_in">Startet in</string>
+    <string name="in_progress">Läuft</string>
+    <string name="finished">Beendet</string>
+    <string name="refresh">Aktualisieren</string>
+    <string name="keep_screen_on">Bildschirm anlassen</string>
+    <string name="watch_character">Figur beobachten</string>
+    <string name="open">OFFEN</string>
+    <string name="closed">GESCHLOSSEN</string>
+    <string name="races">Rennen</string>
+    <string name="error_unavailable">Es konnte keine Verbindung zum Server von Path of Exile hergestellt werden</string>
+    <string name="start_time">Startzeit</string>
+    <string name="end_time">Endzeit</string>
+    <string name="remaining">Verbleibend</string>
+    <string name="ladder">Leiter</string>
+    <string name="name">Name</string>
+    <string name="watch">Beobachten</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="remove">Entfernen</string>
+    <string name="settings">Einstellungen</string>
+    <string name="character_not_found">Es konnte kein Charakter namens %1$s auf der Leiter gefunden werden.</string>
+    <string name="forum_post">Nachricht im Forum</string>
+    <string name="no_rankings">Noch keine Rangliste</string>
+    <string name="no_forum_post">Für dieses Rennen wurde noch kein Eintrag im Forum erstellt.</string>
+    <string name="auto_refresh">Auto-Aktualisierung</string>
+    <string name="all">Alle</string>
+    <string name="watcher_input_error">Charakternamen dürfen nur Buchstabentasten und Unterstriche.</string>
+    <string name="notification">Benachrichtigung</string>
+    <string name="add_notification">Benachrichtigung Hinzufügen</string>
+    <string name="remove_notification">Benachrichtigung Entfernen</string>
+    <string name="error_parse">Beim Versuch, die Daten zu analysieren ist ein Fehler aufgetreten.</string>
+    <string name="races_unavailable">Noch keine Rennen.</string>
+    <string name="upcoming">Bevorstehende</string>
+    <string name="expand_all">Alles erweitern</string>
+    <string name="collapse_all">Alles schließen</string>
+    <string name="starts_at">Startet um</string>
+    <string name="notification_scheduled">Benachrichtigung für %1$s %2$s geplant</string>
+    <string name="notification_dialog_message1">Benachrichtigen Sie mich</string>
+    <string name="notification_dialog_message2">Minuten vor dem Start des Rennens.</string>
+    <string name="add">Hinzufügen</string>
+    <string name="open_in_browser">in Browser öffnen</string>
+    <string name="settings_keepscreenon_summary">Verhindert, dass Ihr Bildschirm ausschaltet, während Sie die Rangliste.</string>
+    <string name="settings_autorefresh_summary">Aktualisiert automatisch die Rangliste alle 30 Sekunden.</string>
+    <string name="character">Charakter</string>
+    <string name="account">Konto</string>
+
+</resources>

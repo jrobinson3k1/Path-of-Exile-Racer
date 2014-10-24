@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="key_auto_refresh">autorefresh</string>
+    <string name="key_keep_screen_on">keyscreenon</string>
+    <string name="key_last_race_fetch">lastracefetch</string>
+    <string name="key_race_mode">racemode</string>
+</resources>
