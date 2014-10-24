@@ -1,9 +1,8 @@
 package com.jasonrobinson.racer.ui.ladder;
 
-import android.app.ActionBar;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.WindowManager;
 
 import com.jasonrobinson.racer.R;
@@ -21,8 +20,9 @@ import java.util.TimerTask;
 @Layout(R.layout.ladder_activity)
 public class LadderActivity extends BaseActivity implements RaceTimeCallback {
 
-    public static final String EXTRA_ID = "id";
     private static final long DISABLE_REFRESH_EXTENSION = 1000 * 60 * 5; // 5 minutes
+
+    public static final String EXTRA_ID = "com.jasonrobinson.racer.id";
 
     RaceTimeFragment mRaceTimeFragment;
     LadderFragment mLadderFragment;
@@ -43,16 +43,17 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
         mLadderFragment = (LadderFragment) getSupportFragmentManager().findFragmentById(R.id.ladder_fragment);
 
         mRace = getDatabaseManager().getRace(mId);
-        mNavAdapter = new ClassSpinnerAdapter(PoeClass.values(), true);
 
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+
+        mNavAdapter = new ClassSpinnerAdapter(actionBar.getThemedContext(), PoeClass.values(), true);
+
         actionBar.setListNavigationCallbacks(mNavAdapter, new ActionBar.OnNavigationListener() {
 
             @Override
             public boolean onNavigationItemSelected(int position, long id) {
-
                 PoeClass poeClass = mNavAdapter.getItem(position);
                 mLadderFragment.fetchLadder(mId, poeClass);
 
@@ -62,10 +63,14 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
             }
         });
 
-        boolean enabled = getSettingsManager().isAutoRefreshEnabled();
-        setAutoRefreshEnabled(enabled, false);
-
         mRaceTimeFragment.setData(mRace);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setAutoRefreshEnabled(getSettingsManager().isAutoRefreshEnabled());
+        keepScreenOn(getSettingsManager().isKeepScreenOn());
     }
 
     @Override
@@ -94,7 +99,7 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
     }
 
     private void onDelayedRaceFinished() {
-        setAutoRefreshEnabled(false, false);
+        setAutoRefreshEnabled(false);
         setRefreshEnabled(false);
     }
 
@@ -113,22 +118,17 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
         return getTimeUntilDelayedFinish() < 0;
     }
 
-    private void setAutoRefreshEnabled(final boolean enabled, final boolean save) {
+    private void setAutoRefreshEnabled(final boolean enabled) {
         runOnUiThread(new Runnable() {
 
             @Override
             public void run() {
-
                 if (mLadderFragment != null) {
                     if (isDelayedRaceFinished()) {
                         mLadderFragment.setAutoRefreshEnabled(false);
                     } else {
                         mLadderFragment.setAutoRefreshEnabled(enabled);
                     }
-                }
-
-                if (save) {
-                    getSettingsManager().setAutoRefresh(enabled);
                 }
             }
         });
@@ -139,7 +139,6 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
 
             @Override
             public void run() {
-
                 if (mLadderFragment != null) {
                     mLadderFragment.setRefreshEnabled(enabled);
                 }
@@ -152,15 +151,12 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
 
             @Override
             public void run() {
-
                 int flag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
                 if (keepScreenOn) {
                     getWindow().addFlags(flag);
                 } else {
                     getWindow().clearFlags(flag);
                 }
-
-                getSettingsManager().setKeepScreenOn(keepScreenOn);
             }
         });
     }

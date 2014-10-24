@@ -13,12 +13,10 @@ public enum PoeClass {
     private String mName;
 
     PoeClass(String name) {
-
         mName = name;
     }
 
     public static PoeClass getClassForName(String name) {
-
         PoeClass[] poeClasses = values();
         for (PoeClass poeClass : poeClasses) {
             if (poeClass.getName().equalsIgnoreCase(name)) {
@@ -30,13 +28,11 @@ public enum PoeClass {
     }
 
     public String getName() {
-
         return mName;
     }
 
     @Override
     public String toString() {
-
-        return mName;
+        return getName();
     }
 }

@@ -19,7 +19,7 @@ import com.metova.slim.annotation.Extra;
 
 import java.util.List;
 
-public class RacesFragment extends BaseExpandableListFragment implements RaceAdapter.OnRaceActionClickListener {
+public class RaceListFragment extends BaseExpandableListFragment implements RaceAdapter.OnRaceActionClickListener {
 
     public static final String EXTRA_OPTION = "option";
 
@@ -31,8 +31,8 @@ public class RacesFragment extends BaseExpandableListFragment implements RaceAda
     @Callback
     RacesCallback mCallback;
 
-    public static RacesFragment newInstance(RaceOptions option) {
-        RacesFragment fragment = new RacesFragment();
+    public static RaceListFragment newInstance(RaceOptions option) {
+        RaceListFragment fragment = new RaceListFragment();
 
         Bundle args = new Bundle();
         args.putSerializable(EXTRA_OPTION, option);
@@ -68,7 +68,7 @@ public class RacesFragment extends BaseExpandableListFragment implements RaceAda
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.races_menu, menu);
+        inflater.inflate(R.menu.race_list_menu, menu);
 
         if (mAdapter == null) {
             menu.removeItem(R.id.menu_expand_all);
@@ -96,11 +96,6 @@ public class RacesFragment extends BaseExpandableListFragment implements RaceAda
         mCallback.showLadder(race);
 
         return true;
-    }
-
-    @Override
-    public void onLadderClicked(Race race) {
-        mCallback.showLadder(race);
     }
 
     @Override

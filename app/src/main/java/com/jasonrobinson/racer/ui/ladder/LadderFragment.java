@@ -57,16 +57,6 @@ public class LadderFragment extends BaseListFragment {
     private boolean mRefreshEnabled = true;
     private boolean mAutoRefreshEnabled;
 
-    public static LadderFragment newInstance(String id) {
-        LadderFragment fragment = new LadderFragment();
-
-        Bundle args = new Bundle();
-        args.putString(EXTRA_ID, id);
-        fragment.setArguments(args);
-
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -250,7 +240,7 @@ public class LadderFragment extends BaseListFragment {
     }
 
     public void setRefreshEnabled(boolean enabled) {
-        if (mRefreshEnabled = enabled) {
+        if (mRefreshEnabled == enabled) {
             return;
         }
 
@@ -287,34 +277,15 @@ public class LadderFragment extends BaseListFragment {
         protected void onPostExecute(LadderResult result) {
             super.onPostExecute(result);
             setRefreshing(false);
-            String toastMessage = null;
+
+            Entry[] entries = null;
+            Entry watchedEntry = null;
+            String toastMessage = getString(R.string.error_unavailable);
 
             if (result != null) {
                 Ladder ladder = result.ladder;
                 if (ladder != null) {
-                    Entry[] entries = ladder.getEntries().toArray(new Entry[ladder.getEntries().size()]);
-
-                    Entry watchedEntry = null;
-                    if (!TextUtils.isEmpty(mWatchedName)) {
-                        watchedEntry = LadderUtils.findEntry(ladder.getEntries(), mWatchedName, mWatchedType);
-                        if (watchedEntry == null && mWatchedCharacterClass == null) {
-                            Toast.makeText(getActivity(), getString(R.string.character_not_found, mWatchedName), Toast.LENGTH_LONG).show();
-                            mWatchedName = null;
-                        } else {
-                            if (watchedEntry != null) {
-                                mWatchedCharacterClass = PoeClass.getClassForName(watchedEntry.getCharacter().getPoeClass());
-                            }
-                        }
-                    }
-
-                    boolean borderFirstItem = !TextUtils.isEmpty(mWatchedName) && watchedEntry != null;
-                    if (mAdapter == null || mReset) {
-                        mAdapter = new LadderAdapter(entries, mWatchedClass != null, borderFirstItem);
-                        setListAdapter(mAdapter);
-                    } else {
-                        mAdapter.setBorderFirstItem(borderFirstItem);
-                        mAdapter.setEntries(entries, mWatchedClass != null);
-                    }
+                    entries = ladder.getEntries().toArray(new Entry[ladder.getEntries().size()]);
                 } else if (result.retrofitError != null) {
                     RetrofitError error = result.retrofitError;
                     if (error.getResponse() != null) {
@@ -323,20 +294,33 @@ public class LadderFragment extends BaseListFragment {
                         if (body.getError() != null) {
                             Log.e(TAG, "Error code: " + body.getError().getCode() + ", Message: " + body.getError().getMessage());
                             toastMessage = body.getError().getMessage();
-                        } else {
-                            toastMessage = getString(R.string.error_unavailable);
                         }
-                    } else {
-                        toastMessage = getString(R.string.error_unavailable);
                     }
-                } else {
-                    toastMessage = getString(R.string.error_unavailable);
                 }
-            } else {
-                toastMessage = getString(R.string.error_unavailable);
             }
 
-            if (toastMessage != null) {
+            if (entries != null) {
+                if (!TextUtils.isEmpty(mWatchedName)) {
+                    watchedEntry = LadderUtils.findEntry(result.ladder.getEntries(), mWatchedName, mWatchedType);
+                    if (watchedEntry == null && mWatchedCharacterClass == null) {
+                        Toast.makeText(getActivity(), getString(R.string.character_not_found, mWatchedName), Toast.LENGTH_LONG).show();
+                        mWatchedName = null;
+                    } else {
+                        if (watchedEntry != null) {
+                            mWatchedCharacterClass = PoeClass.getClassForName(watchedEntry.getCharacter().getPoeClass());
+                        }
+                    }
+                }
+
+                boolean borderFirstItem = !TextUtils.isEmpty(mWatchedName) && watchedEntry != null;
+                if (mAdapter == null || mReset) {
+                    mAdapter = new LadderAdapter(entries, mWatchedClass != null, borderFirstItem);
+                    setListAdapter(mAdapter);
+                } else {
+                    mAdapter.setBorderFirstItem(borderFirstItem);
+                    mAdapter.setEntries(entries, mWatchedClass != null);
+                }
+            } else {
                 Toast.makeText(getActivity(), toastMessage, Toast.LENGTH_LONG).show();
             }
 
@@ -360,6 +344,4 @@ public class LadderFragment extends BaseListFragment {
             }
         }
     }
-
-    ;
 }

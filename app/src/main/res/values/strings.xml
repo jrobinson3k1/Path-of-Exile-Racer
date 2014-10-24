@@ -47,9 +47,11 @@
     <string name="notification_dialog_message2">minutes before the race starts.</string>
     <string name="add">Add</string>
     <string name="open_in_browser">Open in browser</string>
-    <string name="settings_keepscreenon_summary">Prevents your screen from turning off while viewing a ladder.</string>
-    <string name="settings_autorefresh_summary">Automatically updates the ladder every 30 seconds.</string>
+    <string name="settings_keepscreenon_summary">Prevents your screen from going to sleep while viewing a ladder.</string>
+    <string name="settings_autorefresh_summary">Automatically updates the ladder every 30 seconds while viewing a ladder.</string>
     <string name="character">Character</string>
     <string name="account">Account</string>
+    <string name="list">List</string>
+    <string name="calendar">Calendar</string>
 
 </resources>

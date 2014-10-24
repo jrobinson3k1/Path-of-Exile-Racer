@@ -39,7 +39,7 @@ public class RaceAdapter extends BaseExpandableListAdapter {
     private final DateFormat mDateFormat;
     private final DateFormat mTimeFormat;
 
-    private List<List<Race>> mDateRaces = new ArrayList<List<Race>>();
+    private List<List<Race>> mDateRaces = new ArrayList<>();
     private List<Race> mRaces;
 
     private OnRaceActionClickListener mOnActionClickListener;
@@ -268,19 +268,24 @@ public class RaceAdapter extends BaseExpandableListAdapter {
 
         holder.timeTextView.setText(startAtTime);
 
+        int color;
+        int textResId;
         if (race.isInProgress()) {
-            holder.registerTextView.setTextColor(Color.GREEN);
-            holder.registerTextView.setText(R.string.started);
+            color = Color.GREEN;
+            textResId = R.string.started;
         } else if (race.isRegistrationOpen()) {
-            holder.registerTextView.setTextColor(Color.GREEN);
-            holder.registerTextView.setText(R.string.open);
+            color = Color.GREEN;
+            textResId = R.string.open;
         } else if (race.isFinished()) {
-            holder.registerTextView.setTextColor(Color.BLACK);
-            holder.registerTextView.setText(R.string.finished);
+            color = Color.BLACK;
+            textResId = R.string.finished;
         } else {
-            holder.registerTextView.setTextColor(Color.RED);
-            holder.registerTextView.setText(R.string.closed);
+            color = Color.RED;
+            textResId = R.string.closed;
         }
+
+        holder.registerTextView.setTextColor(color);
+        holder.registerTextView.setText(textResId);
 
         holder.registerTextView.setText(holder.registerTextView.getText().toString().toUpperCase(Locale.getDefault()));
     }
@@ -331,8 +336,6 @@ public class RaceAdapter extends BaseExpandableListAdapter {
     }
 
     public interface OnRaceActionClickListener {
-
-        public void onLadderClicked(Race race);
 
         public void onForumPostClicked(Race race);
 

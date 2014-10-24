@@ -10,6 +10,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.analytics.AnalyticsManager;
@@ -19,6 +20,7 @@ import com.jasonrobinson.racer.ui.settings.SettingsActivity;
 import com.jasonrobinson.racer.util.CustomTypefaceSpan;
 import com.jasonrobinson.racer.util.RawTypeface;
 import com.jasonrobinson.racer.util.SettingsManager;
+import com.metova.slim.Slim;
 
 import butterknife.ButterKnife;
 
@@ -42,6 +44,13 @@ public class BaseActivityImpl {
     }
 
     public void onCreate(Bundle savedInstanceState) {
+        View layout = Slim.createLayout(mActivity, mActivity);
+        if (layout != null) {
+            mActivity.setContentView(layout);
+        }
+
+        Slim.injectExtras(mActivity.getIntent().getExtras(), mActivity);
+
         mActivity.overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
         mActivity.setTitle(mActivity.getTitle());
     }

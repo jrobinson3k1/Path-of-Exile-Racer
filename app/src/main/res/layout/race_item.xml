@@ -16,12 +16,16 @@
         android:textSize="18sp"
         android:textStyle="bold" />
 
+    <Space
+        android:layout_width="10dp"
+        android:layout_height="wrap_content" />
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:gravity="right"
+        android:gravity="end"
         android:orientation="vertical">
 
         <TextView
@@ -43,7 +47,8 @@
         android:id="@+id/action_ImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@null"
+        android:padding="8dp"
+        android:background="@drawable/button_selector"
         android:src="@drawable/ic_action_overflow" />
 
 </LinearLayout>

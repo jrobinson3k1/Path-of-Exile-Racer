@@ -33,7 +33,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         builder.setContentTitle(race.getRaceId());
         builder.setContentInfo(context.getString(R.string.starts_at, timeFormat.format(race.getStartAt())));
         builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
-        builder.setLights(context.getResources().getColor(R.color.main_color), 1000, 10000);
+        builder.setLights(context.getResources().getColor(R.color.primary), 1000, 10000);
         builder.setAutoCancel(true);
 
         Intent ladderIntent = new Intent(context, LadderActivity.class);

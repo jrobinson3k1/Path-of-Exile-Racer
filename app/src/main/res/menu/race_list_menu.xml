@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_expand_all"
+        android:icon="@drawable/ic_action_expand"
+        android:showAsAction="never"
+        android:title="@string/expand_all"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_collapse_all"
+        android:icon="@drawable/ic_action_collapse"
+        android:showAsAction="never"
+        android:title="@string/collapse_all"
+        app:showAsAction="never" />
+
+</menu>
