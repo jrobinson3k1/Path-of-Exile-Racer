@@ -57,16 +57,6 @@ public class LadderFragment extends BaseListFragment {
     private boolean mRefreshEnabled = true;
     private boolean mAutoRefreshEnabled;
 
-    public static LadderFragment newInstance(String id) {
-        LadderFragment fragment = new LadderFragment();
-
-        Bundle args = new Bundle();
-        args.putString(EXTRA_ID, id);
-        fragment.setArguments(args);
-
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -250,7 +240,7 @@ public class LadderFragment extends BaseListFragment {
     }
 
     public void setRefreshEnabled(boolean enabled) {
-        if (mRefreshEnabled = enabled) {
+        if (mRefreshEnabled == enabled) {
             return;
         }
 

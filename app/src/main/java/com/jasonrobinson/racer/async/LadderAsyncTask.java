@@ -24,7 +24,7 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
 
     // Character names are unique across all leagues (I think?), eliminating the
     // possibility of a name conflict between races
-    private static LruCache<String, Integer> sCharacterRankCache = new LruCache<String, Integer>(10);
+    private static LruCache<String, Integer> sCharacterRankCache = new LruCache<>(10);
 
     @Override
     protected LadderResult doInBackground(LadderParams... params) {
@@ -143,9 +143,11 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
         }
 
         // Prune extra entries
-        int size = ladder.getEntries().size();
-        for (int i = size - 1; i >= count; i--) {
-            ladder.getEntries().remove(i);
+        if (ladder != null) {
+            int size = ladder.getEntries().size();
+            for (int i = size - 1; i >= count; i--) {
+                ladder.getEntries().remove(i);
+            }
         }
 
         return ladder;
@@ -175,13 +177,12 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
     }
 
     private Entry fetchEntryLinear(RaceClient client, String id, String name, WatchType type, int totalRanks, PoeClass poeClass) throws SocketTimeoutException {
-        Entry entry = null;
         boolean findClassRank = poeClass != null;
         int classRankCount = 0;
 
         for (int offset = 0; offset < totalRanks; offset += LIMIT_PER_REQUEST) {
             Ladder nextLadder = client.fetchLadder(id, offset, LIMIT_PER_REQUEST);
-            entry = LadderUtils.findEntry(nextLadder.getEntries(), name, type);
+            Entry entry = LadderUtils.findEntry(nextLadder.getEntries(), name, type);
             if (entry != null) {
                 if (findClassRank) {
                     LadderUtils.addClassRankToEntry(nextLadder.getEntries(), entry, classRankCount);
@@ -199,12 +200,10 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
             }
         }
 
-        return entry;
+        return null;
     }
 
     private Entry fetchEntryBinary(RaceClient client, String id, String name, WatchType type, int rank, int totalRanks) throws SocketTimeoutException {
-        Entry entry = null;
-
         int startOffset = rank - LIMIT_PER_REQUEST / 2;
         int totalQueries = (int) Math.ceil((double) totalRanks / LIMIT_PER_REQUEST);
         for (int i = 0; i < totalQueries; i++) {
@@ -220,7 +219,7 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
             }
 
             Ladder nextLadder = client.fetchLadder(id, offset, LIMIT_PER_REQUEST);
-            entry = LadderUtils.findEntry(nextLadder.getEntries(), name, type);
+            Entry entry = LadderUtils.findEntry(nextLadder.getEntries(), name, type);
             if (entry != null) {
                 return entry;
             }
@@ -230,7 +229,7 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
             }
         }
 
-        return entry;
+        return null;
     }
 
     public static class LadderParams {

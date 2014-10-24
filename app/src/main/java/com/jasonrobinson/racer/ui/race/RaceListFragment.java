@@ -99,11 +99,6 @@ public class RaceListFragment extends BaseExpandableListFragment implements Race
     }
 
     @Override
-    public void onLadderClicked(Race race) {
-        mCallback.showLadder(race);
-    }
-
-    @Override
     public void onForumPostClicked(Race race) {
         mCallback.showUrl(race.getUrl());
     }
