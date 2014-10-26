@@ -14,6 +14,7 @@
     <string name="watch_character">Figur beobachten</string>
     <string name="open">OFFEN</string>
     <string name="closed">GESCHLOSSEN</string>
+    <string name="started">SCHRITTE</string>
     <string name="races">Rennen</string>
     <string name="error_unavailable">Es konnte keine Verbindung zum Server von Path of Exile hergestellt werden</string>
     <string name="start_time">Startzeit</string>
