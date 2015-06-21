@@ -155,12 +155,7 @@ public class RaceAdapter extends BaseExpandableListAdapter {
             holder.titleTextView.setTypeface(RawTypeface.obtain(context, R.raw.fontin_bold));
             holder.popupMenu = new PopupMenu(context, holder.actionImageView);
 
-            holder.actionImageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    holder.popupMenu.show();
-                }
-            });
+            holder.actionImageView.setOnClickListener(v -> holder.popupMenu.show());
 
             view.setTag(holder);
         }
@@ -223,25 +218,22 @@ public class RaceAdapter extends BaseExpandableListAdapter {
             menu.removeItem(R.id.menu_remove_notification);
         }
 
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.menu_forum_post:
-                        mOnActionClickListener.onForumPostClicked(race);
-                        break;
-                    case R.id.menu_add_notification:
-                        mOnActionClickListener.onAddNotificationClicked(race);
-                        break;
-                    case R.id.menu_remove_notification:
-                        mOnActionClickListener.onRemoveNotificationClicked(race);
-                        break;
-                    default:
-                        return false;
-                }
-
-                return true;
+        popupMenu.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.menu_forum_post:
+                    mOnActionClickListener.onForumPostClicked(race);
+                    break;
+                case R.id.menu_add_notification:
+                    mOnActionClickListener.onAddNotificationClicked(race);
+                    break;
+                case R.id.menu_remove_notification:
+                    mOnActionClickListener.onRemoveNotificationClicked(race);
+                    break;
+                default:
+                    return false;
             }
+
+            return true;
         });
     }
 

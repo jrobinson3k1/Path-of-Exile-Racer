@@ -34,19 +34,11 @@ public class NotificationPickerDialogFragment extends BaseDialogFragment {
 
         builder.setView(customView);
 
-        builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mOnTimeSelectedListener.onTimeSelected(numberPicker.getValue() * 1000 * 60);
-            }
+        builder.setPositiveButton(R.string.add, (dialog, which) -> {
+            mOnTimeSelectedListener.onTimeSelected(numberPicker.getValue() * 1000 * 60);
         });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mOnTimeSelectedListener.onCancel();
-            }
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> {
+            mOnTimeSelectedListener.onCancel();
         });
 
         return builder.create();

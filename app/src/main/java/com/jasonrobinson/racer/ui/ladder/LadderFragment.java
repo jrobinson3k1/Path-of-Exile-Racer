@@ -259,15 +259,11 @@ public class LadderFragment extends BaseListFragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            getActivity().runOnUiThread(new Runnable() {
+            getActivity().runOnUiThread(() -> {
+                setRefreshing(true);
 
-                @Override
-                public void run() {
-                    setRefreshing(true);
-
-                    if (mReset) {
-                        setListShown(false);
-                    }
+                if (mReset) {
+                    setListShown(false);
                 }
             });
         }
@@ -333,13 +329,9 @@ public class LadderFragment extends BaseListFragment {
         @Override
         public void run() {
             if (mRace != null) {
-                getActivity().runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        fetchLadder();
-                        getAnalyticsManager().trackEvent("Ladder", "Refresh", "Automatic");
-                    }
+                getActivity().runOnUiThread(() -> {
+                    fetchLadder();
+                    getAnalyticsManager().trackEvent("Ladder", "Refresh", "Automatic");
                 });
             }
         }

@@ -121,13 +121,9 @@ public class RaceTimeFragment extends BaseFragment {
 
         @Override
         public void onFinish() {
-            getActivity().runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    mCountdownTimeTextView.setText(R.string.finished);
-                    mRaceTimeCallback.onRaceFinished();
-                }
+            getActivity().runOnUiThread(() -> {
+                mCountdownTimeTextView.setText(R.string.finished);
+                mRaceTimeCallback.onRaceFinished();
             });
         }
 

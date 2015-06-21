@@ -50,17 +50,13 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
 
         mNavAdapter = new ClassSpinnerAdapter(actionBar.getThemedContext(), PoeClass.values(), true);
 
-        actionBar.setListNavigationCallbacks(mNavAdapter, new ActionBar.OnNavigationListener() {
+        actionBar.setListNavigationCallbacks(mNavAdapter, (position, id) -> {
+            PoeClass poeClass = mNavAdapter.getItem(position);
+            mLadderFragment.fetchLadder(mId, poeClass);
 
-            @Override
-            public boolean onNavigationItemSelected(int position, long id) {
-                PoeClass poeClass = mNavAdapter.getItem(position);
-                mLadderFragment.fetchLadder(mId, poeClass);
+            getAnalyticsManager().trackEvent("Ladder", "Filter", poeClass == null ? "All" : poeClass.toString());
 
-                getAnalyticsManager().trackEvent("Ladder", "Filter", poeClass == null ? "All" : poeClass.toString());
-
-                return true;
-            }
+            return true;
         });
 
         mRaceTimeFragment.setData(mRace);
@@ -119,44 +115,32 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
     }
 
     private void setAutoRefreshEnabled(final boolean enabled) {
-        runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-                if (mLadderFragment != null) {
-                    if (isDelayedRaceFinished()) {
-                        mLadderFragment.setAutoRefreshEnabled(false);
-                    } else {
-                        mLadderFragment.setAutoRefreshEnabled(enabled);
-                    }
+        runOnUiThread(() -> {
+            if (mLadderFragment != null) {
+                if (isDelayedRaceFinished()) {
+                    mLadderFragment.setAutoRefreshEnabled(false);
+                } else {
+                    mLadderFragment.setAutoRefreshEnabled(enabled);
                 }
             }
         });
     }
 
     private void setRefreshEnabled(final boolean enabled) {
-        runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-                if (mLadderFragment != null) {
-                    mLadderFragment.setRefreshEnabled(enabled);
-                }
+        runOnUiThread(() -> {
+            if (mLadderFragment != null) {
+                mLadderFragment.setRefreshEnabled(enabled);
             }
         });
     }
 
     private void keepScreenOn(final boolean keepScreenOn) {
-        runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-                int flag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
-                if (keepScreenOn) {
-                    getWindow().addFlags(flag);
-                } else {
-                    getWindow().clearFlags(flag);
-                }
+        runOnUiThread(() -> {
+            int flag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+            if (keepScreenOn) {
+                getWindow().addFlags(flag);
+            } else {
+                getWindow().clearFlags(flag);
             }
         });
     }

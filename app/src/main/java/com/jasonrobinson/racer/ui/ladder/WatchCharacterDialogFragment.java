@@ -91,19 +91,11 @@ public class WatchCharacterDialogFragment extends BaseDialogFragment {
         }
 
         builder.setPositiveButton(R.string.watch, null); // Overwritten later
-        builder.setNeutralButton(R.string.remove, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mListener.onRemove();
-            }
+        builder.setNeutralButton(R.string.remove, (dialog, which) -> {
+            mListener.onRemove();
         });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mListener.onCancel();
-            }
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> {
+            mListener.onCancel();
         });
 
         return builder.create();
@@ -116,29 +108,25 @@ public class WatchCharacterDialogFragment extends BaseDialogFragment {
 
         // This allows us to do validation before accepting the input
         Button b = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        b.setOnClickListener(new OnClickListener() {
+        b.setOnClickListener(v -> {
+            String name = mNameEditText.getText().toString();
+            WatchType type = mCharacterRadioButton.isChecked() ? WatchType.CHARACTER : WatchType.ACCOUNT;
 
-            @Override
-            public void onClick(View v) {
-                String name = mNameEditText.getText().toString();
-                WatchType type = mCharacterRadioButton.isChecked() ? WatchType.CHARACTER : WatchType.ACCOUNT;
+            Pattern pattern = null;
+            switch (type) {
+                case CHARACTER:
+                    pattern = PATTERN_CHARACTER;
+                    break;
+                case ACCOUNT:
+                    pattern = PATTERN_ACCOUNT;
+                    break;
+            }
 
-                Pattern pattern = null;
-                switch (type) {
-                    case CHARACTER:
-                        pattern = PATTERN_CHARACTER;
-                        break;
-                    case ACCOUNT:
-                        pattern = PATTERN_ACCOUNT;
-                        break;
-                }
-
-                if (pattern.matcher(name).matches()) {
-                    mListener.onNameSelected(name, type);
-                    dialog.dismiss();
-                } else {
-                    Toast.makeText(getActivity(), R.string.watcher_input_error, Toast.LENGTH_LONG).show();
-                }
+            if (pattern.matcher(name).matches()) {
+                mListener.onNameSelected(name, type);
+                dialog.dismiss();
+            } else {
+                Toast.makeText(getActivity(), R.string.watcher_input_error, Toast.LENGTH_LONG).show();
             }
         });
     }

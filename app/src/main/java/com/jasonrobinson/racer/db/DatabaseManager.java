@@ -121,18 +121,14 @@ public class DatabaseManager {
 
     public int addOrUpdateRaceList(final List<Race> races) {
         try {
-            return mHelper.getRaceDao().callBatchTasks(new Callable<Integer>() {
+            return mHelper.getRaceDao().callBatchTasks(() -> {
 
-                @Override
-                public Integer call() throws Exception {
-
-                    int counter = 0;
-                    for (Race race : races) {
-                        counter += addOrUpdateRace(race) ? 1 : 0;
-                    }
-
-                    return counter;
+                int counter = 0;
+                for (Race race : races) {
+                    counter += addOrUpdateRace(race) ? 1 : 0;
                 }
+
+                return counter;
             });
         } catch (Exception e) {
             Log.e(TAG, "Failed to batch cache races", e);
