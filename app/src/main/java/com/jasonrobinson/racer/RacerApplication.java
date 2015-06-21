@@ -11,6 +11,8 @@ import com.jasonrobinson.racer.module.DatabaseModule;
 import com.jasonrobinson.racer.module.GraphHolder;
 import com.jasonrobinson.racer.module.SettingsModule;
 
+import io.fabric.sdk.android.Fabric;
+
 public class RacerApplication extends Application {
 
     @Override
@@ -20,11 +22,9 @@ public class RacerApplication extends Application {
         if (BuildConfig.DEBUG) {
             GoogleAnalytics.getInstance(this).setDryRun(true);
             GoogleAnalytics.getInstance(this).getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
-
-            Crashlytics.getInstance().setDebugMode(true);
         }
 
-        Crashlytics.start(this);
+        Fabric.with(this, new Crashlytics());
     }
 
     private Object[] getModules() {
