@@ -68,7 +68,7 @@ public class RaceAdapter extends BaseExpandableListAdapter {
             cal.setTime(startAt);
 
             if (lastDate == null || cal.get(Calendar.YEAR) != lastCal.get(Calendar.YEAR) || cal.get(Calendar.DAY_OF_YEAR) != lastCal.get(Calendar.DAY_OF_YEAR)) {
-                mDateRaces.add(new ArrayList<Race>());
+                mDateRaces.add(new ArrayList<>());
                 lastDate = startAt;
             }
 
@@ -329,11 +329,11 @@ public class RaceAdapter extends BaseExpandableListAdapter {
 
     public interface OnRaceActionClickListener {
 
-        public void onForumPostClicked(Race race);
+        void onForumPostClicked(Race race);
 
-        public void onAddNotificationClicked(Race race);
+        void onAddNotificationClicked(Race race);
 
-        public void onRemoveNotificationClicked(Race race);
+        void onRemoveNotificationClicked(Race race);
     }
 
     class ViewHolder {

@@ -50,8 +50,8 @@ public class NotificationPickerDialogFragment extends BaseDialogFragment {
 
     public interface OnTimeSelectedListener {
 
-        public void onTimeSelected(long millis);
+        void onTimeSelected(long millis);
 
-        public void onCancel();
+        void onCancel();
     }
 }

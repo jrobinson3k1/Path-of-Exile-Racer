@@ -58,7 +58,7 @@ public class Race implements Parcelable {
         endAt = new Date(in.readLong());
 
         Parcelable[] ruleParcels = in.readParcelableArray(Rule.class.getClassLoader());
-        rules = new ArrayList<Rule>();
+        rules = new ArrayList<>();
         for (Parcelable ruleParcel : ruleParcels) {
             rules.add((Rule) ruleParcel);
         }

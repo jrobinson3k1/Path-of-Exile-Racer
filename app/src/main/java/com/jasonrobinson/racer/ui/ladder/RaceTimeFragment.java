@@ -107,7 +107,7 @@ public class RaceTimeFragment extends BaseFragment {
 
     public interface RaceTimeCallback {
 
-        public void onRaceFinished();
+        void onRaceFinished();
     }
 
     private class RemainingCountdownTimer extends CountDownTimer {

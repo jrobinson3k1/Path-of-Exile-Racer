@@ -1,23 +1,13 @@
 package com.jasonrobinson.racer.ui.race;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-
 import com.astuetz.PagerSlidingTabStrip;
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.adapter.RaceGridPagerAdapter;
 import com.jasonrobinson.racer.adapter.RaceListPagerAdapter;
-import com.jasonrobinson.racer.async.RaceAsyncTask;
 import com.jasonrobinson.racer.enumeration.RaceOptions;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.model.RaceMode;
+import com.jasonrobinson.racer.module.GraphHolder;
 import com.jasonrobinson.racer.ui.base.BaseActivity;
 import com.jasonrobinson.racer.ui.ladder.LadderActivity;
 import com.jasonrobinson.racer.ui.race.RaceListFragment.RacesCallback;
@@ -25,8 +15,18 @@ import com.jasonrobinson.racer.ui.web.WebActivity;
 import com.jasonrobinson.racer.util.DepthPageTransformer;
 import com.metova.slim.annotation.Layout;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewPager;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.InjectView;
 
@@ -37,27 +37,32 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 
     @InjectView(R.id.tabs)
     PagerSlidingTabStrip mTabs;
+
     @InjectView(R.id.pager)
     ViewPager mPager;
 
+    @Inject
+    RaceManager mRaceManager;
+
     RaceListPagerAdapter mListAdapter;
+
     RaceGridPagerAdapter mGridAdapter;
 
-    RacesTask mRacesTask;
-
     boolean mRefreshing;
+
     RaceMode mRaceMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        GraphHolder.getInstance().inject(this);
 
 //        Toolbar toolbar = new Toolbar(this);
 //        toolbar.setTitle(R.string.races);
 //
 //        setSupportActionBar(toolbar);
 
-        List<RaceListPagerAdapter.RaceListParams> params = new ArrayList<RaceListPagerAdapter.RaceListParams>();
+        List<RaceListPagerAdapter.RaceListParams> params = new ArrayList<>();
         params.add(new RaceListPagerAdapter.RaceListParams(RaceOptions.UNFINISHED, getString(R.string.upcoming)));
         params.add(new RaceListPagerAdapter.RaceListParams(RaceOptions.FINISHED, getString(R.string.finished)));
 
@@ -77,14 +82,6 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
         long now = System.currentTimeMillis();
         if (now - lastFetch >= FETCH_INTERVAL) {
             fetchRaces();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mRacesTask != null) {
-            mRacesTask.cancel(true);
         }
     }
 
@@ -165,43 +162,14 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
     }
 
     private void fetchRaces() {
-        if (mRacesTask != null) {
-            mRacesTask.cancel(true);
-        }
-
-        mRacesTask = new RacesTask();
-        mRacesTask.execute();
+        mRaceManager.fetchRaces()
+                .doOnSubscribe(() -> setRefreshing(true))
+                .doOnTerminate(() -> setRefreshing(false))
+                .subscribe();
     }
 
     private void setRefreshing(boolean refreshing) {
         mRefreshing = refreshing;
         supportInvalidateOptionsMenu();
-    }
-
-    private class RacesTask extends RaceAsyncTask {
-
-        public RacesTask() {
-            super(false);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            setRefreshing(true);
-        }
-
-        @Override
-        protected void onPostExecute(List<Race> result) {
-            super.onPostExecute(result);
-            setRefreshing(false);
-            getSettingsManager().updateLastRaceFetch();
-
-            List<Fragment> fragments = getSupportFragmentManager().getFragments();
-            for (Fragment fragment : fragments) {
-                if (fragment instanceof RaceListFragment && fragment.isVisible()) {
-                    ((RaceListFragment) fragment).refresh();
-                }
-            }
-        }
     }
 }

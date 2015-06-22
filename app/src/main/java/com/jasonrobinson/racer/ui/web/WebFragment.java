@@ -56,6 +56,6 @@ public class WebFragment extends BaseFragment {
 
     public interface WebCallback {
 
-        public void onProgressChanged(int progress);
+        void onProgressChanged(int progress);
     }
 }

@@ -1,7 +1,5 @@
 package com.jasonrobinson.racer.db;
 
-import android.util.Log;
-
 import com.j256.ormlite.dao.Dao.CreateOrUpdateStatus;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.QueryBuilder;
@@ -9,13 +7,17 @@ import com.jasonrobinson.racer.enumeration.RaceOptions;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.model.Race.Rule;
 
+import android.util.Log;
+
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import rx.Observable;
+import rx.subjects.PublishSubject;
 
 @Singleton
 public class DatabaseManager {
@@ -25,18 +27,36 @@ public class DatabaseManager {
     @Inject
     DatabaseHelper mHelper;
 
-    public List<Race> getRaces(RaceOptions option) {
-        switch (option) {
-            case FINISHED:
-                return getAllFinishedRaces();
-            case UNFINISHED:
-                return getAllUnfinishedRaces();
-            case IN_PROGRESS:
-                return getAllInProgressRaces();
-            case ALL:
-            default:
-                return getAllRaces();
-        }
+    private PublishSubject<DatabaseEvent> mEventSubject = PublishSubject.create();
+
+    public Observable<List<Race>> getRaces(RaceOptions option) {
+        return Observable.create(subscriber -> {
+            try {
+                List<Race> races;
+                switch (option) {
+                    case FINISHED:
+                        races = getAllFinishedRaces();
+                        break;
+                    case UNFINISHED:
+                        races = getAllUnfinishedRaces();
+                        break;
+                    case IN_PROGRESS:
+                        races = getAllInProgressRaces();
+                        break;
+                    case ALL:
+                    default:
+                        races = getAllRaces();
+                }
+
+                if (races != null) {
+                    subscriber.onNext(races);
+                }
+
+                subscriber.onCompleted();
+            } catch (Exception e) {
+                subscriber.onError(e);
+            }
+        });
     }
 
     private List<Race> getAllRaces() {
@@ -128,6 +148,7 @@ public class DatabaseManager {
                     counter += addOrUpdateRace(race) ? 1 : 0;
                 }
 
+                mEventSubject.onNext(DatabaseEvent.RACES_TABLE_CHANGED);
                 return counter;
             });
         } catch (Exception e) {
@@ -135,5 +156,9 @@ public class DatabaseManager {
         }
 
         return 0;
+    }
+
+    public Observable<DatabaseEvent> getEventObservable() {
+        return mEventSubject.asObservable();
     }
 }

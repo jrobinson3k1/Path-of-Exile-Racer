@@ -137,10 +137,10 @@ public class WatchCharacterDialogFragment extends BaseDialogFragment {
 
     public interface WatchCharacterDialogListener {
 
-        public void onNameSelected(String name, WatchType type);
+        void onNameSelected(String name, WatchType type);
 
-        public void onRemove();
+        void onRemove();
 
-        public void onCancel();
+        void onCancel();
     }
 }

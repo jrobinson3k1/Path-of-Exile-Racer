@@ -12,7 +12,7 @@ import java.io.InputStream;
 
 public class RawTypeface {
 
-    private static LruCache<Integer, Typeface> sTypefaceCache = new LruCache<Integer, Typeface>(5);
+    private static LruCache<Integer, Typeface> sTypefaceCache = new LruCache<>(5);
 
     private RawTypeface() {
 

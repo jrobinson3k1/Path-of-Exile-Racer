@@ -1,5 +1,16 @@
 package com.jasonrobinson.racer.ui.race;
 
+import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.adapter.RaceAdapter;
+import com.jasonrobinson.racer.enumeration.RaceOptions;
+import com.jasonrobinson.racer.model.Race;
+import com.jasonrobinson.racer.module.GraphHolder;
+import com.jasonrobinson.racer.ui.base.BaseExpandableListFragment;
+import com.jasonrobinson.racer.ui.race.NotificationPickerDialogFragment.OnTimeSelectedListener;
+import com.jasonrobinson.racer.util.AlarmUtils;
+import com.metova.slim.annotation.Callback;
+import com.metova.slim.annotation.Extra;
+
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -7,17 +18,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 
-import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.adapter.RaceAdapter;
-import com.jasonrobinson.racer.enumeration.RaceOptions;
-import com.jasonrobinson.racer.model.Race;
-import com.jasonrobinson.racer.ui.base.BaseExpandableListFragment;
-import com.jasonrobinson.racer.ui.race.NotificationPickerDialogFragment.OnTimeSelectedListener;
-import com.jasonrobinson.racer.util.AlarmUtils;
-import com.metova.slim.annotation.Callback;
-import com.metova.slim.annotation.Extra;
-
 import java.util.List;
+
+import javax.inject.Inject;
 
 public class RaceListFragment extends BaseExpandableListFragment implements RaceAdapter.OnRaceActionClickListener {
 
@@ -30,6 +33,9 @@ public class RaceListFragment extends BaseExpandableListFragment implements Race
 
     @Callback
     RacesCallback mCallback;
+
+    @Inject
+    RaceManager mRaceManager;
 
     public static RaceListFragment newInstance(RaceOptions option) {
         RaceListFragment fragment = new RaceListFragment();
@@ -44,6 +50,7 @@ public class RaceListFragment extends BaseExpandableListFragment implements Race
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        GraphHolder.getInstance().inject(this);
         setHasOptionsMenu(true);
     }
 
@@ -51,18 +58,15 @@ public class RaceListFragment extends BaseExpandableListFragment implements Race
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setEmptyText(getString(R.string.races_unavailable));
+
+        mRaceManager.getRaces(mRaceOption).subscribe(this::setData);
+        mRaceManager.getRaceUpdates(mRaceOption).subscribe(this::setData);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         registerForContextMenu(getExpandableListView());
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        refresh();
     }
 
     @Override
@@ -167,15 +171,10 @@ public class RaceListFragment extends BaseExpandableListFragment implements Race
         getActivity().supportInvalidateOptionsMenu();
     }
 
-    public void refresh() {
-        List<Race> races = getDatabaseManager().getRaces(mRaceOption);
-        setData(races);
-    }
-
     public interface RacesCallback {
 
-        public void showUrl(String url);
+        void showUrl(String url);
 
-        public void showLadder(Race race);
+        void showLadder(Race race);
     }
 }
