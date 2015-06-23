@@ -162,7 +162,7 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
     }
 
     private void fetchRaces() {
-        mRaceManager.fetchRaces()
+        bindLifecycle(mRaceManager.fetchRaces())
                 .doOnSubscribe(() -> setRefreshing(true))
                 .doOnTerminate(() -> setRefreshing(false))
                 .subscribe();

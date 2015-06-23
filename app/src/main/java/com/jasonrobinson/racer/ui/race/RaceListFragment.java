@@ -59,8 +59,8 @@ public class RaceListFragment extends BaseExpandableListFragment implements Race
         super.onViewCreated(view, savedInstanceState);
         setEmptyText(getString(R.string.races_unavailable));
 
-        mRaceManager.getRaces(mRaceOption).subscribe(this::setData);
-        mRaceManager.getRaceUpdates(mRaceOption).subscribe(this::setData);
+        bindLifecycle(mRaceManager.getRaces(mRaceOption)).subscribe(this::setData);
+        bindLifecycle(mRaceManager.getRaceUpdates(mRaceOption)).subscribe(this::setData);
     }
 
     @Override

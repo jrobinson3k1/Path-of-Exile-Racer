@@ -1,5 +1,15 @@
 package com.jasonrobinson.racer.ui.base;
 
+import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.analytics.AnalyticsManager;
+import com.jasonrobinson.racer.db.DatabaseManager;
+import com.jasonrobinson.racer.module.GraphHolder;
+import com.jasonrobinson.racer.ui.settings.SettingsActivity;
+import com.jasonrobinson.racer.util.CustomTypefaceSpan;
+import com.jasonrobinson.racer.util.RawTypeface;
+import com.jasonrobinson.racer.util.SettingsManager;
+import com.metova.slim.Slim;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -12,23 +22,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.analytics.AnalyticsManager;
-import com.jasonrobinson.racer.db.DatabaseManager;
-import com.jasonrobinson.racer.module.GraphHolder;
-import com.jasonrobinson.racer.ui.settings.SettingsActivity;
-import com.jasonrobinson.racer.util.CustomTypefaceSpan;
-import com.jasonrobinson.racer.util.RawTypeface;
-import com.jasonrobinson.racer.util.SettingsManager;
-import com.metova.slim.Slim;
-
 import butterknife.ButterKnife;
+import rx.Observable;
+import rx.android.lifecycle.LifecycleEvent;
+import rx.android.lifecycle.LifecycleObservable;
+import rx.subjects.BehaviorSubject;
 
 public class BaseActivityImpl {
 
-    AnalyticsManager mAnalyticsManager;
-    SettingsManager mSettingsManager;
-    DatabaseManager mDatabaseManager;
+    private final BehaviorSubject<LifecycleEvent> mLifecycleSubject = BehaviorSubject.create();
+
+    private AnalyticsManager mAnalyticsManager;
+
+    private SettingsManager mSettingsManager;
+
+    private DatabaseManager mDatabaseManager;
 
     private Activity mActivity;
 
@@ -44,6 +52,7 @@ public class BaseActivityImpl {
     }
 
     public void onCreate(Bundle savedInstanceState) {
+        mLifecycleSubject.onNext(LifecycleEvent.CREATE);
         View layout = Slim.createLayout(mActivity, mActivity);
         if (layout != null) {
             mActivity.setContentView(layout);
@@ -56,11 +65,25 @@ public class BaseActivityImpl {
     }
 
     public void onStart() {
+        mLifecycleSubject.onNext(LifecycleEvent.START);
         mAnalyticsManager.onStart(mActivity);
     }
 
+    public void onResume() {
+        mLifecycleSubject.onNext(LifecycleEvent.RESUME);
+    }
+
+    public void onPause() {
+        mLifecycleSubject.onNext(LifecycleEvent.PAUSE);
+    }
+
     public void onStop() {
+        mLifecycleSubject.onNext(LifecycleEvent.STOP);
         mAnalyticsManager.onStop(mActivity);
+    }
+
+    public void onDestroy() {
+        mLifecycleSubject.onNext(LifecycleEvent.DESTROY);
     }
 
     public void onContentChanged() {
@@ -120,5 +143,13 @@ public class BaseActivityImpl {
         }
 
         return title;
+    }
+
+    public Observable<LifecycleEvent> lifecycle() {
+        return mLifecycleSubject.asObservable();
+    }
+
+    public <T> Observable<T> bindLifecycle(Observable<T> source) {
+        return LifecycleObservable.bindUntilLifecycleEvent(lifecycle(), source, LifecycleEvent.DESTROY);
     }
 }

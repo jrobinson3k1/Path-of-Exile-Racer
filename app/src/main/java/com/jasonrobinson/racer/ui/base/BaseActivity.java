@@ -1,14 +1,16 @@
 package com.jasonrobinson.racer.ui.base;
 
+import com.jasonrobinson.racer.analytics.AnalyticsManager;
+import com.jasonrobinson.racer.db.DatabaseManager;
+import com.jasonrobinson.racer.util.SettingsManager;
+
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.jasonrobinson.racer.analytics.AnalyticsManager;
-import com.jasonrobinson.racer.db.DatabaseManager;
-import com.jasonrobinson.racer.util.SettingsManager;
-import com.metova.slim.SlimActivity;
+import rx.Observable;
+import rx.android.lifecycle.LifecycleEvent;
 
 public class BaseActivity extends ActionBarActivity {
 
@@ -27,14 +29,32 @@ public class BaseActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        mImpl.onStop();
+    protected void onResume() {
+        super.onResume();
+        mImpl.onResume();
     }
 
     @Override
-    public void onSupportContentChanged() {
-        super.onSupportContentChanged();
+    protected void onPause() {
+        mImpl.onPause();
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        mImpl.onStop();
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mImpl.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onContentChanged() {
+        super.onContentChanged();
         mImpl.onContentChanged();
     }
 
@@ -78,5 +98,13 @@ public class BaseActivity extends ActionBarActivity {
 
     public DatabaseManager getDatabaseManager() {
         return mImpl.getdDatabaseManager();
+    }
+
+    public Observable<LifecycleEvent> lifecycle() {
+        return mImpl.lifecycle();
+    }
+
+    public <T> Observable<T> bindLifecycle(Observable<T> source) {
+        return mImpl.bindLifecycle(source);
     }
 }
