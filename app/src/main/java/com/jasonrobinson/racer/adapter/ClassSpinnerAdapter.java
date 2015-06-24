@@ -1,7 +1,6 @@
 package com.jasonrobinson.racer.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,33 +8,33 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.enumeration.PoeClass;
+import com.jasonrobinson.racer.enumeration.PoEClass;
 import com.jasonrobinson.racer.util.RawTypeface;
 
 public class ClassSpinnerAdapter extends BaseAdapter {
 
     Context mContext;
-    PoeClass[] mPoeClasses;
+    PoEClass[] mPoEClasses;
     boolean mShowAll;
 
-    public ClassSpinnerAdapter(Context context, PoeClass[] poeClasses, boolean showAll) {
+    public ClassSpinnerAdapter(Context context, PoEClass[] poEClasses, boolean showAll) {
         mContext = context;
-        mPoeClasses = poeClasses;
+        mPoEClasses = poEClasses;
         mShowAll = showAll;
     }
 
     @Override
     public int getCount() {
-        return mPoeClasses.length + (mShowAll ? 1 : 0);
+        return mPoEClasses.length + (mShowAll ? 1 : 0);
     }
 
     @Override
-    public PoeClass getItem(int position) {
+    public PoEClass getItem(int position) {
         if (mShowAll && position == 0) {
             return null;
         }
 
-        return mPoeClasses[mShowAll ? position - 1 : position];
+        return mPoEClasses[mShowAll ? position - 1 : position];
     }
 
     @Override
@@ -64,8 +63,8 @@ public class ClassSpinnerAdapter extends BaseAdapter {
             textView = (TextView) v.findViewById(android.R.id.text1);
         }
 
-        PoeClass poeClass = getItem(position);
-        textView.setText(poeClass == null ? mContext.getString(R.string.all) : poeClass.toString());
+        PoEClass poEClass = getItem(position);
+        textView.setText(poEClass == null ? mContext.getString(R.string.all) : poEClass.toString());
 
         return v;
     }

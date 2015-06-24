@@ -6,7 +6,7 @@ import android.text.TextUtils;
 
 import com.jasonrobinson.racer.async.LadderAsyncTask.LadderParams;
 import com.jasonrobinson.racer.async.LadderAsyncTask.LadderResult;
-import com.jasonrobinson.racer.enumeration.PoeClass;
+import com.jasonrobinson.racer.enumeration.PoEClass;
 import com.jasonrobinson.racer.model.Ladder;
 import com.jasonrobinson.racer.model.Ladder.Entry;
 import com.jasonrobinson.racer.model.WatchType;
@@ -34,19 +34,19 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
         String id = ladderParams.id;
         int start = ladderParams.start;
         int count = ladderParams.count;
-        PoeClass poeClass = ladderParams.poeClass;
+        PoEClass poEClass = ladderParams.mPoEClass;
         String character = ladderParams.name;
         WatchType type = ladderParams.type;
-        PoeClass characterPoeClass = ladderParams.characterPoeClass;
+        PoEClass characterPoEClass = ladderParams.mCharacterPoEClass;
 
         RaceClient client = new RaceClient();
         try {
             Ladder ladder;
 
-            if (poeClass == null) {
+            if (poEClass == null) {
                 ladder = fetchLadder(client, id, start, count);
             } else {
-                ladder = fetchLadderForClass(client, id, start, count, poeClass);
+                ladder = fetchLadderForClass(client, id, start, count, poEClass);
             }
 
             if (isCancelled()) {
@@ -56,11 +56,11 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
 
             // Character Watcher
             Entry characterEntry = null;
-            boolean poeClassEqual = poeClass != null && characterPoeClass != null && poeClass == characterPoeClass;
-            if ((poeClassEqual || characterPoeClass == null || poeClass == null) && !TextUtils.isEmpty(character)) {
+            boolean poeClassEqual = poEClass != null && characterPoEClass != null && poEClass == characterPoEClass;
+            if ((poeClassEqual || characterPoEClass == null || poEClass == null) && !TextUtils.isEmpty(character)) {
                 characterEntry = LadderUtils.findEntry(ladder.getEntries(), character, type);
                 if (characterEntry == null) {
-                    characterEntry = fetchEntry(client, id, character, type, ladder.getTotal(), poeClassEqual || characterPoeClass == null ? poeClass : null);
+                    characterEntry = fetchEntry(client, id, character, type, ladder.getTotal(), poeClassEqual || characterPoEClass == null ? poEClass : null);
                 }
             }
 
@@ -70,8 +70,8 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
             }
 
             // Filter by class
-            if (poeClass != null) {
-                LadderUtils.filterEntriesByClass(ladder.getEntries(), poeClass);
+            if (poEClass != null) {
+                LadderUtils.filterEntriesByClass(ladder.getEntries(), poEClass);
                 LadderUtils.addClassRanksToEntries(ladder.getEntries());
 
                 // Prune extra entries
@@ -101,12 +101,12 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
      * than or equal to <code>count</code>. The ladder returned still contains
      * every class.
      */
-    private Ladder fetchLadderForClass(RaceClient client, String id, int start, int count, PoeClass poeClass) throws SocketTimeoutException {
+    private Ladder fetchLadderForClass(RaceClient client, String id, int start, int count, PoEClass poEClass) throws SocketTimeoutException {
         Ladder ladder = null;
         int classCount = 0;
         do {
             Ladder nextLadder = fetchLadder(client, id, start, LIMIT_PER_REQUEST);
-            classCount += LadderUtils.getClassCount(nextLadder.getEntries(), poeClass);
+            classCount += LadderUtils.getClassCount(nextLadder.getEntries(), poEClass);
 
             if (ladder == null) {
                 ladder = nextLadder;
@@ -156,15 +156,15 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
     /**
      * ONLY supply the PoeClass if you want the class rank.
      */
-    private Entry fetchEntry(RaceClient client, String id, String name, WatchType type, int totalRanks, PoeClass poeClass) throws SocketTimeoutException {
+    private Entry fetchEntry(RaceClient client, String id, String name, WatchType type, int totalRanks, PoEClass poEClass) throws SocketTimeoutException {
         Integer characterRank = sCharacterRankCache.get(name.toLowerCase(Locale.US));
         if (characterRank == null) {
             characterRank = 0;
         }
 
         Entry entry;
-        if (characterRank == 0 || poeClass != null) {
-            entry = fetchEntryLinear(client, id, name, type, totalRanks, poeClass);
+        if (characterRank == 0 || poEClass != null) {
+            entry = fetchEntryLinear(client, id, name, type, totalRanks, poEClass);
         } else {
             entry = fetchEntryBinary(client, id, name, type, characterRank, totalRanks);
         }
@@ -176,8 +176,8 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
         return entry;
     }
 
-    private Entry fetchEntryLinear(RaceClient client, String id, String name, WatchType type, int totalRanks, PoeClass poeClass) throws SocketTimeoutException {
-        boolean findClassRank = poeClass != null;
+    private Entry fetchEntryLinear(RaceClient client, String id, String name, WatchType type, int totalRanks, PoEClass poEClass) throws SocketTimeoutException {
+        boolean findClassRank = poEClass != null;
         int classRankCount = 0;
 
         for (int offset = 0; offset < totalRanks; offset += LIMIT_PER_REQUEST) {
@@ -192,7 +192,7 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
             }
 
             if (findClassRank) {
-                classRankCount += LadderUtils.getClassCount(nextLadder.getEntries(), poeClass);
+                classRankCount += LadderUtils.getClassCount(nextLadder.getEntries(), poEClass);
             }
 
             if (isCancelled()) {
@@ -237,19 +237,19 @@ public abstract class LadderAsyncTask extends AsyncTask<LadderParams, Void, Ladd
         private String id;
         private int start;
         private int count;
-        private PoeClass poeClass;
+        private PoEClass mPoEClass;
         private String name;
         private WatchType type;
-        private PoeClass characterPoeClass;
+        private PoEClass mCharacterPoEClass;
 
-        public LadderParams(String id, int start, int count, PoeClass poeClass, String name, WatchType type, PoeClass characterPoeClass) {
+        public LadderParams(String id, int start, int count, PoEClass poEClass, String name, WatchType type, PoEClass characterPoEClass) {
             this.id = id;
             this.start = start;
             this.count = count;
-            this.poeClass = poeClass;
+            this.mPoEClass = poEClass;
             this.name = name;
             this.type = type;
-            this.characterPoeClass = characterPoeClass;
+            this.mCharacterPoEClass = characterPoEClass;
         }
     }
 

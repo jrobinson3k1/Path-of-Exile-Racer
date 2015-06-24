@@ -1,5 +1,9 @@
 package com.jasonrobinson.racer.adapter;
 
+import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.model.Ladder.Entry;
+import com.jasonrobinson.racer.model.Ladder.Entry.Character;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Paint;
@@ -12,23 +16,21 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.model.Ladder.Entry;
-import com.jasonrobinson.racer.model.Ladder.Entry.Character;
-
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.List;
 
 public class LadderAdapter extends BaseAdapter {
 
-    private Entry[] mPreviousEntries;
-    private Entry[] mEntries;
+    private List<Entry> mPreviousEntries;
+
+    private List<Entry> mEntries;
 
     private boolean mUseClassRank;
+
     private boolean mBorderFirstItem;
 
-    public LadderAdapter(Entry[] entries, boolean useClassRank, boolean borderFirstItem) {
-
+    public LadderAdapter(List<Entry> entries, boolean useClassRank, boolean borderFirstItem) {
         mEntries = entries;
         mUseClassRank = useClassRank;
         mBorderFirstItem = borderFirstItem;
@@ -36,25 +38,21 @@ public class LadderAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-
-        return mEntries.length;
+        return mEntries.size();
     }
 
     @Override
     public Entry getItem(int position) {
-
-        return mEntries[position];
+        return mEntries.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-
         return position;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
         Context context = parent.getContext();
         View view = convertView;
         if (view == null) {
@@ -68,7 +66,7 @@ public class LadderAdapter extends BaseAdapter {
         Entry entry = getItem(position);
         Character character = entry.getCharacter();
 
-        holder.rankTextView.setText(Integer.toString(mUseClassRank ? entry.getClassRank() : entry.getRank()));
+        holder.rankTextView.setText(Integer.toString(mUseClassRank ? position + 1 : entry.getRank()));
         holder.nameTextView.setText(character.getName());
         if (entry.isDead()) {
             holder.nameTextView.setPaintFlags(holder.nameTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -77,7 +75,7 @@ public class LadderAdapter extends BaseAdapter {
         }
 
         holder.levelTextView.setText(Integer.toString(character.getLevel()));
-        holder.classTextView.setText(character.getPoeClass());
+        holder.classTextView.setText(character.getPoeClass().getName());
         holder.experienceTextView.setText(formatExperience(character.getExperience()));
 
         applyRankChange(parent.getContext(), view, entry);
@@ -88,7 +86,6 @@ public class LadderAdapter extends BaseAdapter {
     @SuppressWarnings("deprecation")
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void applyRankChange(Context context, View v, Entry entry) {
-
         RankChange rankChange = getRankChange(entry);
         Drawable drawable;
         switch (rankChange) {
@@ -112,7 +109,6 @@ public class LadderAdapter extends BaseAdapter {
     }
 
     private CharSequence formatExperience(long experience) {
-
         MathContext mc = new MathContext(4);
         if (experience >= 1000000000) { // billion
             return new BigDecimal((double) experience / 1000000000).round(mc).toString() + "B";
@@ -126,7 +122,6 @@ public class LadderAdapter extends BaseAdapter {
     }
 
     private RankChange getRankChange(Entry entry) {
-
         if (mPreviousEntries == null) {
             return RankChange.NONE;
         }
@@ -142,7 +137,6 @@ public class LadderAdapter extends BaseAdapter {
     }
 
     private Entry findPreviousEntry(Entry entry) {
-
         if (mPreviousEntries == null) {
             return null;
         }
@@ -158,8 +152,7 @@ public class LadderAdapter extends BaseAdapter {
         return null;
     }
 
-    public void setEntries(Entry[] entries, boolean useClassRank) {
-
+    public void setEntries(List<Entry> entries, boolean useClassRank) {
         mPreviousEntries = mEntries;
         mEntries = entries;
         mUseClassRank = useClassRank;
@@ -168,7 +161,6 @@ public class LadderAdapter extends BaseAdapter {
     }
 
     public void setBorderFirstItem(boolean enable) {
-
         mBorderFirstItem = enable;
     }
 
@@ -181,10 +173,15 @@ public class LadderAdapter extends BaseAdapter {
     private class ViewHolder {
 
         public TextView rankTextView;
+
         public TextView nameTextView;
+
         public TextView levelTextView;
+
         public TextView classTextView;
+
         public TextView experienceTextView;
+
         public View bottomBorderView;
 
         public ViewHolder(View v) {

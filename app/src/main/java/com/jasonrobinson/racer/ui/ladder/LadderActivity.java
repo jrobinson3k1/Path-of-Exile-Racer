@@ -7,7 +7,7 @@ import android.view.WindowManager;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.adapter.ClassSpinnerAdapter;
-import com.jasonrobinson.racer.enumeration.PoeClass;
+import com.jasonrobinson.racer.enumeration.PoEClass;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.ui.base.BaseActivity;
 import com.jasonrobinson.racer.ui.ladder.RaceTimeFragment.RaceTimeCallback;
@@ -48,13 +48,13 @@ public class LadderActivity extends BaseActivity implements RaceTimeCallback {
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
-        mNavAdapter = new ClassSpinnerAdapter(actionBar.getThemedContext(), PoeClass.values(), true);
+        mNavAdapter = new ClassSpinnerAdapter(actionBar.getThemedContext(), PoEClass.values(), true);
 
         actionBar.setListNavigationCallbacks(mNavAdapter, (position, id) -> {
-            PoeClass poeClass = mNavAdapter.getItem(position);
-            mLadderFragment.fetchLadder(mId, poeClass);
+            PoEClass poEClass = mNavAdapter.getItem(position);
+            mLadderFragment.fetchLadder(mId, poEClass);
 
-            getAnalyticsManager().trackEvent("Ladder", "Filter", poeClass == null ? "All" : poeClass.toString());
+            getAnalyticsManager().trackEvent("Ladder", "Filter", poEClass == null ? "All" : poEClass.toString());
 
             return true;
         });

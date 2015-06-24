@@ -1,36 +1,36 @@
 package com.jasonrobinson.racer.ui.ladder;
 
-import android.os.AsyncTask.Status;
+import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.adapter.LadderAdapter;
+import com.jasonrobinson.racer.enumeration.PoEClass;
+import com.jasonrobinson.racer.model.Ladder;
+import com.jasonrobinson.racer.model.Ladder.Entry;
+import com.jasonrobinson.racer.model.Race;
+import com.jasonrobinson.racer.model.WatchType;
+import com.jasonrobinson.racer.module.GraphHolder;
+import com.jasonrobinson.racer.ui.base.BaseListFragment;
+import com.jasonrobinson.racer.ui.ladder.WatchCharacterDialogFragment.WatchCharacterDialogListener;
+import com.jasonrobinson.racer.util.LadderUtils;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.adapter.LadderAdapter;
-import com.jasonrobinson.racer.async.LadderAsyncTask;
-import com.jasonrobinson.racer.async.LadderAsyncTask.LadderParams;
-import com.jasonrobinson.racer.enumeration.PoeClass;
-import com.jasonrobinson.racer.model.Ladder;
-import com.jasonrobinson.racer.model.Ladder.Entry;
-import com.jasonrobinson.racer.model.Race;
-import com.jasonrobinson.racer.model.ServerError;
-import com.jasonrobinson.racer.model.WatchType;
-import com.jasonrobinson.racer.ui.base.BaseListFragment;
-import com.jasonrobinson.racer.ui.ladder.WatchCharacterDialogFragment.WatchCharacterDialogListener;
-import com.jasonrobinson.racer.util.LadderUtils;
-
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import retrofit.RetrofitError;
+import javax.inject.Inject;
+
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 
 public class LadderFragment extends BaseListFragment {
 
@@ -40,26 +40,35 @@ public class LadderFragment extends BaseListFragment {
 
     private static final String TAG_WATCH_CHARACTER = "watchCharacter";
 
+    @Inject
+    LadderManager mLadderManager;
+
     private Race mRace;
 
     private String mWatchedName;
-    private PoeClass mWatchedCharacterClass;
-    private PoeClass mWatchedClass;
+
+    private PoEClass mWatchedCharacterClass;
+
+    private PoEClass mWatchedClass;
+
     private WatchType mWatchedType;
 
     private Timer mAutoRefreshTimer;
+
     private boolean mRefreshing;
 
     private LadderAdapter mAdapter;
-    private LadderTask mTask;
 
     private boolean mTracked;
+
     private boolean mRefreshEnabled = true;
+
     private boolean mAutoRefreshEnabled;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        GraphHolder.getInstance().inject(this);
         setHasOptionsMenu(true);
     }
 
@@ -84,7 +93,7 @@ public class LadderFragment extends BaseListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (mTask != null && mTask.getStatus() != Status.RUNNING && mRace != null) {
+        if (mRace != null) {
             fetchLadder();
         }
     }
@@ -98,10 +107,6 @@ public class LadderFragment extends BaseListFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (mTask != null) {
-            mTask.cancel(true);
-        }
-
         cancelAutoRefresh();
     }
 
@@ -176,22 +181,29 @@ public class LadderFragment extends BaseListFragment {
         fetchLadder(mRace.getRaceId(), mWatchedClass);
     }
 
-    public void fetchLadder(String id, PoeClass poeClass) {
+    public void fetchLadder(String id, PoEClass poEClass) {
         if (mRace == null || !mRace.getRaceId().equals(id)) {
             mRace = getDatabaseManager().getRace(id);
         }
 
-        boolean resetAdapter = mWatchedClass != poeClass;
-        mWatchedClass = poeClass;
+        mWatchedClass = poEClass;
 
-        if (mTask != null) {
-            mTask.cancel(true);
-        }
-
-        LadderParams params = new LadderParams(id, 0, poeClass == null ? 200 : 50, mWatchedClass, mWatchedName, mWatchedType, mWatchedCharacterClass);
-
-        mTask = new LadderTask(resetAdapter);
-        mTask.execute(params);
+        Observable.just(mWatchedClass)
+                .flatMap(watchedClass -> {
+                    if (watchedClass == null) {
+                        return mLadderManager.fetchLadder(mRace.getRaceId(), 0, 200);
+                    } else {
+                        return mLadderManager.fetchLadderForClass(mRace.getRaceId(), 50, watchedClass);
+                    }
+                })
+                .doOnSubscribe(() -> setRefreshing(true))
+                .doOnTerminate(() -> setRefreshing(false))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        this::onLadderReceived,
+                        throwable -> Toast.makeText(getActivity(), R.string.error_unavailable, Toast.LENGTH_LONG).show(),
+                        () -> setListShown(true)
+                );
 
         if (!mTracked) {
             mTracked = true;
@@ -248,80 +260,30 @@ public class LadderFragment extends BaseListFragment {
         getActivity().supportInvalidateOptionsMenu();
     }
 
-    private class LadderTask extends LadderAsyncTask {
-
-        private boolean mReset;
-
-        public LadderTask(boolean resetAdapter) {
-            mReset = resetAdapter;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            getActivity().runOnUiThread(() -> {
-                setRefreshing(true);
-
-                if (mReset) {
-                    setListShown(false);
-                }
-            });
-        }
-
-        // TODO: This method is a mess and needs to be cleaned up
-        @Override
-        protected void onPostExecute(LadderResult result) {
-            super.onPostExecute(result);
-            setRefreshing(false);
-
-            Entry[] entries = null;
-            Entry watchedEntry = null;
-            String toastMessage = getString(R.string.error_unavailable);
-
-            if (result != null) {
-                Ladder ladder = result.ladder;
-                if (ladder != null) {
-                    entries = ladder.getEntries().toArray(new Entry[ladder.getEntries().size()]);
-                } else if (result.retrofitError != null) {
-                    RetrofitError error = result.retrofitError;
-                    if (error.getResponse() != null) {
-                        ServerError body = (ServerError) error.getBodyAs(ServerError.class);
-
-                        if (body.getError() != null) {
-                            Log.e(TAG, "Error code: " + body.getError().getCode() + ", Message: " + body.getError().getMessage());
-                            toastMessage = body.getError().getMessage();
-                        }
-                    }
-                }
-            }
-
-            if (entries != null) {
-                if (!TextUtils.isEmpty(mWatchedName)) {
-                    watchedEntry = LadderUtils.findEntry(result.ladder.getEntries(), mWatchedName, mWatchedType);
-                    if (watchedEntry == null && mWatchedCharacterClass == null) {
-                        Toast.makeText(getActivity(), getString(R.string.character_not_found, mWatchedName), Toast.LENGTH_LONG).show();
-                        mWatchedName = null;
-                    } else {
-                        if (watchedEntry != null) {
-                            mWatchedCharacterClass = PoeClass.getClassForName(watchedEntry.getCharacter().getPoeClass());
-                        }
-                    }
-                }
-
-                boolean borderFirstItem = !TextUtils.isEmpty(mWatchedName) && watchedEntry != null;
-                if (mAdapter == null || mReset) {
-                    mAdapter = new LadderAdapter(entries, mWatchedClass != null, borderFirstItem);
-                    setListAdapter(mAdapter);
-                } else {
-                    mAdapter.setBorderFirstItem(borderFirstItem);
-                    mAdapter.setEntries(entries, mWatchedClass != null);
-                }
+    protected void onLadderReceived(List<Ladder.Entry> entries) {
+        Entry watchedEntry = null;
+        if (!TextUtils.isEmpty(mWatchedName)) {
+            watchedEntry = LadderUtils.findEntry(entries, mWatchedName, mWatchedType);
+            if (watchedEntry == null && mWatchedCharacterClass == null) {
+                Toast.makeText(getActivity(), getString(R.string.character_not_found, mWatchedName), Toast.LENGTH_LONG).show();
+                mWatchedName = null;
             } else {
-                Toast.makeText(getActivity(), toastMessage, Toast.LENGTH_LONG).show();
+                if (watchedEntry != null) {
+                    mWatchedCharacterClass = watchedEntry.getCharacter().getPoeClass();
+                }
             }
-
-            setListShown(true);
         }
+
+        boolean borderFirstItem = !TextUtils.isEmpty(mWatchedName) && watchedEntry != null;
+        if (mAdapter == null) {
+            mAdapter = new LadderAdapter(entries, mWatchedClass != null, borderFirstItem);
+            setListAdapter(mAdapter);
+        } else {
+            mAdapter.setBorderFirstItem(borderFirstItem);
+            mAdapter.setEntries(entries, mWatchedClass != null);
+        }
+
+        setListShown(true);
     }
 
     private class RefreshTimerTask extends TimerTask {

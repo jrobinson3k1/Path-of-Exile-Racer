@@ -1,6 +1,6 @@
 package com.jasonrobinson.racer.enumeration;
 
-public enum PoeClass {
+public enum PoEClass {
 
     DUELIST("Duelist"),
     MARAUDER("Marauder"),
@@ -12,15 +12,15 @@ public enum PoeClass {
 
     private String mName;
 
-    PoeClass(String name) {
+    PoEClass(String name) {
         mName = name;
     }
 
-    public static PoeClass getClassForName(String name) {
-        PoeClass[] poeClasses = values();
-        for (PoeClass poeClass : poeClasses) {
-            if (poeClass.getName().equalsIgnoreCase(name)) {
-                return poeClass;
+    public static PoEClass getClassForName(String name) {
+        PoEClass[] poEClasses = values();
+        for (PoEClass poEClass : poEClasses) {
+            if (poEClass.getName().equalsIgnoreCase(name)) {
+                return poEClass;
             }
         }
 

@@ -1,5 +1,6 @@
 package com.jasonrobinson.racer.module;
 
+import com.jasonrobinson.racer.ui.ladder.LadderFragment;
 import com.jasonrobinson.racer.ui.race.RaceListFragment;
 import com.jasonrobinson.racer.ui.race.RaceManager;
 import com.jasonrobinson.racer.ui.race.RacesActivity;
@@ -16,7 +17,8 @@ import dagger.Module;
         },
         injects = {
                 RacesActivity.class,
-                RaceListFragment.class
+                RaceListFragment.class,
+                LadderFragment.class
         }
 )
 public class RacerModule {

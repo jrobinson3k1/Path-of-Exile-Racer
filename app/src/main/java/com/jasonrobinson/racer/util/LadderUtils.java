@@ -1,6 +1,6 @@
 package com.jasonrobinson.racer.util;
 
-import com.jasonrobinson.racer.enumeration.PoeClass;
+import com.jasonrobinson.racer.enumeration.PoEClass;
 import com.jasonrobinson.racer.model.Ladder.Entry;
 import com.jasonrobinson.racer.model.WatchType;
 
@@ -13,7 +13,6 @@ public class LadderUtils {
     }
 
     public static Entry findEntry(List<Entry> entries, String name, WatchType type) {
-
         for (Entry entry : entries) {
             switch (type) {
                 case ACCOUNT:
@@ -32,11 +31,10 @@ public class LadderUtils {
         return null;
     }
 
-    public static int getClassCount(List<Entry> entries, PoeClass poeClass) {
-
+    public static int getClassCount(List<Entry> entries, PoEClass poEClass) {
         int count = 0;
         for (Entry entry : entries) {
-            if (poeClass == PoeClass.getClassForName(entry.getCharacter().getPoeClass())) {
+            if (poEClass.equals(entry.getCharacter().getPoeClass())) {
                 count++;
             }
         }
@@ -44,25 +42,23 @@ public class LadderUtils {
         return count;
     }
 
-    public static void filterEntriesByClass(List<Entry> entries, PoeClass poeClass) {
-
-        if (poeClass == null) {
+    public static void filterEntriesByClass(List<Entry> entries, PoEClass poEClass) {
+        if (poEClass == null) {
             return;
         }
 
         for (int i = entries.size() - 1; i >= 0; i--) {
             Entry entry = entries.get(i);
-            if (PoeClass.getClassForName(entry.getCharacter().getPoeClass()) != poeClass) {
+            if (!entry.getCharacter().getPoeClass().equals(poEClass)) {
                 entries.remove(i);
             }
         }
     }
 
     public static void addClassRankToEntry(List<Entry> entries, Entry entry, int startRank) {
-
         int rank = startRank + 1;
         String name = entry.getCharacter().getName();
-        PoeClass poeClass = PoeClass.getClassForName(entry.getCharacter().getPoeClass());
+        PoEClass poEClass = entry.getCharacter().getPoeClass();
 
         for (Entry nextEntry : entries) {
             String nextName = nextEntry.getCharacter().getName();
@@ -71,8 +67,8 @@ public class LadderUtils {
                 break;
             }
 
-            PoeClass nextPoeClass = PoeClass.getClassForName(nextEntry.getCharacter().getPoeClass());
-            if (nextPoeClass == poeClass) {
+            PoEClass nextPoEClass = nextEntry.getCharacter().getPoeClass();
+            if (nextPoEClass == poEClass) {
                 rank++;
             }
         }
@@ -89,8 +85,7 @@ public class LadderUtils {
         int scionRank = 1;
 
         for (Entry entry : entries) {
-            PoeClass poeClass = PoeClass.getClassForName(entry.getCharacter().getPoeClass());
-            switch (poeClass) {
+            switch (entry.getCharacter().getPoeClass()) {
                 case DUELIST:
                     entry.setClassRank(duelistRank);
                     duelistRank++;
