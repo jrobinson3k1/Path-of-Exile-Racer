@@ -9,6 +9,8 @@ import com.jasonrobinson.racer.util.CustomTypefaceSpan;
 import com.jasonrobinson.racer.util.RawTypeface;
 import com.jasonrobinson.racer.util.SettingsManager;
 import com.metova.slim.Slim;
+import com.trello.rxlifecycle.ActivityEvent;
+import com.trello.rxlifecycle.RxLifecycle;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -24,13 +26,11 @@ import android.view.View;
 
 import butterknife.ButterKnife;
 import rx.Observable;
-import rx.android.lifecycle.LifecycleEvent;
-import rx.android.lifecycle.LifecycleObservable;
 import rx.subjects.BehaviorSubject;
 
 public class BaseActivityImpl {
 
-    private final BehaviorSubject<LifecycleEvent> mLifecycleSubject = BehaviorSubject.create();
+    private final BehaviorSubject<ActivityEvent> mLifecycleSubject = BehaviorSubject.create();
 
     private AnalyticsManager mAnalyticsManager;
 
@@ -52,7 +52,7 @@ public class BaseActivityImpl {
     }
 
     public void onCreate(Bundle savedInstanceState) {
-        mLifecycleSubject.onNext(LifecycleEvent.CREATE);
+        mLifecycleSubject.onNext(ActivityEvent.CREATE);
         View layout = Slim.createLayout(mActivity, mActivity);
         if (layout != null) {
             mActivity.setContentView(layout);
@@ -65,25 +65,25 @@ public class BaseActivityImpl {
     }
 
     public void onStart() {
-        mLifecycleSubject.onNext(LifecycleEvent.START);
+        mLifecycleSubject.onNext(ActivityEvent.START);
         mAnalyticsManager.onStart(mActivity);
     }
 
     public void onResume() {
-        mLifecycleSubject.onNext(LifecycleEvent.RESUME);
+        mLifecycleSubject.onNext(ActivityEvent.RESUME);
     }
 
     public void onPause() {
-        mLifecycleSubject.onNext(LifecycleEvent.PAUSE);
+        mLifecycleSubject.onNext(ActivityEvent.PAUSE);
     }
 
     public void onStop() {
-        mLifecycleSubject.onNext(LifecycleEvent.STOP);
+        mLifecycleSubject.onNext(ActivityEvent.STOP);
         mAnalyticsManager.onStop(mActivity);
     }
 
     public void onDestroy() {
-        mLifecycleSubject.onNext(LifecycleEvent.DESTROY);
+        mLifecycleSubject.onNext(ActivityEvent.DESTROY);
     }
 
     public void onContentChanged() {
@@ -145,11 +145,15 @@ public class BaseActivityImpl {
         return title;
     }
 
-    public Observable<LifecycleEvent> lifecycle() {
+    public final Observable<ActivityEvent> lifecycle() {
         return mLifecycleSubject.asObservable();
     }
 
-    public <T> Observable<T> bindLifecycle(Observable<T> source) {
-        return LifecycleObservable.bindUntilLifecycleEvent(lifecycle(), source, LifecycleEvent.DESTROY);
+    public final <T> Observable.Transformer<T, T> bindUntilEvent(ActivityEvent event) {
+        return RxLifecycle.bindUntilActivityEvent(mLifecycleSubject, event);
+    }
+
+    public final <T> Observable.Transformer<T, T> bindToLifecycle() {
+        return RxLifecycle.bindActivity(mLifecycleSubject);
     }
 }

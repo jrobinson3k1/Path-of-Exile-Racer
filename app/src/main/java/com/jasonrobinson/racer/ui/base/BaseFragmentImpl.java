@@ -1,25 +1,25 @@
 package com.jasonrobinson.racer.ui.base;
 
-import com.jasonrobinson.racer.analytics.AnalyticsManager;
-import com.jasonrobinson.racer.db.DatabaseManager;
-import com.jasonrobinson.racer.module.GraphHolder;
-import com.jasonrobinson.racer.util.SettingsManager;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
+import com.jasonrobinson.racer.analytics.AnalyticsManager;
+import com.jasonrobinson.racer.db.DatabaseManager;
+import com.jasonrobinson.racer.module.GraphHolder;
+import com.jasonrobinson.racer.util.SettingsManager;
+import com.trello.rxlifecycle.FragmentEvent;
+import com.trello.rxlifecycle.RxLifecycle;
+
 import butterknife.ButterKnife;
 import rx.Observable;
-import rx.android.lifecycle.LifecycleEvent;
-import rx.android.lifecycle.LifecycleObservable;
 import rx.subjects.BehaviorSubject;
 
 public class BaseFragmentImpl {
 
-    private final BehaviorSubject<LifecycleEvent> mLifecycleSubject = BehaviorSubject.create();
+    private final BehaviorSubject<FragmentEvent> mLifecycleSubject = BehaviorSubject.create();
 
     private AnalyticsManager mAnalyticsManager;
 
@@ -38,44 +38,44 @@ public class BaseFragmentImpl {
     }
 
     public void onCreate(Bundle savedInstanceState) {
-        mLifecycleSubject.onNext(LifecycleEvent.CREATE);
+        mLifecycleSubject.onNext(FragmentEvent.CREATE);
     }
 
     public void onAttach(Activity activity) {
-        mLifecycleSubject.onNext(LifecycleEvent.ATTACH);
+        mLifecycleSubject.onNext(FragmentEvent.ATTACH);
     }
 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        mLifecycleSubject.onNext(LifecycleEvent.CREATE_VIEW);
+        mLifecycleSubject.onNext(FragmentEvent.CREATE_VIEW);
         ButterKnife.inject(mFragment, view);
     }
 
     public void onStart() {
-        mLifecycleSubject.onNext(LifecycleEvent.START);
+        mLifecycleSubject.onNext(FragmentEvent.START);
     }
 
     public void onResume() {
-        mLifecycleSubject.onNext(LifecycleEvent.RESUME);
+        mLifecycleSubject.onNext(FragmentEvent.RESUME);
     }
 
     public void onPause() {
-        mLifecycleSubject.onNext(LifecycleEvent.PAUSE);
+        mLifecycleSubject.onNext(FragmentEvent.PAUSE);
     }
 
     public void onStop() {
-        mLifecycleSubject.onNext(LifecycleEvent.STOP);
+        mLifecycleSubject.onNext(FragmentEvent.STOP);
     }
 
     public void onDestroyView() {
-        mLifecycleSubject.onNext(LifecycleEvent.DESTROY_VIEW);
+        mLifecycleSubject.onNext(FragmentEvent.DESTROY_VIEW);
     }
 
-    public void onDetatch() {
-        mLifecycleSubject.onNext(LifecycleEvent.DETACH);
+    public void onDetach() {
+        mLifecycleSubject.onNext(FragmentEvent.DETACH);
     }
 
     public void onDestroy() {
-        mLifecycleSubject.onNext(LifecycleEvent.DESTROY);
+        mLifecycleSubject.onNext(FragmentEvent.DESTROY);
     }
 
     public AnalyticsManager getAnalyticsManager() {
@@ -90,11 +90,15 @@ public class BaseFragmentImpl {
         return mDatabaseManager;
     }
 
-    public Observable<LifecycleEvent> lifecycle() {
+    public final Observable<FragmentEvent> lifecycle() {
         return mLifecycleSubject.asObservable();
     }
 
-    public <T> Observable<T> bindLifecycle(Observable<T> source) {
-        return LifecycleObservable.bindUntilLifecycleEvent(lifecycle(), source, LifecycleEvent.DESTROY_VIEW);
+    public final <T> Observable.Transformer<T, T> bindUntilEvent(FragmentEvent event) {
+        return RxLifecycle.bindUntilFragmentEvent(mLifecycleSubject, event);
+    }
+
+    public final <T> Observable.Transformer<T, T> bindToLifecycle() {
+        return RxLifecycle.bindFragment(mLifecycleSubject);
     }
 }

@@ -9,9 +9,10 @@ import com.jasonrobinson.racer.analytics.AnalyticsManager;
 import com.jasonrobinson.racer.db.DatabaseManager;
 import com.jasonrobinson.racer.util.SettingsManager;
 import com.metova.slim.SlimDialogFragment;
+import com.trello.rxlifecycle.FragmentEvent;
+import com.trello.rxlifecycle.RxLifecycle;
 
 import rx.Observable;
-import rx.android.lifecycle.LifecycleEvent;
 
 public class BaseDialogFragment extends SlimDialogFragment {
 
@@ -67,7 +68,7 @@ public class BaseDialogFragment extends SlimDialogFragment {
 
     @Override
     public void onDetach() {
-        mImpl.onDetatch();
+        mImpl.onDetach();
         super.onDetach();
     }
 
@@ -89,11 +90,15 @@ public class BaseDialogFragment extends SlimDialogFragment {
         return mImpl.getdDatabaseManager();
     }
 
-    public Observable<LifecycleEvent> lifecycle() {
+    public final Observable<FragmentEvent> lifecycle() {
         return mImpl.lifecycle();
     }
 
-    public <T> Observable<T> bindLifecycle(Observable<T> source) {
-        return mImpl.bindLifecycle(source);
+    public final <T> Observable.Transformer<T, T> bindUntilEvent(FragmentEvent event) {
+        return mImpl.bindUntilEvent(event);
+    }
+
+    public final <T> Observable.Transformer<T, T> bindToLifecycle() {
+        return mImpl.bindToLifecycle();
     }
 }

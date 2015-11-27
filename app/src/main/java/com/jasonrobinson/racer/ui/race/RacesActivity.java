@@ -1,5 +1,13 @@
 package com.jasonrobinson.racer.ui.race;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewPager;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+
 import com.astuetz.PagerSlidingTabStrip;
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.adapter.RaceGridPagerAdapter;
@@ -15,14 +23,6 @@ import com.jasonrobinson.racer.ui.web.WebActivity;
 import com.jasonrobinson.racer.util.DepthPageTransformer;
 import com.metova.slim.annotation.Layout;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewPager;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,32 +35,24 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
 
     private static final long FETCH_INTERVAL = 1000 * 60 * 60 * 24; // 24 hours
 
-    @InjectView(R.id.tabs)
-    PagerSlidingTabStrip mTabs;
-
-    @InjectView(R.id.pager)
-    ViewPager mPager;
-
     @Inject
     RaceManager mRaceManager;
 
-    RaceListPagerAdapter mListAdapter;
-
-    RaceGridPagerAdapter mGridAdapter;
-
     boolean mRefreshing;
-
     RaceMode mRaceMode;
+
+    @InjectView(R.id.tabs)
+    PagerSlidingTabStrip mTabs;
+    @InjectView(R.id.pager)
+    ViewPager mPager;
+
+    RaceListPagerAdapter mListAdapter;
+    RaceGridPagerAdapter mGridAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         GraphHolder.getInstance().inject(this);
-
-//        Toolbar toolbar = new Toolbar(this);
-//        toolbar.setTitle(R.string.races);
-//
-//        setSupportActionBar(toolbar);
 
         List<RaceListPagerAdapter.RaceListParams> params = new ArrayList<>();
         params.add(new RaceListPagerAdapter.RaceListParams(RaceOptions.UNFINISHED, getString(R.string.upcoming)));
@@ -162,9 +154,10 @@ public class RacesActivity extends BaseActivity implements RacesCallback {
     }
 
     private void fetchRaces() {
-        bindLifecycle(mRaceManager.fetchRaces())
+        mRaceManager.fetchRaces()
                 .doOnSubscribe(() -> setRefreshing(true))
                 .doOnTerminate(() -> setRefreshing(false))
+                .compose(bindToLifecycle())
                 .subscribe();
     }
 

@@ -1,16 +1,16 @@
 package com.jasonrobinson.racer.ui.base;
 
-import com.jasonrobinson.racer.analytics.AnalyticsManager;
-import com.jasonrobinson.racer.db.DatabaseManager;
-import com.jasonrobinson.racer.util.SettingsManager;
-
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.jasonrobinson.racer.analytics.AnalyticsManager;
+import com.jasonrobinson.racer.db.DatabaseManager;
+import com.jasonrobinson.racer.util.SettingsManager;
+import com.trello.rxlifecycle.ActivityEvent;
+
 import rx.Observable;
-import rx.android.lifecycle.LifecycleEvent;
 
 public class BaseActivity extends ActionBarActivity {
 
@@ -100,11 +100,15 @@ public class BaseActivity extends ActionBarActivity {
         return mImpl.getdDatabaseManager();
     }
 
-    public Observable<LifecycleEvent> lifecycle() {
+    public final Observable<ActivityEvent> lifecycle() {
         return mImpl.lifecycle();
     }
 
-    public <T> Observable<T> bindLifecycle(Observable<T> source) {
-        return mImpl.bindLifecycle(source);
+    public final <T> Observable.Transformer<T, T> bindUntilEvent(ActivityEvent event) {
+        return mImpl.bindUntilEvent(event);
+    }
+
+    public final <T> Observable.Transformer<T, T> bindToLifecycle() {
+        return mImpl.bindToLifecycle();
     }
 }
