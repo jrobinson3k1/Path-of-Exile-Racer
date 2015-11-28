@@ -12,6 +12,7 @@ import com.jasonrobinson.racer.adapter.UpcomingAdapter;
 import com.jasonrobinson.racer.dagger.ComponentHolder;
 import com.jasonrobinson.racer.network.RestService;
 import com.jasonrobinson.racer.ui.BaseFragment;
+import com.jasonrobinson.racer.ui.view.DateDecoration;
 import com.jasonrobinson.racer.ui.view.SimpleDividerDecoration;
 import com.metova.slim.annotation.Layout;
 import com.trello.rxlifecycle.FragmentEvent;
@@ -35,7 +36,6 @@ public class UpcomingFragment extends BaseFragment {
     TextView mEmptyTextView;
 
     private UpcomingAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
 
     public static UpcomingFragment newInstance() {
         return new UpcomingFragment();
@@ -56,11 +56,12 @@ public class UpcomingFragment extends BaseFragment {
 
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.addItemDecoration(new SimpleDividerDecoration(getResources()));
+        mRecyclerView.addItemDecoration(new DateDecoration(getResources()));
 
-        mLayoutManager = new LinearLayoutManager(getActivity());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new UpcomingAdapter();
+        mAdapter = new UpcomingAdapter(getActivity());
         mRecyclerView.setAdapter(mAdapter);
 
         downloadRaces();

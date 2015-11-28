@@ -11,4 +11,9 @@
     <color name="rank_up">#FFECEC</color>
     <color name="rank_down">#E3FBE9</color>
     <color name="rank_none">#00000000</color>
+
+    <!-- Status -->
+    <color name="green">#006400</color>
+    <color name="orange">#ffa500</color>
+    <color name="red">#ff0000</color>
 </resources>

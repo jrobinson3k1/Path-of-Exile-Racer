@@ -51,5 +51,6 @@
     <string name="settings_autorefresh_summary">Aktualisiert automatisch die Rangliste alle 30 Sekunden.</string>
     <string name="character">Charakter</string>
     <string name="account">Konto</string>
+    <string name="registration_open">Registration Open</string>
 
 </resources>

@@ -16,6 +16,7 @@ public class SimpleDividerDecoration extends RecyclerView.ItemDecoration {
         mDivider = resources.getDrawable(R.drawable.simple_divider);
     }
 
+    @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
         int left = parent.getPaddingLeft();
         int right = parent.getWidth() - parent.getPaddingRight();
