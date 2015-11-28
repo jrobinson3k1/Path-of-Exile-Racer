@@ -5,6 +5,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.TextView;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.adapter.UpcomingAdapter;
@@ -30,8 +31,10 @@ public class UpcomingFragment extends BaseFragment {
     SwipeRefreshLayout mSwipeRefreshLayout;
     @Bind(R.id.recycler_view)
     RecyclerView mRecyclerView;
+    @Bind(R.id.empty)
+    TextView mEmptyTextView;
 
-    private RecyclerView.Adapter mAdapter;
+    private UpcomingAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     public static UpcomingFragment newInstance() {
@@ -52,10 +55,13 @@ public class UpcomingFragment extends BaseFragment {
         mSwipeRefreshLayout.setOnRefreshListener(this::downloadRaces);
 
         mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.addItemDecoration(new SimpleDividerDecoration(getResources()));
 
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.addItemDecoration(new SimpleDividerDecoration(getResources()));
+
+        mAdapter = new UpcomingAdapter();
+        mRecyclerView.setAdapter(mAdapter);
 
         downloadRaces();
     }
@@ -65,6 +71,11 @@ public class UpcomingFragment extends BaseFragment {
                 .compose(bindUntilEvent(FragmentEvent.DESTROY_VIEW))
                 .compose(uiHook())
                 .doOnTerminate(() -> mSwipeRefreshLayout.setRefreshing(false))
-                .subscribe(races -> mRecyclerView.setAdapter(new UpcomingAdapter(races)));
+                .subscribe(races -> {
+                    mAdapter.clearAll();
+                    mAdapter.addAll(races);
+
+                    mEmptyTextView.setVisibility(races.isEmpty() ? View.VISIBLE : View.INVISIBLE);
+                });
     }
 }

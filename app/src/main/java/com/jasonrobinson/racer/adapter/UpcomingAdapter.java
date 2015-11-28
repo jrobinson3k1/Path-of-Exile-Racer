@@ -1,5 +1,6 @@
 package com.jasonrobinson.racer.adapter;
 
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,9 +8,11 @@ import android.widget.TextView;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.model.Race;
+import com.jasonrobinson.racer.util.RawTypeface;
 import com.metova.slim.Slim;
 import com.metova.slim.annotation.Layout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -18,11 +21,7 @@ import butterknife.ButterKnife;
 @Layout(R.layout.item_race)
 public class UpcomingAdapter extends RecyclerView.Adapter<UpcomingAdapter.ViewHolder> {
 
-    private List<Race> mRaces;
-
-    public UpcomingAdapter(List<Race> races) {
-        mRaces = races;
-    }
+    private List<Race> mRaces = new ArrayList<>();
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -43,6 +42,16 @@ public class UpcomingAdapter extends RecyclerView.Adapter<UpcomingAdapter.ViewHo
         return mRaces.size();
     }
 
+    public void clearAll() {
+        mRaces.clear();
+        notifyDataSetChanged();
+    }
+
+    public void addAll(List<Race> races) {
+        mRaces.addAll(races);
+        notifyDataSetChanged();
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.title)
@@ -55,6 +64,9 @@ public class UpcomingAdapter extends RecyclerView.Adapter<UpcomingAdapter.ViewHo
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
+            Typeface typeface = RawTypeface.obtain(itemView.getContext(), R.raw.fontin_bold);
+            mTitleTextView.setTypeface(typeface);
         }
     }
 }
