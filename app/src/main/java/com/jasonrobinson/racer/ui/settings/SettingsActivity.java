@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.preference.PreferenceFragment;
 
 import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.ui.base.BaseActivity;
+import com.jasonrobinson.racer.ui.BaseActivity;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -19,11 +19,6 @@ public class SettingsActivity extends BaseActivity {
         }
 
         setTitle(R.string.settings);
-    }
-
-    @Override
-    public boolean showSettingsMenu() {
-        return false;
     }
 
     public static class SettingsFragment extends PreferenceFragment {

@@ -2,18 +2,21 @@
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
         classpath 'io.fabric.tools:gradle:1.+'
         classpath 'me.tatarka:gradle-retrolambda:3.2.4'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
     }
 }
 
 allprojects {
     repositories {
         mavenCentral()
+        jcenter()
         maven { url "http://repo.metova.com/nexus/content/groups/public" }
     }
 }

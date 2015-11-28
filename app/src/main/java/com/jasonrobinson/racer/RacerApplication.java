@@ -3,17 +3,10 @@ package com.jasonrobinson.racer;
 import android.app.Application;
 
 import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.core.CrashlyticsCore;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Logger;
-
-import com.crashlytics.android.core.CrashlyticsCore;
-import com.jasonrobinson.racer.module.AnalyticsModule;
-import com.jasonrobinson.racer.module.ContextModule;
-import com.jasonrobinson.racer.module.DatabaseModule;
-import com.jasonrobinson.racer.module.GraphHolder;
-import com.jasonrobinson.racer.module.NetworkModule;
-import com.jasonrobinson.racer.module.RacerModule;
-import com.jasonrobinson.racer.module.SettingsModule;
+import com.jasonrobinson.racer.dagger.ComponentHolder;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -22,7 +15,8 @@ public class RacerApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        GraphHolder.getInstance().addModules(getModules());
+        ComponentHolder.getInstance().onApplicationCreate();
+
         if (BuildConfig.DEBUG) {
             GoogleAnalytics.getInstance(this).setDryRun(true);
             GoogleAnalytics.getInstance(this).getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
@@ -30,16 +24,5 @@ public class RacerApplication extends Application {
 
         CrashlyticsCore core = new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build();
         Fabric.with(this, new Crashlytics.Builder().core(core).build());
-    }
-
-    private Object[] getModules() {
-        return new Object[]{
-                new ContextModule(this),
-                new AnalyticsModule(),
-                new DatabaseModule(),
-                new SettingsModule(),
-                new NetworkModule(),
-                new RacerModule()
-        };
     }
 }

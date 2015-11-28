@@ -9,27 +9,27 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.ui.base.BaseFragment;
+import com.jasonrobinson.racer.ui.BaseFragment;
 import com.metova.slim.annotation.Callback;
+import com.metova.slim.annotation.Layout;
 
-import butterknife.InjectView;
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
+@Layout(R.layout.web_fragment)
 public class WebFragment extends BaseFragment {
 
-    @InjectView(R.id.webview)
+    @Bind(R.id.webview)
     WebView mWebView;
 
     @Callback
     WebCallback mCallback;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.web_fragment, container, false);
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ButterKnife.bind(this, view);
+
         mWebView.setWebViewClient(new WebViewClient());
         mWebView.setWebChromeClient(new WebChromeClient() {
 

@@ -12,12 +12,13 @@ import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 
 import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.ui.base.BaseActivity;
+import com.jasonrobinson.racer.ui.BaseActivity;
 import com.jasonrobinson.racer.ui.web.WebFragment.WebCallback;
 import com.metova.slim.annotation.Extra;
 import com.metova.slim.annotation.Layout;
 
-import butterknife.InjectView;
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 @Layout(R.layout.web_activity)
 public class WebActivity extends BaseActivity implements WebCallback {
@@ -29,12 +30,13 @@ public class WebActivity extends BaseActivity implements WebCallback {
 
     WebFragment mWebFragment;
 
-    @InjectView(R.id.progress)
+    @Bind(R.id.progress)
     ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ButterKnife.bind(this);
         setTitle(R.string.forum_post);
 
         mWebFragment = (WebFragment) getSupportFragmentManager().findFragmentById(R.id.web_fragment);
