@@ -1,6 +1,7 @@
 package com.jasonrobinson.racer.ui.race;
 
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -10,6 +11,7 @@ import com.jasonrobinson.racer.adapter.UpcomingAdapter;
 import com.jasonrobinson.racer.dagger.ComponentHolder;
 import com.jasonrobinson.racer.network.RestService;
 import com.jasonrobinson.racer.ui.BaseFragment;
+import com.jasonrobinson.racer.ui.view.SimpleDividerDecoration;
 import com.metova.slim.annotation.Layout;
 import com.trello.rxlifecycle.FragmentEvent;
 
@@ -24,6 +26,8 @@ public class UpcomingFragment extends BaseFragment {
     @Inject
     RestService mRestService;
 
+    @Bind(R.id.swipe)
+    SwipeRefreshLayout mSwipeRefreshLayout;
     @Bind(R.id.recycler_view)
     RecyclerView mRecyclerView;
 
@@ -45,14 +49,22 @@ public class UpcomingFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
+        mSwipeRefreshLayout.setOnRefreshListener(this::downloadRaces);
+
         mRecyclerView.setHasFixedSize(true);
 
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.addItemDecoration(new SimpleDividerDecoration(getResources()));
 
+        downloadRaces();
+    }
+
+    private void downloadRaces() {
         mRestService.races()
                 .compose(bindUntilEvent(FragmentEvent.DESTROY_VIEW))
                 .compose(uiHook())
+                .doOnTerminate(() -> mSwipeRefreshLayout.setRefreshing(false))
                 .subscribe(races -> mRecyclerView.setAdapter(new UpcomingAdapter(races)));
     }
 }
