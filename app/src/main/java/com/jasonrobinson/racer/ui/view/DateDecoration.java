@@ -41,7 +41,7 @@ public class DateDecoration extends RecyclerView.ItemDecoration {
         mTextPaint.setTextSize(size);
 
         Rect bounds = new Rect();
-        mTextPaint.getTextBounds("a", 0, 1, bounds);
+        mTextPaint.getTextBounds("A", 0, 1, bounds);
 
         mTextOffsetY = bounds.height() / 2;
         mTextOffsetX = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18f, res.getDisplayMetrics()) / 2;
