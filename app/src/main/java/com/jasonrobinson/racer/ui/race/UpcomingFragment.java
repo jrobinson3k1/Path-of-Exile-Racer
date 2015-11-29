@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.adapter.UpcomingAdapter;
+import com.jasonrobinson.racer.adapter.RacesAdapter;
 import com.jasonrobinson.racer.dagger.ComponentHolder;
 import com.jasonrobinson.racer.network.RestService;
 import com.jasonrobinson.racer.ui.BaseFragment;
@@ -35,7 +35,7 @@ public class UpcomingFragment extends BaseFragment {
     @Bind(R.id.empty)
     TextView mEmptyTextView;
 
-    private UpcomingAdapter mAdapter;
+    private RacesAdapter mAdapter;
 
     public static UpcomingFragment newInstance() {
         return new UpcomingFragment();
@@ -56,12 +56,12 @@ public class UpcomingFragment extends BaseFragment {
 
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.addItemDecoration(new SimpleDividerDecoration(getResources()));
-        mRecyclerView.addItemDecoration(new DateDecoration(getResources()));
+        mRecyclerView.addItemDecoration(new DateDecoration(getContext()));
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new UpcomingAdapter(getActivity());
+        mAdapter = new RacesAdapter(getActivity());
         mRecyclerView.setAdapter(mAdapter);
 
         downloadRaces();

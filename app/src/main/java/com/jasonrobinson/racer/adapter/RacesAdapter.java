@@ -1,7 +1,8 @@
 package com.jasonrobinson.racer.adapter;
 
 import android.content.Context;
-import android.graphics.Typeface;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.ui.view.DateDecoration;
 import com.jasonrobinson.racer.util.RawTypeface;
+import com.jasonrobinson.racer.util.TimeUtils;
 import com.metova.slim.Slim;
 import com.metova.slim.annotation.Layout;
 
@@ -23,16 +25,21 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 @Layout(R.layout.item_race)
-public class UpcomingAdapter extends RecyclerView.Adapter<UpcomingAdapter.ViewHolder> implements DateDecoration.DateProvider {
+public class RacesAdapter extends RecyclerView.Adapter<RacesAdapter.ViewHolder> implements DateDecoration.DateProvider {
 
     private static DateFormat sTimeFormat;
 
     private Context mContext;
+    private int mDefaultTextColor;
     private List<Race> mRaces = new ArrayList<>();
 
-    public UpcomingAdapter(Context context) {
+    public RacesAdapter(Context context) {
         mContext = context;
         sTimeFormat = android.text.format.DateFormat.getTimeFormat(context);
+
+        TypedArray a = context.getTheme().obtainStyledAttributes(new int[]{android.R.attr.textColorSecondary});
+        mDefaultTextColor = a.getColor(0, Color.BLACK);
+        a.recycle();
     }
 
     @Override
@@ -45,8 +52,10 @@ public class UpcomingAdapter extends RecyclerView.Adapter<UpcomingAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, int position) {
         Race race = mRaces.get(position);
         holder.mTitleTextView.setText(race.getId());
-        holder.mStartTimeTextView.setText(sTimeFormat.format(race.getStartAt()));
-        updateStatusText(holder.mStatusTextView, race);
+        holder.mDurationTextView.setText(TimeUtils.formatDuration(mContext, race.getStartAt(), race.getEndAt()));
+        holder.mTimeTextView.setText(sTimeFormat.format(race.getStartAt()));
+
+        updateColorForStatus(holder.mTimeTextView, race);
     }
 
     @Override
@@ -69,18 +78,15 @@ public class UpcomingAdapter extends RecyclerView.Adapter<UpcomingAdapter.ViewHo
         notifyDataSetChanged();
     }
 
-    private void updateStatusText(TextView textView, Race race) {
+    private void updateColorForStatus(TextView textView, Race race) {
         if (race.isInProgress()) {
-            textView.setText(R.string.in_progress);
             textView.setTextColor(mContext.getResources().getColor(R.color.green));
         } else if (race.isFinished()) {
-            textView.setText(R.string.finished);
             textView.setTextColor(mContext.getResources().getColor(R.color.red));
         } else if (race.isRegistrationOpen()) {
-            textView.setText(R.string.registration_open);
             textView.setTextColor(mContext.getResources().getColor(R.color.orange));
         } else {
-            textView.setText("");
+            textView.setTextColor(mDefaultTextColor);
         }
     }
 
@@ -88,17 +94,17 @@ public class UpcomingAdapter extends RecyclerView.Adapter<UpcomingAdapter.ViewHo
 
         @Bind(R.id.title)
         TextView mTitleTextView;
-        @Bind(R.id.start_time)
-        TextView mStartTimeTextView;
-        @Bind(R.id.status)
-        TextView mStatusTextView;
+        @Bind(R.id.time)
+        TextView mTimeTextView;
+        @Bind(R.id.duration)
+        TextView mDurationTextView;
 
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            Typeface typeface = RawTypeface.obtain(itemView.getContext(), R.raw.fontin_bold);
-            mTitleTextView.setTypeface(typeface);
+            mTitleTextView.setTypeface(RawTypeface.obtain(itemView.getContext(), R.raw.fontin_bold));
+            mDurationTextView.setTypeface(RawTypeface.obtain(itemView.getContext(), R.raw.fontin_regular));
         }
     }
 }

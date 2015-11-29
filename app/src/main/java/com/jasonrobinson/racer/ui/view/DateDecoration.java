@@ -1,10 +1,10 @@
 package com.jasonrobinson.racer.ui.view;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextPaint;
@@ -13,6 +13,7 @@ import android.view.View;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.util.CalendarUtils;
+import com.jasonrobinson.racer.util.RawTypeface;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,22 +30,22 @@ public class DateDecoration extends RecyclerView.ItemDecoration {
 
     private List<String> mDisplayedDates = new ArrayList<>();
 
-    public DateDecoration(Resources res) {
-        mRes = res;
-        mDrawable = res.getDrawable(R.drawable.date_container);
+    public DateDecoration(Context context) {
+        mRes = context.getResources();
+        mDrawable = mRes.getDrawable(R.drawable.date_container);
 
         mTextPaint = new TextPaint();
         mTextPaint.setTextAlign(Paint.Align.CENTER);
-        mTextPaint.setColor(res.getColor(android.R.color.black));
-        mTextPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        float size = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20f, res.getDisplayMetrics());
+        mTextPaint.setColor(mRes.getColor(android.R.color.black));
+        mTextPaint.setTypeface(RawTypeface.obtain(context, R.raw.fontin_bold));
+        float size = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20f, mRes.getDisplayMetrics());
         mTextPaint.setTextSize(size);
 
         Rect bounds = new Rect();
         mTextPaint.getTextBounds("A", 0, 1, bounds);
 
         mTextOffsetY = bounds.height() / 2;
-        mTextOffsetX = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18f, res.getDisplayMetrics()) / 2;
+        mTextOffsetX = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18f, mRes.getDisplayMetrics()) / 2;
     }
 
     @Override
