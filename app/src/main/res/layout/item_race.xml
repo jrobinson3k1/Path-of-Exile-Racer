@@ -18,6 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="18sp"
             android:textStyle="bold"
             tools:text="3 Hour Party (STV136)" />

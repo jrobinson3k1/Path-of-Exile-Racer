@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -11,7 +12,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.ui.race.UpcomingFragment;
+import com.jasonrobinson.racer.enumeration.RaceOptions;
+import com.jasonrobinson.racer.ui.race.RacesFragmentFactory;
 import com.jasonrobinson.racer.ui.settings.SettingsActivity;
 import com.metova.slim.annotation.Layout;
 
@@ -19,7 +21,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 @Layout(R.layout.activity_main)
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements TitleDelegate {
 
     @Bind(R.id.drawer)
     DrawerLayout mDrawerLayout;
@@ -38,7 +40,7 @@ public class MainActivity extends BaseActivity {
 
         if (savedInstanceState == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(R.id.content, UpcomingFragment.newInstance());
+            ft.add(R.id.content, RacesFragmentFactory.newFragment(RaceOptions.UPCOMING));
             ft.commit();
         }
 
@@ -51,6 +53,21 @@ public class MainActivity extends BaseActivity {
 
         mNavigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
+                case R.id.upcoming:
+                    replaceContent(RacesFragmentFactory.newFragment(RaceOptions.UPCOMING));
+                    break;
+                case R.id.in_progress:
+                    replaceContent(RacesFragmentFactory.newFragment(RaceOptions.IN_PROGRESS));
+                    break;
+                case R.id.finished:
+                    replaceContent(RacesFragmentFactory.newFragment(RaceOptions.FINISHED));
+                    break;
+                case R.id.favorites:
+                    // TODO: Implement
+                    break;
+                case R.id.alarms:
+                    // TODO: Implement
+                    break;
                 case R.id.settings:
                     startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                     break;
@@ -59,6 +76,17 @@ public class MainActivity extends BaseActivity {
             mDrawerLayout.closeDrawers();
             return true;
         });
+    }
+
+    private void replaceContent(Fragment fragment) {
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.content);
+        if (fragment.getClass().equals(currentFragment.getClass())) {
+            return;
+        }
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.content, fragment);
+        ft.commit();
     }
 
     @Override
@@ -80,5 +108,11 @@ public class MainActivity extends BaseActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void setActionBarTitle(CharSequence title) {
+        assert getSupportActionBar() != null;
+        getSupportActionBar().setTitle(title);
     }
 }

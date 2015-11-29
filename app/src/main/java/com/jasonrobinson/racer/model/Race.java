@@ -61,6 +61,11 @@ public class Race {
         return now.after(getRegisterAt()) && now.before(getEndAt());
     }
 
+    public boolean isUpcoming() {
+        Date now = new Date(System.currentTimeMillis());
+        return now.before(getStartAt());
+    }
+
     public static class Rule {
 
         private long id;

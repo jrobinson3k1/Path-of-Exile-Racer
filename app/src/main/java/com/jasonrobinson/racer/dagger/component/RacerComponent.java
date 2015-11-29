@@ -1,7 +1,7 @@
 package com.jasonrobinson.racer.dagger.component;
 
-import com.jasonrobinson.racer.ui.race.UpcomingFragment;
+import com.jasonrobinson.racer.ui.race.RacesFragment;
 
 public interface RacerComponent {
-    void inject(UpcomingFragment obj);
+    void inject(RacesFragment obj);
 }
