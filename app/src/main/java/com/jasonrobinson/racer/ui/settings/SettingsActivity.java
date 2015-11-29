@@ -3,20 +3,31 @@ package com.jasonrobinson.racer.ui.settings;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.support.v7.widget.Toolbar;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.ui.BaseActivity;
+import com.metova.slim.annotation.Layout;
 
+import butterknife.ButterKnife;
+
+@Layout(R.layout.activity_settings)
 public class SettingsActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Toolbar toolbar = ButterKnife.findById(this, R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(android.R.id.content, SettingsFragment.newInstance());
+            ft.add(R.id.content, SettingsFragment.newInstance());
             ft.commit();
         }
+
+        assert getSupportActionBar() != null;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         setTitle(R.string.settings);
     }

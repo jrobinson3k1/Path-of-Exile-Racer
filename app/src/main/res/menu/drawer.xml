@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:id="@+id/group_races"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/upcoming"
+            android:checked="true"
+            android:icon="@drawable/ic_calendar_clock_black_24dp"
+            android:title="@string/upcoming" />
+
+        <item
+            android:id="@+id/in_progress"
+            android:checked="false"
+            android:icon="@drawable/ic_run_black_24dp"
+            android:title="@string/in_progress" />
+
+        <item
+            android:id="@+id/finished"
+            android:checked="false"
+            android:icon="@drawable/ic_flag_checkered_black_24dp"
+            android:title="@string/finished" />
+    </group>
+    <group
+        android:id="@+id/group_special"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/favorites"
+            android:checked="false"
+            android:icon="@drawable/ic_favorite_black_24dp"
+            android:title="@string/favorites" />
+
+        <item
+            android:id="@+id/alarms"
+            android:checked="false"
+            android:icon="@drawable/ic_alarm_black_24dp"
+            android:title="@string/alarms" />
+    </group>
+    <group
+        android:id="@+id/group_settings"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/settings"
+            android:checkable="false"
+            android:checked="false"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="@string/settings" />
+    </group>
+</menu>

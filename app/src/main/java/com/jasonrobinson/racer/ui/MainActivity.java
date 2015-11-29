@@ -1,16 +1,18 @@
 package com.jasonrobinson.racer.ui;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.ui.race.UpcomingFragment;
+import com.jasonrobinson.racer.ui.settings.SettingsActivity;
 import com.metova.slim.annotation.Layout;
 
 import butterknife.Bind;
@@ -21,12 +23,14 @@ public class MainActivity extends BaseActivity {
 
     @Bind(R.id.drawer)
     DrawerLayout mDrawerLayout;
+    @Bind(R.id.navigation)
+    NavigationView mNavigationView;
+
     ActionBarDrawerToggle mDrawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
         Toolbar toolbar = ButterKnife.findById(this, R.id.toolbar);
@@ -38,23 +42,23 @@ public class MainActivity extends BaseActivity {
             ft.commit();
         }
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-            }
-        };
-
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         assert getSupportActionBar() != null;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+
+        mNavigationView.setNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.settings:
+                    startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                    break;
+            }
+
+            mDrawerLayout.closeDrawers();
+            return true;
+        });
     }
 
     @Override
