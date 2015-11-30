@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.dagger.ComponentHolder;
 import com.jasonrobinson.racer.enumeration.RaceOptions;
 import com.jasonrobinson.racer.ui.race.RacesFragmentFactory;
 import com.jasonrobinson.racer.ui.settings.SettingsActivity;
@@ -33,6 +34,7 @@ public class MainActivity extends BaseActivity implements TitleDelegate {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ComponentHolder.getInstance().component().inject(this);
         ButterKnife.bind(this);
 
         Toolbar toolbar = ButterKnife.findById(this, R.id.toolbar);

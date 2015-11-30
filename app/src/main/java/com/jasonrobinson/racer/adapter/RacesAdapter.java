@@ -53,7 +53,7 @@ public class RacesAdapter extends RecyclerView.Adapter<RacesAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Race race = mRaces.get(position);
-        holder.mTitleTextView.setText(race.getId());
+        holder.mTitleTextView.setText(race.getName());
         holder.mDurationTextView.setText(TimeUtils.formatDuration(mContext, race.getStartAt(), race.getEndAt()));
         holder.mTimeTextView.setText(sTimeFormat.format(race.getStartAt()));
 

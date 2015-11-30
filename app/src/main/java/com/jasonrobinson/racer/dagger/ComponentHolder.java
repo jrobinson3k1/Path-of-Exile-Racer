@@ -1,7 +1,10 @@
 package com.jasonrobinson.racer.dagger;
 
+import android.content.Context;
+
 import com.jasonrobinson.racer.dagger.component.DaggerProductionComponent;
 import com.jasonrobinson.racer.dagger.component.RacerComponent;
+import com.jasonrobinson.racer.dagger.module.SettingsModule;
 
 public class ComponentHolder {
 
@@ -17,9 +20,11 @@ public class ComponentHolder {
         return ourInstance;
     }
 
-    public void onApplicationCreate() {
+    public void onApplicationCreate(Context context) {
         if (mRacerComponent == null) {
-            mRacerComponent = DaggerProductionComponent.create();
+            mRacerComponent = DaggerProductionComponent.builder()
+                    .settingsModule(new SettingsModule(context))
+                    .build();
         }
 
         mApplicationCreateCalled = true;

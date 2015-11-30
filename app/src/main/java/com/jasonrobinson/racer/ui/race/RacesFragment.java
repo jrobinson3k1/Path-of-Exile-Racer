@@ -11,8 +11,9 @@ import android.widget.TextView;
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.adapter.RacesAdapter;
 import com.jasonrobinson.racer.dagger.ComponentHolder;
+import com.jasonrobinson.racer.manager.RacesManager;
+import com.jasonrobinson.racer.event.RaceEvent;
 import com.jasonrobinson.racer.model.Race;
-import com.jasonrobinson.racer.network.RestService;
 import com.jasonrobinson.racer.ui.BaseFragment;
 import com.jasonrobinson.racer.ui.TitleDelegate;
 import com.jasonrobinson.racer.ui.view.DateDecoration;
@@ -33,7 +34,7 @@ import rx.Observable;
 public abstract class RacesFragment extends BaseFragment {
 
     @Inject
-    RestService mRestService;
+    RacesManager mRacesManager;
 
     @Callback
     TitleDelegate mTitleDelegate;
@@ -71,15 +72,29 @@ public abstract class RacesFragment extends BaseFragment {
         mAdapter = new RacesAdapter(getActivity());
         mRecyclerView.setAdapter(mAdapter);
 
-        downloadRaces();
+        showRaces();
+        subscribeForRaceChanges();
     }
 
     private void downloadRaces() {
-        mRestService.races()
+        mRacesManager.download()
+                .compose(bindUntilEvent(FragmentEvent.DESTROY_VIEW))
+                .compose(uiHook())
+                .finallyDo(() -> mSwipeRefreshLayout.setRefreshing(false))
+                .subscribe();
+    }
+
+    private void subscribeForRaceChanges() {
+        mRacesManager.getEventObservable()
+                .filter(event -> event == RaceEvent.TABLE_CHANGED)
+                .subscribe(event -> showRaces());
+    }
+
+    private void showRaces() {
+        mRacesManager.races()
                 .compose(bindUntilEvent(FragmentEvent.DESTROY_VIEW))
                 .compose(uiHook())
                 .compose(racesTransformer())
-                .doOnTerminate(() -> mSwipeRefreshLayout.setRefreshing(false))
                 .subscribe(races -> {
                     mAdapter.clearAll();
                     mAdapter.addAll(races);
