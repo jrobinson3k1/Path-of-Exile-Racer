@@ -60,24 +60,26 @@
             android:layout_marginRight="-4dp">
 
             <ImageButton
+                android:id="@+id/add_alarm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/alarm"
                 android:padding="4dp"
-                android:src="@drawable/ic_alarm_add_black_24dp" />
+                android:src="@drawable/ic_alarm_24dp_selector" />
 
             <Space
                 android:layout_width="4dp"
                 android:layout_height="wrap_content" />
 
             <ImageButton
+                android:id="@+id/toggle_favorite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/favorite"
                 android:padding="4dp"
-                android:src="@drawable/ic_favorite_border_black_24dp" />
+                android:src="@drawable/ic_favorite_24dp_selector" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

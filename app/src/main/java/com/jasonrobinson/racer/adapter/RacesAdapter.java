@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.jasonrobinson.racer.R;
@@ -13,6 +14,7 @@ import com.jasonrobinson.racer.model.Race;
 import com.jasonrobinson.racer.ui.view.DateDecoration;
 import com.jasonrobinson.racer.util.RawTypeface;
 import com.jasonrobinson.racer.util.TimeUtils;
+import com.jasonrobinson.racer.util.ViewUtils;
 import com.metova.slim.Slim;
 import com.metova.slim.annotation.Layout;
 
@@ -56,6 +58,12 @@ public class RacesAdapter extends RecyclerView.Adapter<RacesAdapter.ViewHolder> 
         holder.mTimeTextView.setText(sTimeFormat.format(race.getStartAt()));
 
         updateColorForStatus(holder.mTimeTextView, race);
+
+        holder.mAddAlarmImageButton.setSelected(false);
+        holder.mToggleFavoriteImageButton.setSelected(false);
+
+        holder.mAddAlarmImageButton.setOnClickListener(v -> v.setSelected(!v.isSelected()));
+        holder.mToggleFavoriteImageButton.setOnClickListener(v -> v.setSelected(!v.isSelected()));
     }
 
     @Override
@@ -98,13 +106,22 @@ public class RacesAdapter extends RecyclerView.Adapter<RacesAdapter.ViewHolder> 
         TextView mTimeTextView;
         @Bind(R.id.duration)
         TextView mDurationTextView;
+        @Bind(R.id.add_alarm)
+        ImageButton mAddAlarmImageButton;
+        @Bind(R.id.toggle_favorite)
+        ImageButton mToggleFavoriteImageButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            mTitleTextView.setTypeface(RawTypeface.obtain(itemView.getContext(), R.raw.fontin_bold));
-            mDurationTextView.setTypeface(RawTypeface.obtain(itemView.getContext(), R.raw.fontin_regular));
+            Context context = itemView.getContext();
+
+            mTitleTextView.setTypeface(RawTypeface.obtain(context, R.raw.fontin_bold));
+            mDurationTextView.setTypeface(RawTypeface.obtain(context, R.raw.fontin_regular));
+
+            mAddAlarmImageButton.setImageDrawable(ViewUtils.colorizeDrawable(context, mAddAlarmImageButton.getDrawable()));
+            mToggleFavoriteImageButton.setImageDrawable(ViewUtils.colorizeDrawable(context, mToggleFavoriteImageButton.getDrawable()));
         }
     }
 }
