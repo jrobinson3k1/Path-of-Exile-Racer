@@ -2,6 +2,7 @@ package com.jasonrobinson.racer.model;
 
 import com.jasonrobinson.racer.database.RaceDatabase;
 import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.ConflictAction;
 import com.raizlabs.android.dbflow.annotation.ForeignKey;
 import com.raizlabs.android.dbflow.annotation.ForeignKeyReference;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
@@ -19,11 +20,11 @@ public class RaceInteractions extends BaseModel {
     @PrimaryKey(autoincrement = true)
     long id;
     @Column
-    @Unique
+    @Unique(onUniqueConflict = ConflictAction.IGNORE)
     @ForeignKey(
-            references = {@ForeignKeyReference(columnName = "race_name",
-                    columnType = String.class,
-                    foreignColumnName = "name")},
+            references = {@ForeignKeyReference(columnName = "race_id",
+                    columnType = Long.class,
+                    foreignColumnName = "id")},
             saveForeignKeyModel = false)
     ForeignKeyContainer<Race> race;
     @Column
@@ -31,22 +32,13 @@ public class RaceInteractions extends BaseModel {
     @Column
     Date alarm;
 
-    public RaceInteractions() {
-        super();
-    }
-
-    public RaceInteractions(Race race) {
-        super();
-        this.race = new ForeignKeyContainer<>(Race.class);
-        this.race.setModel(race);
-    }
-
     public boolean isFavorite() {
         return favorite;
     }
 
     public void setFavorite(boolean favorite) {
         this.favorite = favorite;
+        update();
     }
 
     public Date getAlarm() {

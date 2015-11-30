@@ -7,7 +7,6 @@ import com.jasonrobinson.racer.R;
 import java.util.Date;
 import java.util.Formatter;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 public class TimeUtils {
 
@@ -45,7 +44,7 @@ public class TimeUtils {
     }
 
     public static CharSequence formatDuration(Context context, Date start, Date end) {
-        if(end.before(start) || end.equals(start)) {
+        if (end.before(start) || end.equals(start)) {
             return "0 " + context.getString(R.string.seconds);
         }
 
@@ -59,32 +58,32 @@ public class TimeUtils {
         long seconds = duration % 60;
 
         StringBuilder durationBuilder = new StringBuilder();
-        if(weeks > 0) {
+        if (weeks > 0) {
             durationBuilder.append(formatTimeUnit(weeks, context.getString(R.string.week), context.getString(R.string.weeks)));
             durationBuilder.append(" ");
         }
 
-        if(days > 0) {
+        if (days > 0) {
             durationBuilder.append(formatTimeUnit(days, context.getString(R.string.day), context.getString(R.string.days)));
             durationBuilder.append(" ");
         }
 
-        if(hours > 0) {
+        if (hours > 0) {
             durationBuilder.append(formatTimeUnit(hours, context.getString(R.string.hour), context.getString(R.string.hours)));
             durationBuilder.append(" ");
         }
 
-        if(minutes > 0) {
+        if (minutes > 0) {
             durationBuilder.append(formatTimeUnit(minutes, context.getString(R.string.minute), context.getString(R.string.minutes)));
             durationBuilder.append(" ");
         }
 
-        if(seconds > 0) {
+        if (seconds > 0) {
             durationBuilder.append(formatTimeUnit(seconds, context.getString(R.string.second), context.getString(R.string.seconds)));
         }
 
         // Remove trailing whitespace
-        if(durationBuilder.length() > 0 && durationBuilder.lastIndexOf(" ") == durationBuilder.length() - 1) {
+        if (durationBuilder.length() > 0 && durationBuilder.lastIndexOf(" ") == durationBuilder.length() - 1) {
             durationBuilder.deleteCharAt(durationBuilder.length() - 1);
         }
 
@@ -92,7 +91,7 @@ public class TimeUtils {
     }
 
     private static CharSequence formatTimeUnit(long time, String singular, String plural) {
-        if(time == 1) {
+        if (time == 1) {
             return time + " " + singular;
         }
 

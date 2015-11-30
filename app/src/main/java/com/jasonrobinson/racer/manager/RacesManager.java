@@ -20,7 +20,6 @@ import javax.inject.Singleton;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
-import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
 @Singleton

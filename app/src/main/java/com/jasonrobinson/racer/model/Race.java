@@ -6,6 +6,7 @@ import com.jasonrobinson.racer.util.gson.Exclude;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.ConflictAction;
 import com.raizlabs.android.dbflow.annotation.ForeignKey;
+import com.raizlabs.android.dbflow.annotation.ForeignKeyAction;
 import com.raizlabs.android.dbflow.annotation.ForeignKeyReference;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
@@ -23,7 +24,7 @@ public class Race extends BaseModel {
     long id;
     @SerializedName("id")
     @Column
-    @Unique(onUniqueConflict = ConflictAction.REPLACE)
+    @Unique(onUniqueConflict = ConflictAction.IGNORE)
     String name;
     @Column
     String description;
@@ -39,10 +40,12 @@ public class Race extends BaseModel {
     Date endAt;
 
     @Exclude
+    @Column
     @ForeignKey(
             references = {@ForeignKeyReference(columnName = "interactions_id",
                     columnType = Long.class,
                     foreignColumnName = "id")},
+            onDelete = ForeignKeyAction.CASCADE,
             saveForeignKeyModel = false)
     RaceInteractions interactions;
 
@@ -96,7 +99,9 @@ public class Race extends BaseModel {
 
     public RaceInteractions getInteractions() {
         if (interactions == null) {
-            interactions = new RaceInteractions(this);
+            interactions = new RaceInteractions();
+            interactions.save();
+            update();
         }
 
         return interactions;

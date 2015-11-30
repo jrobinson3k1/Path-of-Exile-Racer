@@ -15,6 +15,8 @@ public class RacesFragmentFactory {
                 return InProgressRacesFragment.newInstance();
             case FINISHED:
                 return FinishedRacesFragment.newInstance();
+            case FAVORITE:
+                return FavoriteRacesFragment.newInstance();
         }
 
         throw new IllegalArgumentException("Race option not supported.");

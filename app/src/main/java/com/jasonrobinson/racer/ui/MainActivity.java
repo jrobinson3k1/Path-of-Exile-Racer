@@ -65,7 +65,7 @@ public class MainActivity extends BaseActivity implements TitleDelegate {
                     replaceContent(RacesFragmentFactory.newFragment(RaceOptions.FINISHED));
                     break;
                 case R.id.favorites:
-                    // TODO: Implement
+                    replaceContent(RacesFragmentFactory.newFragment(RaceOptions.FAVORITE));
                     break;
                 case R.id.alarms:
                     // TODO: Implement

@@ -62,8 +62,16 @@ public class RacesAdapter extends RecyclerView.Adapter<RacesAdapter.ViewHolder> 
         holder.mAddAlarmImageButton.setSelected(false);
         holder.mToggleFavoriteImageButton.setSelected(false);
 
-        holder.mAddAlarmImageButton.setOnClickListener(v -> v.setSelected(!v.isSelected()));
-        holder.mToggleFavoriteImageButton.setOnClickListener(v -> v.setSelected(!v.isSelected()));
+        holder.mAddAlarmImageButton.setOnClickListener(v -> {
+            v.setSelected(!v.isSelected());
+        });
+
+        holder.mToggleFavoriteImageButton.setSelected(race.getInteractions().isFavorite());
+        holder.mToggleFavoriteImageButton.setOnClickListener(v -> {
+            boolean favorite = !v.isSelected();
+            race.getInteractions().setFavorite(favorite);
+            v.setSelected(favorite);
+        });
     }
 
     @Override

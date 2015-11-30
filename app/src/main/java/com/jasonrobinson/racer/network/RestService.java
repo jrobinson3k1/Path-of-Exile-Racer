@@ -11,6 +11,7 @@ public interface RestService {
 
     /**
      * Get a list of upcoming races.
+     *
      * @return List of upcoming races.
      */
     @GET("/leagues?type=event")
