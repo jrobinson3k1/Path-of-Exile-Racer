@@ -1,9 +1,9 @@
 package com.jasonrobinson.racer.ui.race;
 
-import android.support.annotation.NonNull;
-
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.model.Race;
+
+import android.support.annotation.NonNull;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public class FavoriteRacesFragment extends RacesFragment {
     protected Observable.Transformer<List<Race>, List<Race>> racesTransformer() {
         return observable -> observable
                 .flatMap(Observable::from)
-                .filter(race -> race.getInteractions().isFavorite())
+                .filter(Race::isFavorite)
                 .toList();
     }
 

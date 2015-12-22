@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.jasonrobinson.racer">
+<manifest package="com.jasonrobinson.racer"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -31,6 +31,8 @@
             android:name=".ui.settings.SettingsActivity"
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".ui.MainActivity" />
+
+        <receiver android:name=".receiver.RaceAlarmReceiver" />
 
         <meta-data
             android:name="com.google.android.gms.version"

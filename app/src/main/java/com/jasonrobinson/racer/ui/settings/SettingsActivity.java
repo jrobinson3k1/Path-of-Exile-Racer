@@ -1,13 +1,13 @@
 package com.jasonrobinson.racer.ui.settings;
 
+import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.ui.BaseActivity;
+import com.metova.slim.annotation.Layout;
+
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.support.v7.widget.Toolbar;
-
-import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.ui.BaseActivity;
-import com.metova.slim.annotation.Layout;
 
 import butterknife.ButterKnife;
 

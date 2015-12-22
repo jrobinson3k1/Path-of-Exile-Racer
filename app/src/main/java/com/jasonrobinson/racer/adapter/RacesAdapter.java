@@ -1,5 +1,16 @@
 package com.jasonrobinson.racer.adapter;
 
+import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.dagger.ComponentHolder;
+import com.jasonrobinson.racer.manager.RaceAlarmManager;
+import com.jasonrobinson.racer.model.Race;
+import com.jasonrobinson.racer.ui.view.DateDecoration;
+import com.jasonrobinson.racer.util.RawTypeface;
+import com.jasonrobinson.racer.util.TimeUtils;
+import com.jasonrobinson.racer.util.ViewUtils;
+import com.metova.slim.Slim;
+import com.metova.slim.annotation.Layout;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -9,19 +20,13 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.model.Race;
-import com.jasonrobinson.racer.ui.view.DateDecoration;
-import com.jasonrobinson.racer.util.RawTypeface;
-import com.jasonrobinson.racer.util.TimeUtils;
-import com.jasonrobinson.racer.util.ViewUtils;
-import com.metova.slim.Slim;
-import com.metova.slim.annotation.Layout;
-
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -31,11 +36,15 @@ public class RacesAdapter extends RecyclerView.Adapter<RacesAdapter.ViewHolder> 
 
     private static DateFormat sTimeFormat;
 
+    @Inject
+    RaceAlarmManager mAlarmManager;
+
     private Context mContext;
     private int mDefaultTextColor;
     private List<Race> mRaces = new ArrayList<>();
 
     public RacesAdapter(Context context) {
+        ComponentHolder.getInstance().component().inject(this);
         mContext = context;
         sTimeFormat = android.text.format.DateFormat.getTimeFormat(context);
 
@@ -59,18 +68,26 @@ public class RacesAdapter extends RecyclerView.Adapter<RacesAdapter.ViewHolder> 
 
         updateColorForStatus(holder.mTimeTextView, race);
 
-        holder.mAddAlarmImageButton.setSelected(false);
-        holder.mToggleFavoriteImageButton.setSelected(false);
-
+        holder.mAddAlarmImageButton.setSelected(race.getAlarm() != null);
         holder.mAddAlarmImageButton.setOnClickListener(v -> {
-            v.setSelected(!v.isSelected());
+            boolean selected = !v.isSelected();
+            if (selected) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(race.getStartAt());
+                cal.add(Calendar.MINUTE, -15); // TODO: Add time picker
+                mAlarmManager.schedule(mContext, cal, race);
+            } else {
+                mAlarmManager.cancel(mContext, race);
+            }
+
+            v.setSelected(selected);
         });
 
-        holder.mToggleFavoriteImageButton.setSelected(race.getInteractions().isFavorite());
+        holder.mToggleFavoriteImageButton.setSelected(race.isFavorite());
         holder.mToggleFavoriteImageButton.setOnClickListener(v -> {
-            boolean favorite = !v.isSelected();
-            race.getInteractions().setFavorite(favorite);
-            v.setSelected(favorite);
+            boolean selected = !v.isSelected();
+            race.setFavorite(selected);
+            v.setSelected(selected);
         });
     }
 

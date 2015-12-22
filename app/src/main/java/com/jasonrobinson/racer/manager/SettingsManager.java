@@ -1,9 +1,9 @@
 package com.jasonrobinson.racer.manager;
 
+import com.jasonrobinson.racer.R;
+
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import com.jasonrobinson.racer.R;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

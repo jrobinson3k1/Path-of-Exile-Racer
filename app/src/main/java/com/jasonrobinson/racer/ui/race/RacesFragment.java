@@ -1,13 +1,5 @@
 package com.jasonrobinson.racer.ui.race;
 
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.widget.TextView;
-
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.adapter.RacesAdapter;
 import com.jasonrobinson.racer.dagger.ComponentHolder;
@@ -21,6 +13,14 @@ import com.jasonrobinson.racer.ui.view.SimpleDividerDecoration;
 import com.metova.slim.annotation.Callback;
 import com.metova.slim.annotation.Layout;
 import com.trello.rxlifecycle.FragmentEvent;
+
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -91,7 +91,7 @@ public abstract class RacesFragment extends BaseFragment {
     }
 
     private void showRaces() {
-        mRacesManager.races()
+        mRacesManager.getRaces()
                 .compose(bindUntilEvent(FragmentEvent.DESTROY_VIEW))
                 .compose(uiHook())
                 .compose(racesTransformer())

@@ -1,15 +1,15 @@
 package com.jasonrobinson.racer.ui.web;
 
+import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.ui.BaseFragment;
+import com.metova.slim.annotation.Callback;
+import com.metova.slim.annotation.Layout;
+
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
-import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.ui.BaseFragment;
-import com.metova.slim.annotation.Callback;
-import com.metova.slim.annotation.Layout;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

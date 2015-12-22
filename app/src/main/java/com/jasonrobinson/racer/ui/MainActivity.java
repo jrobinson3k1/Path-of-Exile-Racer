@@ -1,5 +1,12 @@
 package com.jasonrobinson.racer.ui;
 
+import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.dagger.ComponentHolder;
+import com.jasonrobinson.racer.enumeration.RaceOptions;
+import com.jasonrobinson.racer.ui.race.RacesFragmentFactory;
+import com.jasonrobinson.racer.ui.settings.SettingsActivity;
+import com.metova.slim.annotation.Layout;
+
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -11,13 +18,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.dagger.ComponentHolder;
-import com.jasonrobinson.racer.enumeration.RaceOptions;
-import com.jasonrobinson.racer.ui.race.RacesFragmentFactory;
-import com.jasonrobinson.racer.ui.settings.SettingsActivity;
-import com.metova.slim.annotation.Layout;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -28,8 +28,9 @@ public class MainActivity extends BaseActivity implements TitleDelegate {
     DrawerLayout mDrawerLayout;
     @Bind(R.id.navigation)
     NavigationView mNavigationView;
-
     ActionBarDrawerToggle mDrawerToggle;
+
+    private int mSelectedNavId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,41 +55,35 @@ public class MainActivity extends BaseActivity implements TitleDelegate {
         getSupportActionBar().setHomeButtonEnabled(true);
 
         mNavigationView.setNavigationItemSelectedListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.upcoming:
-                    replaceContent(RacesFragmentFactory.newFragment(RaceOptions.UPCOMING));
-                    break;
-                case R.id.in_progress:
-                    replaceContent(RacesFragmentFactory.newFragment(RaceOptions.IN_PROGRESS));
-                    break;
-                case R.id.finished:
-                    replaceContent(RacesFragmentFactory.newFragment(RaceOptions.FINISHED));
-                    break;
-                case R.id.favorites:
-                    replaceContent(RacesFragmentFactory.newFragment(RaceOptions.FAVORITE));
-                    break;
-                case R.id.alarms:
-                    // TODO: Implement
-                    break;
-                case R.id.settings:
-                    startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-                    break;
+            int itemId = item.getItemId();
+            if (itemId != mSelectedNavId) {
+                switch (itemId) {
+                    case R.id.upcoming:
+                        replaceContent(RacesFragmentFactory.newFragment(RaceOptions.UPCOMING));
+                        break;
+                    case R.id.in_progress:
+                        replaceContent(RacesFragmentFactory.newFragment(RaceOptions.IN_PROGRESS));
+                        break;
+                    case R.id.finished:
+                        replaceContent(RacesFragmentFactory.newFragment(RaceOptions.FINISHED));
+                        break;
+                    case R.id.favorites:
+                        replaceContent(RacesFragmentFactory.newFragment(RaceOptions.FAVORITES));
+                        break;
+                    case R.id.alarms:
+                        replaceContent(RacesFragmentFactory.newFragment(RaceOptions.ALARMS));
+                        break;
+                    case R.id.settings:
+                        startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                        break;
+                }
+
+                mSelectedNavId = itemId;
             }
 
             mDrawerLayout.closeDrawers();
             return true;
         });
-    }
-
-    private void replaceContent(Fragment fragment) {
-        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.content);
-        if (fragment.getClass().equals(currentFragment.getClass())) {
-            return;
-        }
-
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.content, fragment);
-        ft.commit();
     }
 
     @Override
@@ -105,16 +100,18 @@ public class MainActivity extends BaseActivity implements TitleDelegate {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+        return mDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
     @Override
     public void setActionBarTitle(CharSequence title) {
         assert getSupportActionBar() != null;
         getSupportActionBar().setTitle(title);
+    }
+
+    private void replaceContent(Fragment fragment) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.content, fragment);
+        ft.commit();
     }
 }

@@ -1,14 +1,15 @@
 package com.jasonrobinson.racer;
 
-import android.app.Application;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Logger;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.Logger;
 import com.jasonrobinson.racer.dagger.ComponentHolder;
 import com.raizlabs.android.dbflow.config.FlowLog;
 import com.raizlabs.android.dbflow.config.FlowManager;
+
+import android.app.Application;
 
 import io.fabric.sdk.android.Fabric;
 

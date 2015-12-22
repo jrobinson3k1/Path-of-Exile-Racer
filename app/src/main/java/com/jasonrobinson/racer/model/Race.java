@@ -1,6 +1,7 @@
 package com.jasonrobinson.racer.model;
 
 import com.google.gson.annotations.SerializedName;
+
 import com.jasonrobinson.racer.database.RaceDatabase;
 import com.jasonrobinson.racer.util.gson.Exclude;
 import com.raizlabs.android.dbflow.annotation.Column;
@@ -49,6 +50,16 @@ public class Race extends BaseModel {
             saveForeignKeyModel = false)
     RaceInteractions interactions;
 
+    private RaceInteractions getInteractions() {
+        if (interactions == null) {
+            interactions = new RaceInteractions();
+            interactions.save();
+            update();
+        }
+
+        return interactions;
+    }
+
     public boolean isUpcoming() {
         Date now = new Date(System.currentTimeMillis());
         return now.before(getStartAt());
@@ -67,6 +78,10 @@ public class Race extends BaseModel {
     public boolean isRegistrationOpen() {
         Date now = new Date(System.currentTimeMillis());
         return now.after(getRegisterAt()) && now.before(getEndAt());
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getName() {
@@ -97,13 +112,19 @@ public class Race extends BaseModel {
         return endAt;
     }
 
-    public RaceInteractions getInteractions() {
-        if (interactions == null) {
-            interactions = new RaceInteractions();
-            interactions.save();
-            update();
-        }
+    public boolean isFavorite() {
+        return getInteractions().isFavorite();
+    }
 
-        return interactions;
+    public void setFavorite(boolean favorite) {
+        getInteractions().setFavorite(favorite);
+    }
+
+    public Date getAlarm() {
+        return getInteractions().getAlarm();
+    }
+
+    public void setAlarm(Date alarm) {
+        getInteractions().setAlarm(alarm);
     }
 }

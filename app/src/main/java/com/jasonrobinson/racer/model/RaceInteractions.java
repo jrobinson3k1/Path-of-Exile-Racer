@@ -47,5 +47,6 @@ public class RaceInteractions extends BaseModel {
 
     public void setAlarm(Date alarm) {
         this.alarm = alarm;
+        update();
     }
 }

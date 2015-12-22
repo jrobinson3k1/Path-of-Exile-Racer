@@ -1,8 +1,8 @@
 package com.jasonrobinson.racer.util;
 
-import android.content.Context;
-
 import com.jasonrobinson.racer.R;
+
+import android.content.Context;
 
 import java.util.Date;
 import java.util.Formatter;

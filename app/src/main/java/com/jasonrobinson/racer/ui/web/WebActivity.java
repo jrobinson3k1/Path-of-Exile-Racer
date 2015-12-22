@@ -1,5 +1,11 @@
 package com.jasonrobinson.racer.ui.web;
 
+import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.ui.BaseActivity;
+import com.jasonrobinson.racer.ui.web.WebFragment.WebCallback;
+import com.metova.slim.annotation.Extra;
+import com.metova.slim.annotation.Layout;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,12 +16,6 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
-
-import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.ui.BaseActivity;
-import com.jasonrobinson.racer.ui.web.WebFragment.WebCallback;
-import com.metova.slim.annotation.Extra;
-import com.metova.slim.annotation.Layout;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -88,13 +88,13 @@ public class WebActivity extends BaseActivity implements WebCallback {
                 }
 
                 @Override
-                public void onAnimationRepeat(Animation animation) {
-                    // no-op
+                public void onAnimationEnd(Animation animation) {
+                    mProgressBar.setVisibility(View.GONE);
                 }
 
                 @Override
-                public void onAnimationEnd(Animation animation) {
-                    mProgressBar.setVisibility(View.GONE);
+                public void onAnimationRepeat(Animation animation) {
+                    // no-op
                 }
             });
 

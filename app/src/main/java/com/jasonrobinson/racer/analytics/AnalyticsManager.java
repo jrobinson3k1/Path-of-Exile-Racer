@@ -1,11 +1,11 @@
 package com.jasonrobinson.racer.analytics;
 
-import android.app.Activity;
-import android.content.Context;
-
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+
+import android.app.Activity;
+import android.content.Context;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

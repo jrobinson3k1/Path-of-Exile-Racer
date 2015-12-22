@@ -16,6 +16,11 @@ public enum ErrorCode {
         this.code = code;
     }
 
+    public int getCode() {
+
+        return code;
+    }
+
     public static ErrorCode getForCode(int code) {
 
         ErrorCode[] errorCodes = values();
@@ -26,10 +31,5 @@ public enum ErrorCode {
         }
 
         return null;
-    }
-
-    public int getCode() {
-
-        return code;
     }
 }

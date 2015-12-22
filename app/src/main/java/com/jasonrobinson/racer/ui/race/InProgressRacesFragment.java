@@ -1,9 +1,9 @@
 package com.jasonrobinson.racer.ui.race;
 
-import android.support.annotation.NonNull;
-
 import com.jasonrobinson.racer.R;
 import com.jasonrobinson.racer.model.Race;
+
+import android.support.annotation.NonNull;
 
 import java.util.List;
 

@@ -9,10 +9,10 @@ import java.util.List;
 
 import rx.Observable;
 
-public class UpcomingRacesFragment extends RacesFragment {
+public class AlarmRacesFragment extends RacesFragment {
 
-    public static UpcomingRacesFragment newInstance() {
-        return new UpcomingRacesFragment();
+    public static AlarmRacesFragment newInstance() {
+        return new AlarmRacesFragment();
     }
 
     @NonNull
@@ -20,12 +20,12 @@ public class UpcomingRacesFragment extends RacesFragment {
     protected Observable.Transformer<List<Race>, List<Race>> racesTransformer() {
         return observable -> observable
                 .flatMap(Observable::from)
-                .filter(Race::isUpcoming)
+                .filter(race -> race.getAlarm() != null)
                 .toList();
     }
 
     @Override
     public CharSequence getTitle() {
-        return getString(R.string.upcoming);
+        return getString(R.string.alarms);
     }
 }

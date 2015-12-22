@@ -1,5 +1,9 @@
 package com.jasonrobinson.racer.ui.view;
 
+import com.jasonrobinson.racer.R;
+import com.jasonrobinson.racer.util.CalendarUtils;
+import com.jasonrobinson.racer.util.RawTypeface;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -10,10 +14,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextPaint;
 import android.util.TypedValue;
 import android.view.View;
-
-import com.jasonrobinson.racer.R;
-import com.jasonrobinson.racer.util.CalendarUtils;
-import com.jasonrobinson.racer.util.RawTypeface;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -117,6 +117,7 @@ public class DateDecoration extends RecyclerView.ItemDecoration {
     }
 
     public interface DateProvider {
+
         Date getDateForPosition(int position);
     }
 }

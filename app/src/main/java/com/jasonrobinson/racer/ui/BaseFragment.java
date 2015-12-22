@@ -1,5 +1,9 @@
 package com.jasonrobinson.racer.ui;
 
+import com.metova.slim.Slim;
+import com.trello.rxlifecycle.FragmentEvent;
+import com.trello.rxlifecycle.RxLifecycle;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,10 +11,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.metova.slim.Slim;
-import com.trello.rxlifecycle.FragmentEvent;
-import com.trello.rxlifecycle.RxLifecycle;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -20,24 +20,6 @@ import rx.subjects.BehaviorSubject;
 public class BaseFragment extends Fragment {
 
     private final BehaviorSubject<FragmentEvent> mLifecycleSubject = BehaviorSubject.create();
-
-    public final Observable<FragmentEvent> lifecycle() {
-        return mLifecycleSubject.asObservable();
-    }
-
-    public final <T> Observable.Transformer<T, T> bindUntilEvent(FragmentEvent event) {
-        return RxLifecycle.bindUntilFragmentEvent(mLifecycleSubject, event);
-    }
-
-    public final <T> Observable.Transformer<T, T> bindToLifecycle() {
-        return RxLifecycle.bindFragment(mLifecycleSubject);
-    }
-
-    public final <T> Observable.Transformer<T, T> uiHook() {
-        return observable -> observable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -106,5 +88,23 @@ public class BaseFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mLifecycleSubject.onNext(FragmentEvent.DETACH);
+    }
+
+    public final Observable<FragmentEvent> lifecycle() {
+        return mLifecycleSubject.asObservable();
+    }
+
+    public final <T> Observable.Transformer<T, T> bindUntilEvent(FragmentEvent event) {
+        return RxLifecycle.bindUntilFragmentEvent(mLifecycleSubject, event);
+    }
+
+    public final <T> Observable.Transformer<T, T> bindToLifecycle() {
+        return RxLifecycle.bindFragment(mLifecycleSubject);
+    }
+
+    public final <T> Observable.Transformer<T, T> uiHook() {
+        return observable -> observable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 }

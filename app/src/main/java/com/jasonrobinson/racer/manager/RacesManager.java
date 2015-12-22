@@ -2,6 +2,7 @@ package com.jasonrobinson.racer.manager;
 
 import com.jasonrobinson.racer.event.RaceEvent;
 import com.jasonrobinson.racer.model.Race;
+import com.jasonrobinson.racer.model.Race$Table;
 import com.jasonrobinson.racer.network.RestService;
 import com.raizlabs.android.dbflow.runtime.DBTransactionInfo;
 import com.raizlabs.android.dbflow.runtime.TransactionManager;
@@ -9,6 +10,7 @@ import com.raizlabs.android.dbflow.runtime.transaction.BaseTransaction;
 import com.raizlabs.android.dbflow.runtime.transaction.TransactionListener;
 import com.raizlabs.android.dbflow.runtime.transaction.process.ProcessModelInfo;
 import com.raizlabs.android.dbflow.runtime.transaction.process.UpdateModelListTransaction;
+import com.raizlabs.android.dbflow.sql.builder.Condition;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
 import java.util.List;
@@ -18,7 +20,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import rx.Observable;
-import rx.Subscriber;
 import rx.Subscription;
 import rx.subjects.PublishSubject;
 
@@ -74,18 +75,20 @@ public class RacesManager {
                 });
     }
 
-    public Observable<List<Race>> races() {
-        return Observable.create(new Observable.OnSubscribe<List<Race>>() {
-            @Override
-            public void call(Subscriber<? super List<Race>> subscriber) {
-                try {
-                    subscriber.onNext(new Select().from(Race.class).queryList());
-                    subscriber.onCompleted();
-                } catch (Exception e) {
-                    subscriber.onError(e);
-                }
-            }
-        });
+    public Observable<List<Race>> getRaces() {
+        return Observable.defer(() ->
+                Observable.just(
+                        new Select().from(Race.class).queryList()
+                )
+        );
+    }
+
+    public Observable<Race> getRace(String name) {
+        return Observable.defer(() ->
+                Observable.just(
+                        new Select().from(Race.class).where(Condition.column(Race$Table.NAME).eq(name)).querySingle()
+                )
+        );
     }
 
     private void scheduleRacesDownload() {

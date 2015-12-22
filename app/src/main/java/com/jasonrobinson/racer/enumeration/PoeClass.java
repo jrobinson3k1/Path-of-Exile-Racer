@@ -16,6 +16,15 @@ public enum PoEClass {
         mName = name;
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
+
+    public String getName() {
+        return mName;
+    }
+
     public static PoEClass getClassForName(String name) {
         PoEClass[] poEClasses = values();
         for (PoEClass poEClass : poEClasses) {
@@ -25,14 +34,5 @@ public enum PoEClass {
         }
 
         return null;
-    }
-
-    public String getName() {
-        return mName;
-    }
-
-    @Override
-    public String toString() {
-        return getName();
     }
 }

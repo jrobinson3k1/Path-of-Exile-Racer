@@ -1,12 +1,12 @@
 package com.jasonrobinson.racer.ui.view;
 
+import com.jasonrobinson.racer.R;
+
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-
-import com.jasonrobinson.racer.R;
 
 public class SimpleDividerDecoration extends RecyclerView.ItemDecoration {
 
